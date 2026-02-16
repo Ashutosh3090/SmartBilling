@@ -271,6 +271,36 @@
     let merchantDB = [];
     let bagDB = [];
 
+    function syncMissingNames() {
+        let farmersUpdated = false;
+        let merchantsUpdated = false;
+        
+        let allFarmerEntries = [...(cropDataDB || []), ...(bagDB || [])];
+        allFarmerEntries.forEach(e => {
+            if (e.name) {
+                let n = e.name.trim();
+                if (n !== "" && !farmers.find(f => f.toLowerCase() === n.toLowerCase())) {
+                    farmers.push(n);
+                    farmersUpdated = true;
+                }
+            }
+        });
+
+        let allMerchantEntries = (merchantDB || []);
+        allMerchantEntries.forEach(e => {
+            if (e.name) {
+                let n = e.name.trim();
+                if (n !== "" && !merchants.find(m => m.toLowerCase() === n.toLowerCase())) {
+                    merchants.push(n);
+                    merchantsUpdated = true;
+                }
+            }
+        });
+
+        if (farmersUpdated) { database.ref('farmers').set(farmers); }
+        if (merchantsUpdated) { database.ref('merchants').set(merchants); }
+    }
+
     database.ref('farmers').once('value', snap => { if(!snap.exists()) database.ref('farmers').set(defaultFarmersList); });
     database.ref('merchants').once('value', snap => { if(!snap.exists()) database.ref('merchants').set(["Traders A"]); });
 
@@ -282,9 +312,21 @@
         if(snap.exists()) { merchants = snap.val(); loadMerchantList(); if(document.getElementById("merchantListModal").style.display==="block") renderMerList(); } 
     });
 
-    database.ref('cropData').on('value', snap => { cropDataDB = snap.exists() ? snap.val() : []; refreshOpenModals('crop'); });
-    database.ref('merchantData').on('value', snap => { merchantDB = snap.exists() ? snap.val() : []; refreshOpenModals('merchant'); });
-    database.ref('bagData').on('value', snap => { bagDB = snap.exists() ? snap.val() : []; refreshOpenModals('bag'); });
+    database.ref('cropData').on('value', snap => { 
+        cropDataDB = snap.exists() ? snap.val() : []; 
+        syncMissingNames(); 
+        refreshOpenModals('crop'); 
+    });
+    database.ref('merchantData').on('value', snap => { 
+        merchantDB = snap.exists() ? snap.val() : []; 
+        syncMissingNames(); 
+        refreshOpenModals('merchant'); 
+    });
+    database.ref('bagData').on('value', snap => { 
+        bagDB = snap.exists() ? snap.val() : []; 
+        syncMissingNames(); 
+        refreshOpenModals('bag'); 
+    });
 
     function refreshOpenModals(type) {
         if(type==='crop') {
@@ -339,7 +381,6 @@
         html2pdf().set(opt).from(element).save();
     }
 
-    /* AUTO ADD & CASE INSENSITIVE HELPER FUNCTION */
     function resolveAndAddName(type, rawName) {
         let name = rawName.trim();
         if(!name) return "";
@@ -347,7 +388,7 @@
         
         if (type === 'farmer') {
             let existing = farmers.find(f => f.toLowerCase() === nameLower);
-            if (existing) return existing; // Returns existing name with original casing
+            if (existing) return existing; 
             farmers.push(name);
             database.ref('farmers').set(farmers);
             return name;
@@ -398,7 +439,7 @@
         let name = resolveAndAddName('farmer', rawName);
         let a=parseFloat(document.getElementById("advAmount").value); 
         if(!name||!a)return; 
-        let d=getData(); d.push({id:Date.now(), date:document.getElementById("advDate").value, name:n, type:'advance', amount:act==='GIVE'?a:-a}); saveData(d); alert("Advance Saved!"); document.getElementById("advAmount").value=""; document.getElementById("advModal").style.display="none"; 
+        let d=getData(); d.push({id:Date.now(), date:document.getElementById("advDate").value, name:name, type:'advance', amount:act==='GIVE'?a:-a}); saveData(d); alert("Advance Saved!"); document.getElementById("advAmount").value=""; document.getElementById("advModal").style.display="none"; 
     }
     function openAdvListModal() { document.getElementById("advListModal").style.display="block"; renderAdvList(); }
     let isAdvMode = false; function toggleAdvEditMode(){ isAdvMode=!isAdvMode; document.getElementById("manageAdvListBtn").innerText=isAdvMode?"❌ Done":"⚙️ Manage"; renderAdvList(); }
@@ -593,25 +634,43 @@
                     else if (e.date >= startFilter && e.date <= endFilter) { filteredData.push(e); }
                 }
             });
-            let html = `<li style="list-style:none;"><table style="width: 100%; border-collapse: collapse; font-size: 16px; margin-bottom: 10px;"><thead><tr style="border-bottom: 2px solid #000;"><th style="text-align:left; padding-bottom:8px; width:100px;">तारीख</th><th style="text-align:center; padding-bottom:8px;">तपशील</th><th style="text-align:right; padding-bottom:8px;">रक्कम (₹)</th></tr></thead><tbody>`;
+            
+            // --- NEW PREMIUM TRADER BILL UI ---
+            let html = `<li style="list-style:none;">
+                <div style="border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);">
+                <table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: left;">
+                <thead>
+                    <tr style="background: #f8fafc; color: #475569; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px;">
+                        <th style="padding: 14px 16px; border-bottom: 2px solid #e2e8f0;">तारीख</th>
+                        <th style="text-align:center; padding: 14px 16px; border-bottom: 2px solid #e2e8f0;">तपशील</th>
+                        <th style="text-align:right; padding: 14px 16px; border-bottom: 2px solid #e2e8f0;">रक्कम (₹)</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+            
             let runningBal = openingBal; let lastBillDate = ""; 
             if(openingBal !== 0 || filteredData.length > 0) {
-                if(openingBal !== 0) { html += `<tr><td></td><td style="text-align:center; padding:10px 0; font-weight:bold;">मागील बाकी :</td><td style="text-align:right; font-weight:bold; padding:10px 0;">${openingBal}</td></tr>`; }
+                if(openingBal !== 0) { html += `<tr style="background: #fffbeb;"><td colspan="2" style="text-align:right; padding:12px 16px; font-weight:700; color:#d97706;">मागील बाकी :</td><td style="text-align:right; font-weight:800; padding:12px 16px; color:#d97706;">${openingBal}</td></tr>`; }
                 filteredData.forEach(e => {
                     let displayDate = ""; if (e.date !== lastBillDate) { displayDate = formatDate(e.date); lastBillDate = e.date; }
                     if (e.type !== 'payment') {
-                        runningBal += e.total; let tPrefix = (e.merType && e.merType !== 'undefined') ? e.merType + " - " : "";
-                        html += `<tr><td style="padding:6px 0;">${displayDate}</td><td style="text-align:center; padding:6px 0;">${tPrefix}${e.weight} x ${e.rate}</td><td style="text-align:right; font-weight:bold; padding:6px 0;">${e.total}</td></tr>`;
+                        runningBal += e.total; let tPrefix = (e.merType && e.merType !== 'undefined') ? `<span style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:11px; color:#64748b; margin-right:4px;">${e.merType}</span> ` : "";
+                        html += `<tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding:14px 16px; color:#64748b; font-weight:500;">${displayDate}</td><td style="text-align:center; padding:14px 16px; font-weight:600; color:#334155;">${tPrefix}${e.weight} x ${e.rate}</td><td style="text-align:right; font-weight:700; padding:14px 16px; color:#0f172a;">${e.total}</td></tr>`;
                     } else {
-                        html += `<tr><td></td><td style="text-align:right; padding-top:15px; font-weight:bold; font-size:14px;">Total :</td><td style="text-align:right; padding-top:15px; font-weight:bold; font-size:15px;">${runningBal}</td></tr>`;
+                        html += `<tr style="background: #f8fafc; border-top: 1px solid #e2e8f0;"><td colspan="2" style="text-align:right; padding:10px 16px; font-weight:700; color:#475569;">एकूण रक्कम :</td><td style="text-align:right; font-weight:800; padding:10px 16px; color:#0f172a;">${runningBal}</td></tr>`;
                         runningBal -= e.amount; let payDate = (e.date !== lastBillDate) ? formatDate(e.date) : ""; if(e.date !== lastBillDate) lastBillDate = e.date;
-                        html += `<tr><td style="padding:6px 0;">${payDate}</td><td style="text-align:right; padding:6px 0; font-weight:bold; color:green;">जमा :</td><td style="text-align:right; padding:6px 0; border-bottom: 2px solid #000; font-weight:bold; color:green;">- ${e.amount}</td></tr>`;
-                        html += `<tr><td></td><td></td><td style="text-align:right; padding:10px 0;"><span style="border: 2px solid #000; padding: 4px 10px; font-weight: bold;">${runningBal} /-</span></td></tr>`;
+                        html += `<tr style="background: #ecfdf5;"><td style="padding:14px 16px; color:#059669; font-weight:500;">${payDate}</td><td style="text-align:right; padding:14px 16px; font-weight:700; color:#059669;">जमा :</td><td style="text-align:right; padding:14px 16px; font-weight:800; color:#059669;">- ${e.amount}</td></tr>`;
+                        html += `<tr><td colspan="3" style="text-align:right; padding:12px 16px; border-bottom: 1px solid #e2e8f0;"><span style="background: #eff6ff; color: #1d4ed8; padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 13px;">बाकी: ${runningBal} /-</span></td></tr>`;
                     }
                 });
-                if(filteredData.length > 0 && filteredData[filteredData.length-1].type !== 'payment') { html += `<tr><td></td><td style="text-align:right; font-weight:bold; padding-top:15px;">सध्याची बाकी :</td><td style="text-align:right; padding-top:15px;"><span style="border: 2px solid #000; padding: 4px 10px; font-weight: bold;">${runningBal} /-</span></td></tr>`; }
-            } else { html += `<tr><td colspan="3" style="text-align:center; padding: 20px;">No Data Found</td></tr>`; }
-            html += `</tbody></table></li>`; list.innerHTML = html;
+                if(filteredData.length > 0 && filteredData[filteredData.length-1].type !== 'payment') { 
+                    html += `<tr style="background: linear-gradient(135deg, #eff6ff, #e0eafc);"><td colspan="2" style="text-align:right; font-weight:800; padding:18px 16px; color:#1e3a8a; font-size:15px;">सध्याची बाकी :</td><td style="text-align:right; padding:18px 16px;"><span style="background: #1e3a8a; color: white; padding: 8px 16px; border-radius: 10px; font-weight: 800; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-size:16px;">₹ ${runningBal} /-</span></td></tr>`; 
+                }
+            } else { 
+                html += `<tr><td colspan="3" style="text-align:center; padding: 30px; color: #94a3b8; font-weight: 500;">No Data Found</td></tr>`; 
+            }
+            html += `</tbody></table></div></li>`; 
+            list.innerHTML = html;
         }
     }
 </script>
