@@ -339,10 +339,35 @@
         html2pdf().set(opt).from(element).save();
     }
 
+    /* AUTO ADD & CASE INSENSITIVE HELPER FUNCTION */
+    function resolveAndAddName(type, rawName) {
+        let name = rawName.trim();
+        if(!name) return "";
+        let nameLower = name.toLowerCase();
+        
+        if (type === 'farmer') {
+            let existing = farmers.find(f => f.toLowerCase() === nameLower);
+            if (existing) return existing; // Returns existing name with original casing
+            farmers.push(name);
+            database.ref('farmers').set(farmers);
+            return name;
+        } else {
+            let existing = merchants.find(m => m.toLowerCase() === nameLower);
+            if (existing) return existing;
+            merchants.push(name);
+            database.ref('merchants').set(merchants);
+            return name;
+        }
+    }
+
     /* 1. FARMER CROP */
     function onDateChange() { document.getElementById("rate").value=""; }
     function saveCrop() {
-        let date=document.getElementById("dateInput").value; let name=document.getElementById("farmerName").value.trim(); let w=parseFloat(document.getElementById("weight").value); let r=parseFloat(document.getElementById("rate").value);
+        let date=document.getElementById("dateInput").value; 
+        let rawName=document.getElementById("farmerName").value;
+        let name = resolveAndAddName('farmer', rawName);
+        let w=parseFloat(document.getElementById("weight").value); 
+        let r=parseFloat(document.getElementById("rate").value);
         if(!date||!name||!w||!r) { alert("Fill all details!"); return; }
         let data=getData(); if(data.some(e=>e.date===date && e.name===name && e.type==='crop')) { alert("⚠️ Double Entry Detected!"); return; }
         data.push({id:Date.now(), date, name, type:'crop', weight:w, rate:r, total:Math.floor((w*r)/5)*5}); saveData(data);
@@ -368,14 +393,30 @@
 
     /* 2. ADVANCE */
     function openAdvModal() { document.getElementById("advModal").style.display="block"; document.getElementById("advDate").value=document.getElementById("dateInput").value; }
-    function saveAdvance(act) { let n=document.getElementById("advFarmerName").value; let a=parseFloat(document.getElementById("advAmount").value); if(!n||!a)return; let d=getData(); d.push({id:Date.now(), date:document.getElementById("advDate").value, name:n, type:'advance', amount:act==='GIVE'?a:-a}); saveData(d); alert("Advance Saved!"); document.getElementById("advAmount").value=""; document.getElementById("advModal").style.display="none"; }
+    function saveAdvance(act) { 
+        let rawName=document.getElementById("advFarmerName").value; 
+        let name = resolveAndAddName('farmer', rawName);
+        let a=parseFloat(document.getElementById("advAmount").value); 
+        if(!name||!a)return; 
+        let d=getData(); d.push({id:Date.now(), date:document.getElementById("advDate").value, name:n, type:'advance', amount:act==='GIVE'?a:-a}); saveData(d); alert("Advance Saved!"); document.getElementById("advAmount").value=""; document.getElementById("advModal").style.display="none"; 
+    }
     function openAdvListModal() { document.getElementById("advListModal").style.display="block"; renderAdvList(); }
     let isAdvMode = false; function toggleAdvEditMode(){ isAdvMode=!isAdvMode; document.getElementById("manageAdvListBtn").innerText=isAdvMode?"❌ Done":"⚙️ Manage"; renderAdvList(); }
     function renderAdvList() { let d=getData().filter(e=>e.type==='advance'); d.sort((a,b)=>b.id-a.id); let tb=document.getElementById("advListBody"); tb.innerHTML=""; let t=0; d.forEach(e=>{ t+=e.amount; let b=isAdvMode?`<button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button>`:""; let typeSpan = e.amount>0?'<span style="color:var(--danger);font-weight:bold;">Given</span>':'<span style="color:var(--success);font-weight:bold;">Received</span>'; tb.innerHTML+=`<tr><td>${formatDate(e.date)}</td><td>${e.name}</td><td>${typeSpan}</td><td style="font-weight:bold;">${Math.abs(e.amount)}</td><td style="text-align:center;">${b}</td></tr>`; }); document.getElementById("totalAdvDisplay").innerText="Total Adv: ₹" + t; if(d.length===0) tb.innerHTML="<tr><td colspan='5' style='text-align:center;'>No Advances</td></tr>"; }
 
     /* 3. BAGS / POTI */
     function openBagModal() { document.getElementById("bagModal").style.display="block"; }
-    function saveBagEntry() { let date = document.getElementById("bagDate").value; let name = document.getElementById("bagName").value.trim(); let qty = parseInt(document.getElementById("bagQty").value); let type = document.getElementById("bagType").value; let rate = parseFloat(document.getElementById("bagRate").value) || 0; if(!date || !name || !qty) return; let data = getBagDB(); if(data.some(e => e.date === date && e.name === name)) { alert("⚠️ Double Entry Detected!"); return; } data.push({ id: Date.now(), date, name, qty, type, rate, total: qty*rate }); saveBagDB(data); document.getElementById("bagQty").value = ""; document.getElementById("bagName").value = ""; alert("Bag Saved!"); }
+    function saveBagEntry() { 
+        let date = document.getElementById("bagDate").value; 
+        let rawName = document.getElementById("bagName").value; 
+        let name = resolveAndAddName('farmer', rawName);
+        let qty = parseInt(document.getElementById("bagQty").value); 
+        let type = document.getElementById("bagType").value; 
+        let rate = parseFloat(document.getElementById("bagRate").value) || 0; 
+        if(!date || !name || !qty) return; 
+        let data = getBagDB(); if(data.some(e => e.date === date && e.name === name)) { alert("⚠️ Double Entry Detected!"); return; } 
+        data.push({ id: Date.now(), date, name, qty, type, rate, total: qty*rate }); saveBagDB(data); document.getElementById("bagQty").value = ""; document.getElementById("bagName").value = ""; alert("Bag Saved!"); 
+    }
     function openBagPreview() { document.getElementById("bagPreviewModal").style.display="block"; renderBagPreview(); }
     function renderBagPreview() { let date = document.getElementById("bagDate").value; let data = getBagDB().filter(e => e.date === date); let tbody = document.getElementById("bagPreviewBody"); tbody.innerHTML = ""; data.sort((a,b) => b.id - a.id); data.forEach(e => { let t = e.type === 'Poti' ? 'पोती' : 'बॅग'; tbody.innerHTML += `<tr><td>${e.name}</td><td>${toMarathi(e.qty)} ${t} x ${e.rate||0}</td><td style="font-weight:bold;">₹${toMarathi(e.total||0)}</td><td style="text-align:center;"><button class="small-btn btn-edit" onclick="editBagEntry(${e.id}, 'preview')">✏️</button><button class="small-btn btn-del" onclick="delBagEntry(${e.id}, 'preview')">🗑</button></td></tr>`; }); if(data.length===0) tbody.innerHTML="<tr><td colspan='4' style='text-align:center;'>No Entries Today</td></tr>"; }
     let isBagListMode = false; function openBagList() { document.getElementById("bagListModal").style.display="block"; isBagListMode = false; document.getElementById("bagManageBtn").innerText="⚙️ Manage"; renderBagList(); }
@@ -389,8 +430,11 @@
     /* 4. MERCHANT (TRADERS) */
     function openMerchantHub() { document.getElementById("merchantHubModal").style.display="block"; }
     function saveMerchantEntry() {
-        let date=document.getElementById("merDate").value; let name=document.getElementById("merName").value.trim(); 
-        let w=parseFloat(document.getElementById("merWeight").value); let r=parseFloat(document.getElementById("merRate").value);
+        let date=document.getElementById("merDate").value; 
+        let rawName=document.getElementById("merName").value; 
+        let name = resolveAndAddName('merchant', rawName);
+        let w=parseFloat(document.getElementById("merWeight").value); 
+        let r=parseFloat(document.getElementById("merRate").value);
         let merType = document.getElementById("merTypeSel").value; 
         if(!date||!name||!w||!r) { alert("Fill all trader details"); return; }
         let data=getMerchantDB();
@@ -406,7 +450,16 @@
     }
     
     function openMerJamaModal() { document.getElementById("merJamaModal").style.display="block"; document.getElementById("merJamaDateOut").value = document.getElementById("dateInput").value; document.getElementById("merJamaNameOut").value = document.getElementById("merName").value; }
-    function saveMerJamaOutside() { let date = document.getElementById("merJamaDateOut").value; let name = document.getElementById("merJamaNameOut").value.trim(); let amt = parseFloat(document.getElementById("merJamaAmountOut").value); if(!date || !name || !amt || amt <= 0) {alert("Fill correct details"); return;} let data = getMerchantDB(); data.push({ id: Date.now(), date: date, name: name, type: 'payment', amount: amt }); saveMerchantDB(data); alert("✅ " + name + " जमा: " + amt + "/-"); document.getElementById("merJamaAmountOut").value = ""; document.getElementById("merJamaModal").style.display="none"; }
+    function saveMerJamaOutside() { 
+        let date = document.getElementById("merJamaDateOut").value; 
+        let rawName = document.getElementById("merJamaNameOut").value; 
+        let name = resolveAndAddName('merchant', rawName);
+        let amt = parseFloat(document.getElementById("merJamaAmountOut").value); 
+        if(!date || !name || !amt || amt <= 0) {alert("Fill correct details"); return;} 
+        let data = getMerchantDB(); data.push({ id: Date.now(), date: date, name: name, type: 'payment', amount: amt }); saveMerchantDB(data); 
+        alert("✅ " + name + " जमा: " + amt + "/-"); 
+        document.getElementById("merJamaAmountOut").value = ""; document.getElementById("merJamaModal").style.display="none"; 
+    }
     
     function openMerPreviewModal() { document.getElementById("merPreviewModal").style.display="block"; renderMerPreview(); }
     function renderMerPreview() {
