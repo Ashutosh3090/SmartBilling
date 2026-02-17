@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ultra Premium Billing System</title>
+    <title>Ultra Premium Smart Billing</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -12,7 +12,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* ULTRA PREMIUM CSS (Glassmorphism & Gradients) */
         :root {
             --bg-gradient: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
             --surface-glass: rgba(255, 255, 255, 0.85);
@@ -42,31 +41,43 @@
         .container { 
             width: 100%; max-width: 800px; background: var(--surface-glass); 
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            padding: 30px 20px; border-radius: var(--radius-xl); 
+            padding: 20px; border-radius: var(--radius-xl); 
             box-shadow: var(--shadow-premium); border: 1px solid var(--surface-border);
         }
 
-        h3 { text-align: center; color: var(--text-main); margin-bottom: 25px; font-weight: 800; font-size: 22px; }
+        h3 { text-align: center; color: var(--text-main); margin-bottom: 20px; font-weight: 800; font-size: 22px; }
         .app-title { background: linear-gradient(135deg, #1e293b, #4338ca); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px;}
 
-        .section-box { background: rgba(255,255,255,0.6); padding: 20px; border-radius: var(--radius-lg); margin-bottom: 20px; box-shadow: inset 0 2px 4px rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.5);}
-        .input-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 15px;}
-        .input-group { flex: 1; min-width: 110px; display: flex; flex-direction: column; gap: 6px; }
+        /* --- DASHBOARD CSS --- */
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .dash-card { background: #fff; padding: 15px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: center; }
+        .dash-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px;}
+        .dash-value { font-size: 18px; font-weight: 800; color: var(--text-main); }
+        .text-green { color: var(--success); } .text-orange { color: var(--merchant-color); } .text-red { color: var(--danger); } .text-blue { color: var(--primary); }
+
+        .section-box { background: rgba(255,255,255,0.6); padding: 15px; border-radius: var(--radius-lg); margin-bottom: 20px; box-shadow: inset 0 2px 4px rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.5);}
+        .input-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 12px;}
+        .input-group { flex: 1; min-width: 100px; display: flex; flex-direction: column; gap: 5px; position: relative;}
         label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding-left: 5px;}
         input, select { 
-            width: 100%; padding: 15px; border: 2px solid transparent; 
-            border-radius: var(--radius-md); font-size: 15px; font-weight: 500;
-            background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: all 0.3s;
+            width: 100%; padding: 12px; border: 2px solid transparent; 
+            border-radius: var(--radius-md); font-size: 14px; font-weight: 600;
+            background: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: all 0.3s;
         }
         input:focus, select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px var(--primary-glow); transform: translateY(-2px);}
 
+        /* MIC BUTTON */
+        .mic-btn { position: absolute; right: 5px; bottom: 5px; background: #e0e7ff; color: var(--primary); border: none; border-radius: 8px; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: 0.3s; box-shadow: none; z-index: 10; }
+        .mic-btn.recording { background: #fee2e2; color: #ef4444; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
         button { border: none; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: var(--radius-md);}
         button:active { transform: scale(0.95); }
-        .btn-add { background: linear-gradient(135deg, #4f46e5, #3730a3); color: white; padding: 16px; width: 100%; font-size: 16px; border-radius: var(--radius-lg); box-shadow: 0 10px 20px var(--primary-glow); text-transform: uppercase; letter-spacing: 1px;}
+        .btn-add { background: linear-gradient(135deg, #4f46e5, #3730a3); color: white; padding: 14px; width: 100%; font-size: 15px; border-radius: var(--radius-lg); box-shadow: 0 8px 15px var(--primary-glow); text-transform: uppercase; letter-spacing: 1px;}
         
-        .action-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(105px, 1fr)); gap: 12px; margin-top: 25px; }
-        .action-btn { padding: 16px 10px; font-size: 13px; color: white; border-radius: var(--radius-lg); flex-direction: column; box-shadow: 0 8px 15px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.2); text-shadow: 0 1px 2px rgba(0,0,0,0.2);}
-        .action-btn i { font-size: 20px; margin-bottom: 5px; font-style: normal;}
+        .action-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
+        .action-btn { padding: 12px 5px; font-size: 12px; color: white; border-radius: var(--radius-lg); flex-direction: column; box-shadow: 0 6px 12px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.2); }
+        .action-btn i { font-size: 18px; margin-bottom: 4px; font-style: normal;}
         
         .bg-gradient-purple { background: linear-gradient(135deg, #a855f7, #7e22ce); }
         .bg-gradient-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
@@ -75,53 +86,48 @@
         .bg-gradient-red { background: linear-gradient(135deg, #f43f5e, #be123c); }
         .bg-gradient-merchant { background: linear-gradient(135deg, #f97316, #c2410c); }
         .bg-gradient-bag { background: linear-gradient(135deg, #db2777, #9d174d); }
+        .bg-gradient-whatsapp { background: linear-gradient(135deg, #25D366, #128C7E); } /* WhatsApp Green */
 
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px);}
-        .modal-content { background: #ffffff; margin: 5% auto; padding: 25px; width: 92%; max-width: 650px; border-radius: var(--radius-xl); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); position: relative; max-height: 85vh; overflow-y: auto; }
-        .close-icon { position: absolute; right: 20px; top: 20px; width: 36px; height: 36px; background: #f1f5f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--text-muted); cursor: pointer; transition: 0.3s;}
+        .modal-content { background: #ffffff; margin: 5% auto; padding: 20px; width: 92%; max-width: 650px; border-radius: var(--radius-xl); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); position: relative; max-height: 85vh; overflow-y: auto; }
+        .close-icon { position: absolute; right: 15px; top: 15px; width: 32px; height: 32px; background: #f1f5f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text-muted); cursor: pointer;}
 
-        .table-container { border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; background: #fff;}
-        .styled-table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: left; }
-        .styled-table th { background: #f8fafc; color: var(--text-muted); padding: 14px 16px; font-weight: 600; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid var(--border-color); position: sticky; top: 0; z-index: 5;}
-        .styled-table td { padding: 14px 16px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-weight: 500;}
-        .premium-list-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
-        .premium-row { background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.02); border-radius: var(--radius-md); border: 1px solid var(--border-color);}
-        .premium-row td { padding: 16px; vertical-align: middle; }
+        .table-container { border: 1px solid #e2e8f0; border-radius: var(--radius-md); overflow: hidden; background: #fff;}
+        .styled-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+        .styled-table th { background: #f8fafc; color: var(--text-muted); padding: 12px 14px; font-weight: 600; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; position: sticky; top: 0; z-index: 5;}
+        .styled-table td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; color: var(--text-main); font-weight: 500;}
+        .premium-list-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+        .premium-row { background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-radius: var(--radius-md); border: 1px solid #e2e8f0;}
+        .premium-row td { padding: 14px; vertical-align: middle; }
         
-        .user-avatar { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; background: #eff6ff; color: #3b82f6; border-radius: 50%; margin-right: 12px; font-size: 18px; }
-        .badge-green { background: #ecfdf5; color: var(--success); padding: 6px 14px; border-radius: var(--radius-full); font-weight: 700; font-size: 14px; display: inline-block; box-shadow: 0 2px 4px rgba(16,185,129,0.1);}
+        .user-avatar { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; background: #eff6ff; color: #3b82f6; border-radius: 50%; margin-right: 10px; font-size: 16px; }
+        .badge-green { background: #ecfdf5; color: var(--success); padding: 6px 12px; border-radius: var(--radius-full); font-weight: 700; font-size: 13px; display: inline-block;}
+        .badge-red { background: #fef2f2; color: var(--danger); padding: 6px 12px; border-radius: var(--radius-full); font-weight: 700; font-size: 13px; display: inline-block; border: 1px solid #fecaca;}
 
-        .list-header-bar { display: flex; justify-content: center; gap: 10px; align-items: center; margin-bottom: 20px; background: #f8fafc; padding: 12px; border-radius: var(--radius-md); flex-wrap: wrap; }
-        .btn-action-small { padding: 8px 16px; font-size: 13px; border-radius: var(--radius-full); font-weight: 600; color: white;}
-        .small-btn { padding: 6px 12px; font-size: 12px; margin: 0 2px; border-radius: 8px; box-shadow: none; font-weight: 600;}
+        .list-header-bar { display: flex; justify-content: center; gap: 8px; align-items: center; margin-bottom: 15px; background: #f8fafc; padding: 10px; border-radius: var(--radius-md); flex-wrap: wrap; }
+        .btn-action-small { padding: 8px 14px; font-size: 12px; border-radius: var(--radius-full); font-weight: 600; color: white;}
+        .small-btn { padding: 6px 10px; font-size: 12px; margin: 0 2px; border-radius: 8px; box-shadow: none; font-weight: 600;}
         .btn-edit { background: #fffbeb; color: #d97706; border: 1px solid #fde68a;}
         .btn-del { background: #fef2f2; color: #ef4444; border: 1px solid #fecaca;}
-        .manage-btn { background: var(--surface); border: 1px solid var(--border-color); font-size: 14px; cursor: pointer; margin-left: 8px; padding: 6px 10px; border-radius: 8px; color: var(--text-muted);}
+        .manage-btn { background: #f8fafc; border: 1px solid #e2e8f0; font-size: 12px; cursor: pointer; margin-left: 6px; padding: 6px 10px; border-radius: 8px; color: var(--text-muted);}
 
-        .grand-total-box { background: linear-gradient(135deg, var(--primary) 0%, #312e81 100%); color: white; padding: 35px; border-radius: 20px; text-align: center; margin-top: 10px; box-shadow: var(--shadow-lg); }
-        .grand-total-label { font-size: 16px; opacity: 0.8; margin-bottom: 5px; display: block; text-transform: uppercase;}
-        .grand-total-amount { font-size: 46px; font-weight: 800;}
-        .ledger-box { border: 2px solid var(--text-main); padding: 4px 12px; border-radius: 6px; background: #fff; display: inline-block; font-weight: 700;}
-
-        /* Segmented Control for Bill Modal */
-        .segmented-control { display: flex; background: #e2e8f0; padding: 4px; border-radius: 14px; margin-bottom: 20px; }
-        .segmented-control label { flex: 1; text-align: center; padding: 10px 0; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.3s; margin-bottom: 0; }
+        /* Segmented Control */
+        .segmented-control { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 15px; }
+        .segmented-control label { flex: 1; text-align: center; padding: 8px 0; border-radius: 10px; font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.3s; margin-bottom: 0; }
         .segmented-control input[type="radio"] { display: none; }
         .segmented-control input[type="radio"]:checked + label { background: #ffffff; color: var(--primary); box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
 
-        #syncStatus { position: fixed; top: 15px; right: 15px; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; color: white; background: var(--success); z-index: 9999; box-shadow: 0 4px 10px rgba(16,185,129,0.3); display: none;}
-
+        #syncStatus { position: fixed; top: 10px; right: 10px; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; color: white; background: var(--success); z-index: 9999; box-shadow: 0 4px 10px rgba(16,185,129,0.3); display: none;}
         #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 99999; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: rgba(255, 255, 255, 0.05); padding: 40px 30px; border-radius: 30px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); text-align: center; width: 90%; max-width: 380px; color: white; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 50px rgba(0,0,0,0.5);}
-        .login-box input { text-align: center; font-size: 28px; letter-spacing: 12px; font-weight: 800; background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.2); color: white; padding: 20px; border-radius: 20px; margin-bottom: 25px; width: 100%; transition: 0.3s;}
-        .login-box input:focus { border-color: #6366f1; background: rgba(0,0,0,0.5); box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);}
-
+        .login-box { background: rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 24px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); text-align: center; width: 90%; max-width: 350px; color: white; border: 1px solid rgba(255,255,255,0.1);}
+        .login-box input { text-align: center; font-size: 24px; letter-spacing: 10px; font-weight: 800; background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.2); color: white; padding: 15px; border-radius: 16px; margin-bottom: 20px; width: 100%;}
+        
         #appContent { display: none; }
-        .bill-area-printable { background: #ffffff; padding: 20px; color: #000000; border-radius: 12px; }
+        .bill-area-printable { background: #ffffff; padding: 15px; color: #000000; border-radius: 12px; }
 
         @media print {
             body { background: white; padding: 0; margin: 0; display: block;}
-            .container, .modal, .action-buttons, .section-box, #syncStatus, #loginScreen { display: none !important; }
+            .container, .modal, .action-buttons, .section-box, #syncStatus, #loginScreen, .dashboard-grid { display: none !important; }
             #finalBillModal, #finalBagBillModal { display: block !important; position: static !important; width: 100%; height: auto; background: white; }
             .modal-content { box-shadow: none !important; border: none !important; margin: 0 !important; padding: 0 !important; width: 100% !important; max-width: 100% !important;}
             .no-print-in-bill { display: none !important; }
@@ -132,39 +138,66 @@
 
 <div id="loginScreen">
     <div class="login-box">
-        <div style="font-size: 60px; margin-bottom: 10px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));">🔒</div>
+        <div style="font-size: 50px; margin-bottom: 10px;">🔒</div>
         <h2 style="font-weight: 700; margin-bottom: 10px;">Secure Login</h2>
-        <p style="font-size: 14px; color: #94a3b8; margin-bottom: 30px;">Enter your PIN to access the billing system.</p>
         <input type="password" id="loginPin" inputmode="numeric" placeholder="••••" maxlength="4" onkeypress="if(event.key === 'Enter') verifyPin()">
         <button class="btn-add" style="background: linear-gradient(135deg, #6366f1, #4f46e5);" onclick="verifyPin()">Unlock System</button>
     </div>
 </div>
 
-<div id="syncStatus">🟢 Cloud Sync Active</div>
+<div id="syncStatus">🟢 Syncing</div>
 
 <div id="appContent">
     <div class="container">
         <div class="section no-print">
-            <h3 class="app-title">✨ Ultra Premium Smart Billing Hub</h3>
+            <h3 class="app-title">✨ Smart Billing Hub</h3>
+            
+            <div class="dashboard-grid">
+                <div class="dash-card">
+                    <span class="dash-title">आजची खरेदी (शेतकरी)</span>
+                    <span class="dash-value text-blue" id="dashPurchase">₹ 0</span>
+                </div>
+                <div class="dash-card">
+                    <span class="dash-title">आजची विक्री (व्यापारी)</span>
+                    <span class="dash-value text-orange" id="dashSales">₹ 0</span>
+                </div>
+                <div class="dash-card">
+                    <span class="dash-title">एकूण येणे बाकी ⚠️</span>
+                    <span class="dash-value text-red" id="dashPending">₹ 0</span>
+                </div>
+                <div class="dash-card">
+                    <span class="dash-title">आजचा उचल/ऍडव्हान्स</span>
+                    <span class="dash-value text-green" id="dashAdvance">₹ 0</span>
+                </div>
+            </div>
+
             <div class="section-box">
                 <div class="input-row">
                     <div class="input-group" style="flex: 1; min-width: 120px;"><label>📅 Date:</label><input type="date" id="dateInput" onchange="onDateChange()"></div>
-                    <div class="input-group" style="flex: 2;"><label>👤 Farmer Name:</label><input type="text" id="farmerName" list="farmerList" placeholder="🔍 Type Name..." onchange="autoSelectFarmerName()"><datalist id="farmerList"></datalist></div>
+                    
+                    <div class="input-group" style="flex: 2;">
+                        <label>👤 Farmer Name:</label>
+                        <div style="position: relative; width: 100%;">
+                            <input type="text" id="farmerName" list="farmerList" placeholder="Name or speak 🎙️..." onchange="autoSelectFarmerName()" style="padding-right: 45px;">
+                            <button id="micBtn" class="mic-btn" onclick="startVoiceRecognition()" title="Voice Entry">🎙️</button>
+                        </div>
+                        <datalist id="farmerList"></datalist>
+                    </div>
                 </div>
                 <div class="input-row">
                     <div class="input-group"><label>⚖️ Weight (Kg):</label><input type="number" id="weight" step="0.01" placeholder="0.00"></div>
                     <div class="input-group"><label>💵 Rate (₹):</label><input type="number" id="rate" step="0.01" placeholder="0.00"></div>
                 </div>
-                <button id="mainBtn" class="btn-add" style="margin-top: 10px;" onclick="saveCrop()">✅ Save Entry</button>
+                <button id="mainBtn" class="btn-add" style="margin-top: 5px;" onclick="saveCrop()">✅ Save Entry</button>
             </div>
 
             <div class="action-buttons">
                 <button class="action-btn bg-gradient-purple" onclick="openPreviewModal()"><i>👁️</i> Preview</button>
                 <button class="action-btn bg-gradient-orange" onclick="openAdvModal()"><i>💰</i> Advance</button>
                 <button class="action-btn bg-gradient-blue" onclick="openBillModal('FARMER')"><i>📜</i> Farmer Bill</button>
-                <button class="action-btn bg-gradient-green" onclick="openFarmerListModal()"><i>👥</i> Farmers List</button>
+                <button class="action-btn bg-gradient-green" onclick="openFarmerListModal()"><i>👥</i> Farmers</button>
                 <button class="action-btn bg-gradient-merchant" onclick="openMerchantHub()"><i>🏢</i> Traders</button>
-                <button class="action-btn bg-gradient-bag" onclick="openBagModal()"><i>🎒</i> Bags / पोती</button>
+                <button class="action-btn bg-gradient-bag" onclick="openBagModal()"><i>🎒</i> Bags</button>
             </div>
         </div>
 
@@ -174,11 +207,11 @@
         
         <div id="merPreviewModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('merPreviewModal').style.display='none'">✕</div><h3 style="color: var(--primary);">👁️ Today's Trader Entries</h3><div class="table-container"><table class="styled-table"><thead><tr><th>Name</th><th>Details</th><th>Total</th><th>Action</th></tr></thead><tbody id="merPreviewBody"></tbody></table></div></div></div>
         
-        <div id="editMerEntryModal" class="modal no-print" style="z-index: 1050 !important;"><div class="modal-content" style="border: 1px solid var(--accent);"><div class="close-icon" onclick="document.getElementById('editMerEntryModal').style.display='none'">✕</div><h3 style="color: var(--accent);">✏️ अपडेट एंट्री</h3><input type="hidden" id="editMerId"><input type="hidden" id="editMerSource"><input type="hidden" id="editMerNameHidden"><div class="section-box" style="background: #fffbeb; border-color: #fde68a;"><div class="input-group" style="margin-bottom: 15px;"><label>तारीख (Date):</label><input type="date" id="editMerDate"></div><div id="editMerBillFields" style="display:none;"><div class="input-row"><div class="input-group"><label>प्रकार:</label><select id="editMerTypeSel"><option value="नि">नि</option><option value="पि">पि</option><option value="के">के</option><option value="शे">शे</option><option value="रु">रु</option></select></div><div class="input-group"><label>वजन:</label><input type="number" id="editMerWeight" step="0.01" oninput="calcEditMerTotal()"></div><div class="input-group"><label>भाव:</label><input type="number" id="editMerRate" step="0.01" oninput="calcEditMerTotal()"></div></div><div class="input-group" style="margin-top: 15px;"><label>एकूण रक्कम (Amount):</label><input type="number" id="editMerTotal" step="0.01" style="font-weight:bold; color:var(--primary); font-size: 16px;"></div></div><div id="editMerJamaFields" style="display:none; margin-bottom:15px;" class="input-group"><label>जमा रक्कम (Jama Amount):</label><input type="number" id="editMerJamaAmount" step="0.01" style="font-weight:bold; color:var(--success); font-size: 16px;"></div></div><button class="btn-add bg-gradient-orange" onclick="saveMerEntryEdit()">✅ जतन करा (Update)</button></div></div>
+        <div id="editMerEntryModal" class="modal no-print" style="z-index: 1050 !important;"><div class="modal-content" style="border: 1px solid #d97706;"><div class="close-icon" onclick="document.getElementById('editMerEntryModal').style.display='none'">✕</div><h3 style="color: #d97706;">✏️ अपडेट एंट्री</h3><input type="hidden" id="editMerId"><input type="hidden" id="editMerSource"><input type="hidden" id="editMerNameHidden"><div class="section-box" style="background: #fffbeb; border-color: #fde68a;"><div class="input-group" style="margin-bottom: 15px;"><label>तारीख (Date):</label><input type="date" id="editMerDate"></div><div id="editMerBillFields" style="display:none;"><div class="input-row"><div class="input-group"><label>प्रकार:</label><select id="editMerTypeSel"><option value="नि">नि</option><option value="पि">पि</option><option value="के">के</option><option value="शे">शे</option><option value="रु">रु</option></select></div><div class="input-group"><label>वजन:</label><input type="number" id="editMerWeight" step="0.01" oninput="calcEditMerTotal()"></div><div class="input-group"><label>भाव:</label><input type="number" id="editMerRate" step="0.01" oninput="calcEditMerTotal()"></div></div><div class="input-group" style="margin-top: 15px;"><label>एकूण रक्कम:</label><input type="number" id="editMerTotal" step="0.01" style="font-weight:bold; color:var(--primary); font-size: 16px;"></div></div><div id="editMerJamaFields" style="display:none; margin-bottom:15px;" class="input-group"><label>जमा रक्कम:</label><input type="number" id="editMerJamaAmount" step="0.01" style="font-weight:bold; color:var(--success); font-size: 16px;"></div></div><button class="btn-add bg-gradient-orange" onclick="saveMerEntryEdit()">✅ जतन करा</button></div></div>
         
-        <div id="merchantListModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('merchantListModal').style.display='none'">✕</div><h3>👥 Traders List</h3><div class="list-header-bar"><button class="btn-action-small bg-gradient-merchant" onclick="addNewMerchantPrompt()">➕ Add New</button><button class="btn-action-small bg-gradient-green" onclick="calculateMerGrandTotal()">💰 All Totals</button><button class="btn-action-small" style="background: var(--secondary);" id="merManageBtn" onclick="toggleMerListMode()">⚙️ Manage</button></div><p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-bottom: 10px;">Click Name to Open Ledger (खातेवही)</p><div style="overflow-x: auto; max-height: 55vh;"><table class="premium-list-table"><tbody id="merchantListBody"></tbody></table></div></div></div>
-        <div id="merDetailModal" class="modal no-print"><div class="modal-content" style="background: var(--bg-light); padding: 25px;"><div class="close-icon" onclick="closeMerDetail()">✕</div><h3 id="merDetailName" style="color: var(--merchant-color); margin-bottom: 15px; font-size: 24px;">Trader Ledger</h3><input type="hidden" id="activeMerchantName"><div style="text-align: right; margin-bottom: 10px;"><button class="small-btn bg-gradient-orange" style="color:white; font-size: 13px; padding: 8px 12px;" id="merHistManageBtn" onclick="toggleMerHistMode()">✏️ Edit / Delete Mode</button></div><div class="table-container" id="merTableContainer" style="max-height: 55vh; overflow-y: auto;"><table class="styled-table" style="background: var(--surface);"><thead><tr><th>तारीख</th><th>तपशील</th><th style="text-align:right;">रक्कम (₹)</th><th style="width: 60px; text-align:center;">⚙️</th></tr></thead><tbody id="merDetailBody"></tbody></table></div></div></div>
-        <div id="merGrandTotalModal" class="modal no-print"><div class="modal-content" style="max-width: 400px;"><div class="close-icon" style="background: rgba(255,255,255,0.2); color:white;" onclick="document.getElementById('merGrandTotalModal').style.display='none'">✕</div><h3 style="color: white; margin-top:10px; position: relative; z-index: 2;">💰 Traders Grand Total</h3><div class="grand-total-box" style="margin-top: -50px; padding-top: 70px;"><span class="grand-total-label">Total Receivable</span><span class="grand-total-amount" id="merGrandTotalDisplay">₹ 0</span></div></div></div>
+        <div id="merchantListModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('merchantListModal').style.display='none'">✕</div><h3>👥 Traders List</h3><div class="list-header-bar"><button class="btn-action-small bg-gradient-merchant" onclick="addNewMerchantPrompt()">➕ Add New</button><button class="btn-action-small" style="background: var(--secondary);" id="merManageBtn" onclick="toggleMerListMode()">⚙️ Manage</button></div><div style="overflow-x: auto; max-height: 55vh;"><table class="premium-list-table"><tbody id="merchantListBody"></tbody></table></div></div></div>
+        
+        <div id="merDetailModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeMerDetail()">✕</div><h3 id="merDetailName" style="color: var(--merchant-color); margin-bottom: 15px;">Trader Ledger</h3><input type="hidden" id="activeMerchantName"><div style="text-align: right; margin-bottom: 10px;"><button class="small-btn bg-gradient-orange" style="color:white;" id="merHistManageBtn" onclick="toggleMerHistMode()">✏️ Edit Mode</button></div><div class="table-container" id="merTableContainer" style="max-height: 55vh; overflow-y: auto;"><table class="styled-table"><thead><tr><th>तारीख</th><th>तपशील</th><th style="text-align:right;">रक्कम (₹)</th><th style="width: 50px; text-align:center;">⚙️</th></tr></thead><tbody id="merDetailBody"></tbody></table></div></div></div>
         
         <div id="billModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('billModal').style.display='none'">✕</div><h3 id="billTitle">Generate Bill</h3><input type="hidden" id="billType"><div class="section-box" style="padding: 15px;">
             <div class="segmented-control">
@@ -189,21 +222,36 @@
             </div>
             <div id="monthlyBillDiv" class="input-group" style="margin-bottom: 15px;"><label>Select Month:</label><input type="month" id="reportMonth"></div><div id="customBillDiv" style="display:none; gap:10px; margin-bottom: 15px;"><div class="input-group"><label>From:</label><input type="date" id="billMainStartDate"></div><div class="input-group"><label>To:</label><input type="date" id="billMainEndDate"></div></div><div class="input-group"><label id="billNameLabel">Search Name:</label><input type="text" id="searchName" list="billNameSuggestions" placeholder="Start typing..."><datalist id="billNameSuggestions"></datalist></div></div><button class="btn-add bg-gradient-blue" onclick="generateFinalBill()">📜 Show Bill</button></div></div>
         
-        <div id="finalBillModal" class="modal"><div class="modal-content" style="max-width: 650px; background: #fff;"><div class="no-print-in-bill" style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px;"><button class="small-btn bg-gradient-blue" onclick="window.print()" style="padding: 8px 20px; font-size:14px; color:white;">🖨️ Print</button><button class="small-btn bg-gradient-orange" onclick="downloadBillPDF('mainBillPrintableArea', 'BILL')" style="padding: 8px 20px; font-size:14px; color:white;">📄 Save PDF</button><button class="small-btn" onclick="document.getElementById('finalBillModal').style.display='none'" style="background:var(--secondary); padding: 8px 20px; font-size:14px; color:white;">✕ Close</button></div><div id="mainBillPrintableArea" class="bill-area-printable"><div class="bill-header"><div class="header-name" id="billHeaderName" style="font-size: 20px; font-weight: bold;">---</div><div class="header-month" id="billMonthDisplay" style="color: #555;">---</div><hr style="margin-top: 10px; border-top: 1px dashed #ccc;"></div><ul id="billList" class="bill-list" style="padding-left: 0;"></ul><div class="total-row" id="billTotalRow" style="font-size: 18px; font-weight: bold; margin-top: 15px;">Total: <span id="billTotalAmount">०/-</span></div><div class="advance-box" id="billAdvBox" style="color: red; font-weight: bold; margin-top: 5px;"></div></div></div></div>
+        <div id="finalBillModal" class="modal"><div class="modal-content" style="max-width: 650px; background: #fff;">
+            <div class="no-print-in-bill" style="display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;">
+                <button class="small-btn bg-gradient-whatsapp" onclick="sendWhatsAppBill('mainBillPrintableArea')" style="padding: 8px 15px; font-size:13px; color:white;">📲 WhatsApp</button>
+                <button class="small-btn bg-gradient-blue" onclick="window.print()" style="padding: 8px 15px; font-size:13px; color:white;">🖨️ Print</button>
+                <button class="small-btn bg-gradient-orange" onclick="downloadBillPDF('mainBillPrintableArea', 'BILL')" style="padding: 8px 15px; font-size:13px; color:white;">📄 PDF</button>
+                <button class="small-btn" onclick="document.getElementById('finalBillModal').style.display='none'" style="background:var(--secondary); padding: 8px 15px; font-size:13px; color:white;">✕ Close</button>
+            </div>
+            <div id="mainBillPrintableArea" class="bill-area-printable"><div class="bill-header"><div class="header-name" id="billHeaderName" style="font-size: 20px; font-weight: bold;">---</div><div class="header-month" id="billMonthDisplay" style="color: #555;">---</div><hr style="margin-top: 10px; border-top: 1px dashed #ccc;"></div><ul id="billList" class="bill-list" style="padding-left: 0;"></ul><div class="total-row" id="billTotalRow" style="font-size: 18px; font-weight: bold; margin-top: 15px;">Total: <span id="billTotalAmount">०/-</span></div><div class="advance-box" id="billAdvBox" style="color: red; font-weight: bold; margin-top: 5px;"></div></div>
+        </div></div>
 
         <div id="bagModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">🎒 Bags / पोती Tracker</h3><div class="section-box" style="border-color: #ddd6fe; background: #f5f3ff;"><div class="input-row"><div class="input-group"><label>Date:</label><input type="date" id="bagDate"></div><div class="input-group" style="flex:2;"><label>Name:</label><input type="text" id="bagName" list="farmerList" placeholder="Search..."></div></div><div class="input-row"><div class="input-group"><label>Qty:</label><input type="number" id="bagQty" placeholder="0"></div><div class="input-group"><label>Type:</label><select id="bagType"><option value="Poti">पोती</option><option value="Bag">बॅग</option></select></div><div class="input-group"><label>Rate:</label><input type="number" id="bagRate" placeholder="0.00"></div></div><button class="btn-add bg-gradient-bag" style="margin-top:10px;" onclick="saveBagEntry()">✅ Save Entry (+)</button></div><div class="list-header-bar" style="background:transparent; padding:0;"><button class="btn-action-small" style="background:var(--secondary); color:white;" onclick="openBagPreview()">👁️ Preview</button><button class="btn-action-small" style="background:var(--text-main); color:white;" onclick="openBagList()">📋 All History</button><button class="btn-action-small bg-gradient-orange" onclick="openBagBillModal()">📜 Bag Bill</button></div></div></div>
-        <div id="bagPreviewModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagPreviewModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">👁️ Today's Bags</h3><div class="table-container" style="max-height: 60vh;"><table class="styled-table"><thead><tr><th>Name</th><th>Details</th><th>Total</th><th>Action</th></tr></thead><tbody id="bagPreviewBody"></tbody></table></div></div></div>
-        <div id="bagListModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagListModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">📋 All Bags History</h3><div class="list-header-bar"><button class="btn-action-small" style="background:var(--secondary); color:white;" id="bagManageBtn" onclick="toggleBagListMode()">⚙️ Manage</button></div><div id="bagListContainer" style="overflow-x: auto; max-height: 55vh; background: var(--surface); border-radius: var(--radius-md); padding: 10px;"></div></div></div>
-        <div id="bagBillModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagBillModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">📜 Generate Bag Bill</h3><div class="section-box"><div class="input-group" style="margin-bottom: 15px;"><label>Select Name:</label><input type="text" id="bagBillName" list="farmerList" placeholder="Start typing name..."></div><div class="input-row"><div class="input-group"><label>From Date:</label><input type="date" id="bagStartDate"></div><div class="input-group"><label>To Date:</label><input type="date" id="bagEndDate"></div></div></div><button class="btn-add bg-gradient-purple" onclick="generateBagBill()">Show Bill</button></div></div>
-        <div id="finalBagBillModal" class="modal"><div class="modal-content" style="max-width: 650px; background: #fff;"><div class="no-print-in-bill" style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px;"><button class="small-btn bg-gradient-blue" onclick="window.print()" style="padding: 8px 20px; font-size:14px; color:white;">🖨️ Print</button><button class="small-btn bg-gradient-orange" onclick="downloadBillPDF('bagBillPrintableArea', 'BAG')" style="padding: 8px 20px; font-size:14px; color:white;">📄 Save PDF</button><button class="small-btn" onclick="document.getElementById('finalBagBillModal').style.display='none'" style="background:var(--secondary); padding: 8px 20px; font-size:14px; color:white;">✕ Close</button></div><div id="bagBillPrintableArea" class="bill-area-printable"><div class="bill-header"><div class="header-name" id="bagBillHeaderName" style="font-size: 20px; font-weight: bold;">---</div><div class="header-month" id="bagBillDateDisplay" style="color: #555;">---</div><hr style="margin-top: 10px; border-top: 1px dashed #ccc;"></div><ul id="bagBillList" class="bill-list" style="padding-left: 0;"></ul><div class="total-row" style="font-size: 18px; font-weight: bold; margin-top: 15px;">Total Amount: <span id="bagBillTotalAmount">०/-</span></div></div></div></div>
+        <div id="bagPreviewModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagPreviewModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">👁️ Today's Bags</h3><div class="table-container"><table class="styled-table"><thead><tr><th>Name</th><th>Details</th><th>Total</th><th>Action</th></tr></thead><tbody id="bagPreviewBody"></tbody></table></div></div></div>
+        <div id="bagListModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagListModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">📋 All Bags History</h3><div class="list-header-bar"><button class="btn-action-small" style="background:var(--secondary); color:white;" id="bagManageBtn" onclick="toggleBagListMode()">⚙️ Manage</button></div><div id="bagListContainer" style="overflow-x: auto; max-height: 55vh; background: #fff; border-radius: var(--radius-md); padding: 10px;"></div></div></div>
+        <div id="bagBillModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagBillModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">📜 Generate Bag Bill</h3><div class="section-box"><div class="input-group" style="margin-bottom: 15px;"><label>Select Name:</label><input type="text" id="bagBillName" list="farmerList" placeholder="Start typing..."></div><div class="input-row"><div class="input-group"><label>From:</label><input type="date" id="bagStartDate"></div><div class="input-group"><label>To:</label><input type="date" id="bagEndDate"></div></div></div><button class="btn-add bg-gradient-purple" onclick="generateBagBill()">Show Bill</button></div></div>
+        <div id="finalBagBillModal" class="modal"><div class="modal-content" style="max-width: 650px; background: #fff;">
+            <div class="no-print-in-bill" style="display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 15px;">
+                <button class="small-btn bg-gradient-whatsapp" onclick="sendWhatsAppBill('bagBillPrintableArea')" style="padding: 8px 15px; font-size:13px; color:white;">📲 WhatsApp</button>
+                <button class="small-btn bg-gradient-blue" onclick="window.print()" style="padding: 8px 15px; font-size:13px; color:white;">🖨️ Print</button>
+                <button class="small-btn bg-gradient-orange" onclick="downloadBillPDF('bagBillPrintableArea', 'BAG')" style="padding: 8px 15px; font-size:13px; color:white;">📄 PDF</button>
+                <button class="small-btn" onclick="document.getElementById('finalBagBillModal').style.display='none'" style="background:var(--secondary); padding: 8px 15px; font-size:13px; color:white;">✕ Close</button>
+            </div>
+            <div id="bagBillPrintableArea" class="bill-area-printable"><div class="bill-header"><div class="header-name" id="bagBillHeaderName" style="font-size: 20px; font-weight: bold;">---</div><div class="header-month" id="bagBillDateDisplay" style="color: #555;">---</div><hr style="margin-top: 10px; border-top: 1px dashed #ccc;"></div><ul id="bagBillList" class="bill-list" style="padding-left: 0;"></ul><div class="total-row" style="font-size: 18px; font-weight: bold; margin-top: 15px;">Total Amount: <span id="bagBillTotalAmount">०/-</span></div></div>
+        </div></div>
 
         <div id="previewModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('previewModal').style.display='none'">✕</div><h3 style="color: var(--primary);">👁️ Today's Farmer Entries</h3><div class="table-container"><table class="styled-table"><thead><tr><th>Name</th><th>Details</th><th>Total</th><th>Action</th></tr></thead><tbody id="previewBody"></tbody></table></div></div></div>
-        <div id="listModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('listModal').style.display='none'">✕</div><h3>👥 Farmers Overview</h3><div class="list-header-bar"><button class="btn-action-small bg-gradient-green" onclick="addNewFarmerPrompt()">➕ New</button><button class="btn-action-small bg-gradient-blue" onclick="calculateGrandTotal()">💰 Total</button><button class="btn-action-small bg-gradient-orange" onclick="toggleAllAmounts()">👁️ Show/Hide</button><button class="btn-action-small" style="background:var(--secondary); color:white;" id="manageListBtn" onclick="toggleEditMode()">⚙️ Manage</button></div><div style="overflow-x: auto; max-height: 55vh;"><table class="premium-list-table"><tbody id="farmerListBody"></tbody></table></div></div></div>
-        <div id="grandTotalModal" class="modal no-print"><div class="modal-content" style="max-width: 400px;"><div class="close-icon" style="background: rgba(255,255,255,0.2); color:white;" onclick="document.getElementById('grandTotalModal').style.display='none'">✕</div><h3 style="color: white; position: relative; z-index: 2;">💰 Grand Total</h3><div class="grand-total-box" style="margin-top: -50px; padding-top: 70px; background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);"><span class="grand-total-label">Total Crop Value</span><span class="grand-total-amount" id="grandTotalDisplay">₹ 0</span></div></div></div>
-        <div id="detailModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('detailModal').style.display='none'">✕</div><h3 id="detailFarmerName" style="color: var(--primary);">History</h3><div class="table-container" style="max-height: 60vh;"><table class="styled-table"><thead><tr><th>Date</th><th>Type</th><th>Details</th><th>Amount</th><th>Edit</th></tr></thead><tbody id="detailBody"></tbody></table></div></div></div>
+        <div id="listModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('listModal').style.display='none'">✕</div><h3>👥 Farmers</h3><div class="list-header-bar"><button class="btn-action-small bg-gradient-green" onclick="addNewFarmerPrompt()">➕ New</button><button class="btn-action-small bg-gradient-orange" onclick="toggleAllAmounts()">👁️ Show/Hide</button><button class="btn-action-small" style="background:var(--secondary); color:white;" id="manageListBtn" onclick="toggleEditMode()">⚙️ Manage</button></div><div style="overflow-x: auto; max-height: 55vh;"><table class="premium-list-table"><tbody id="farmerListBody"></tbody></table></div></div></div>
+        <div id="detailModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('detailModal').style.display='none'">✕</div><h3 id="detailFarmerName" style="color: var(--primary);">History</h3><div class="table-container" style="max-height: 60vh;"><table class="styled-table"><thead><tr><th>Date</th><th>Type</th><th>Details</th><th>Amt</th><th>Edit</th></tr></thead><tbody id="detailBody"></tbody></table></div></div></div>
         
-        <div id="advModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('advModal').style.display='none'">✕</div><h3 style="color: var(--danger);">💰 Advance (उचल)</h3><div class="section-box" style="border-color:#fecaca; background:#fef2f2;"><div class="input-group" style="margin-bottom: 10px;"><label>Date:</label><input type="date" id="advDate"></div><div class="input-group" style="margin-bottom: 10px;"><label>Farmer Name:</label><input type="text" id="advFarmerName" list="farmerList"></div><div class="input-group" style="margin-bottom: 15px;"><label>Amount (₹):</label><input type="number" id="advAmount" style="font-weight:bold; color:var(--danger); font-size:16px;"></div><div style="display:flex; gap:10px;"><button class="btn-add bg-gradient-red" style="flex:1; padding:12px;" onclick="saveAdvance('GIVE')">Given (+)</button><button class="btn-add bg-gradient-green" style="flex:1; padding:12px;" onclick="saveAdvance('TAKE')">Received (-)</button></div></div><button class="btn-add" style="background:var(--text-main);" onclick="openAdvListModal()">📜 Show Advance List</button></div></div>
-        <div id="advListModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('advListModal').style.display='none'">✕</div><h3 style="color: var(--danger);">📜 Advance List</h3><div class="list-header-bar"><span id="totalAdvDisplay" style="font-weight:bold; color:var(--danger); font-size:16px; flex:1; text-align:left;">Total: 0</span><button class="small-btn" style="background:var(--secondary); color:white;" id="manageAdvListBtn" onclick="toggleAdvEditMode()">⚙️ Manage</button></div><div class="table-container" style="max-height: 55vh;"><table class="styled-table"><thead><tr><th>Date</th><th>Name</th><th>Type</th><th>Amt</th><th>⚙️</th></tr></thead><tbody id="advListBody"></tbody></table></div></div></div>
+        <div id="advModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('advModal').style.display='none'">✕</div><h3 style="color: var(--danger);">💰 Advance (उचल)</h3><div class="section-box" style="border-color:#fecaca; background:#fef2f2;"><div class="input-group" style="margin-bottom: 10px;"><label>Date:</label><input type="date" id="advDate"></div><div class="input-group" style="margin-bottom: 10px;"><label>Farmer Name:</label><input type="text" id="advFarmerName" list="farmerList"></div><div class="input-group" style="margin-bottom: 15px;"><label>Amount (₹):</label><input type="number" id="advAmount" style="font-weight:bold; color:var(--danger); font-size:16px;"></div><div style="display:flex; gap:10px;"><button class="btn-add bg-gradient-red" style="flex:1; padding:12px;" onclick="saveAdvance('GIVE')">Given (+)</button><button class="btn-add bg-gradient-green" style="flex:1; padding:12px;" onclick="saveAdvance('TAKE')">Received (-)</button></div></div><button class="btn-add" style="background:var(--text-main);" onclick="openAdvListModal()">📜 Advance List</button></div></div>
+        <div id="advListModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('advListModal').style.display='none'">✕</div><h3 style="color: var(--danger);">📜 Advance List</h3><div class="list-header-bar"><span id="totalAdvDisplay" style="font-weight:bold; color:var(--danger); font-size:14px; flex:1; text-align:left;">Total: 0</span><button class="small-btn" style="background:var(--secondary); color:white;" id="manageAdvListBtn" onclick="toggleAdvEditMode()">⚙️ Manage</button></div><div class="table-container" style="max-height: 55vh;"><table class="styled-table"><thead><tr><th>Date</th><th>Name</th><th>Type</th><th>Amt</th><th>⚙️</th></tr></thead><tbody id="advListBody"></tbody></table></div></div></div>
 
     </div>
 </div>
@@ -212,16 +260,15 @@
     const APP_PIN = "1504";
 
     function verifyPin() {
-        const enteredPin = document.getElementById("loginPin").value;
-        if (enteredPin === APP_PIN) {
+        if (document.getElementById("loginPin").value === APP_PIN) {
             sessionStorage.setItem("isLoggedIn", "true");
             document.getElementById("loginScreen").style.display = "none";
             document.getElementById("appContent").style.display = "block";
             document.getElementById("syncStatus").style.display = "block";
+            updateDashboard();
         } else {
-            alert("❌ चुकीचा पिन! कृपया पुन्हा प्रयत्न करा.");
+            alert("❌ चुकीचा पिन!");
             document.getElementById("loginPin").value = "";
-            document.getElementById("loginPin").focus();
         }
     }
 
@@ -230,132 +277,7 @@
             document.getElementById("loginScreen").style.display = "none";
             document.getElementById("appContent").style.display = "block";
             document.getElementById("syncStatus").style.display = "block";
-        } else {
-            document.getElementById("loginScreen").style.display = "flex";
-            document.getElementById("appContent").style.display = "none";
-            document.getElementById("syncStatus").style.display = "none";
-            document.getElementById("loginPin").focus();
         }
-    });
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyD1XNdHAgGO4teBASsQG35UuG4OJrVzV08",
-      authDomain: "smartbilling-6262c.firebaseapp.com",
-      databaseURL: "https://smartbilling-6262c-default-rtdb.firebaseio.com",
-      projectId: "smartbilling-6262c",
-      storageBucket: "smartbilling-6262c.firebasestorage.app",
-      messagingSenderId: "118481620678",
-      appId: "1:118481620678:web:c9a07d53d6ef4497ea11c7"
-    };
-    
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-
-    let connectedRef = firebase.database().ref(".info/connected");
-    connectedRef.on("value", (snap) => {
-        let statusEl = document.getElementById("syncStatus");
-        if (snap.val() === true) {
-            statusEl.innerText = "🟢 Cloud Connected";
-            statusEl.style.background = "#10b981";
-        } else {
-            statusEl.innerText = "🔴 Offline";
-            statusEl.style.background = "#ef4444";
-        }
-    });
-
-    const defaultFarmersList = ["1. सौदी", "2. पोपट", "3. बन्ने", "4. तानाजी", "5. आकाश", "6. शिवानंद", "7. हरी", "8. सचिन", "9. एकनाथ", "10. अनिल कोळी", "11. सागर", "12. अर्जुन", "13. धीरज", "14. बाबासो", "15. A.S.", "16. विष्णू", "17. झुंडवाडे", "18. प्रशांत", "19. अशोक", "20. दशरथ", "21. श्रेयस", "22. R. मुळके", "23. येरडोले", "24. सुनिल", "25. शिंदे", "26. SD", "27. विकास", "28. मिस्त्री", "29. रामा", "30. आप्पासो", "31. राहुल", "32. संदिप", "33. उमाजी", "34. किरण", "35. ग. खोराडी", "36. अजय", "37. ग. काटावे", "38. S. चव्हाण", "39. मारुती", "40. बोकरे", "41. राजू", "42. निलेश", "43. सरकार", "44. ग. नाईक", "45. प्रकाश", "46. जोतिराम", "47. सोहम", "48. स्वराज", "49. निकम", "50. सानप"];
-    let farmers = defaultFarmersList;
-    let merchants = ["Traders A"];
-    
-    let cropDataDB = [];
-    let merchantDB = [];
-    let bagDB = [];
-
-    function syncMissingNames() {
-        let farmersUpdated = false;
-        let merchantsUpdated = false;
-        
-        let allFarmerEntries = [...(cropDataDB || []), ...(bagDB || [])];
-        allFarmerEntries.forEach(e => {
-            if (e.name) {
-                let n = e.name.trim();
-                if (n !== "" && !farmers.find(f => f.toLowerCase() === n.toLowerCase())) {
-                    farmers.push(n);
-                    farmersUpdated = true;
-                }
-            }
-        });
-
-        let allMerchantEntries = (merchantDB || []);
-        allMerchantEntries.forEach(e => {
-            if (e.name) {
-                let n = e.name.trim();
-                if (n !== "" && !merchants.find(m => m.toLowerCase() === n.toLowerCase())) {
-                    merchants.push(n);
-                    merchantsUpdated = true;
-                }
-            }
-        });
-
-        if (farmersUpdated) { database.ref('farmers').set(farmers); }
-        if (merchantsUpdated) { database.ref('merchants').set(merchants); }
-    }
-
-    database.ref('farmers').once('value', snap => { if(!snap.exists()) database.ref('farmers').set(defaultFarmersList); });
-    database.ref('merchants').once('value', snap => { if(!snap.exists()) database.ref('merchants').set(["Traders A"]); });
-
-    database.ref('farmers').on('value', snap => { 
-        if(snap.exists()) { farmers = snap.val(); loadFarmerList(); if(document.getElementById("listModal").style.display==="block") generateFarmerStatus(); } 
-    });
-    
-    database.ref('merchants').on('value', snap => { 
-        if(snap.exists()) { merchants = snap.val(); loadMerchantList(); if(document.getElementById("merchantListModal").style.display==="block") renderMerList(); } 
-    });
-
-    database.ref('cropData').on('value', snap => { 
-        cropDataDB = snap.exists() ? snap.val() : []; 
-        syncMissingNames(); 
-        refreshOpenModals('crop'); 
-    });
-    database.ref('merchantData').on('value', snap => { 
-        merchantDB = snap.exists() ? snap.val() : []; 
-        syncMissingNames(); 
-        refreshOpenModals('merchant'); 
-    });
-    database.ref('bagData').on('value', snap => { 
-        bagDB = snap.exists() ? snap.val() : []; 
-        syncMissingNames(); 
-        refreshOpenModals('bag'); 
-    });
-
-    function refreshOpenModals(type) {
-        if(type==='crop') {
-            if(document.getElementById("previewModal").style.display==="block") renderPreview();
-            if(document.getElementById("listModal").style.display==="block") generateFarmerStatus();
-            if(document.getElementById("advListModal").style.display==="block") renderAdvList();
-            if(document.getElementById("detailModal").style.display==="block") renderDetail(document.getElementById("detailFarmerName").innerText);
-        } else if(type==='merchant') {
-            if(document.getElementById("merPreviewModal").style.display==="block") renderMerPreview();
-            if(document.getElementById("merchantListModal").style.display==="block") renderMerList();
-            if(document.getElementById("merDetailModal").style.display==="block") renderMerHistory(document.getElementById("activeMerchantName").value);
-        } else if(type==='bag') {
-            if(document.getElementById("bagPreviewModal").style.display==="block") renderBagPreview();
-            if(document.getElementById("bagListModal").style.display==="block") renderBagList();
-        }
-    }
-
-    function getData() { return cropDataDB || []; }
-    function saveData(data) { cropDataDB = data; database.ref('cropData').set(data); }
-    function getMerchantDB() { return merchantDB || []; }
-    function saveMerchantDB(data) { merchantDB = data; database.ref('merchantData').set(data); }
-    function getBagDB() { return bagDB || []; }
-    function saveBagDB(data) { bagDB = data; database.ref('bagData').set(data); }
-
-    function toMarathi(num) { const map = { '0':'०','1':'१','2':'२','3':'३','4':'४','5':'५','6':'६','7':'७','8':'८','9':'९' }; return num.toString().split('').map(d => map[d] || d).join(''); }
-    function formatDate(dateStr) { if(!dateStr) return ""; let d = new Date(dateStr); let day = String(d.getDate()).padStart(2, '0'); let month = String(d.getMonth()+1).padStart(2, '0'); let year = String(d.getFullYear()).slice(-2); return `${day}/${month}/${year}`; }
-    const marathiMonths = ["जानेवारी", "फेब्रुवारी", "मार्च", "एप्रिल", "मे", "जून", "जुलै", "ऑगस्ट", "सप्टेंबर", "ऑक्टोबर", "नोव्हेंबर", "डिसेंबर"];
-
-    document.addEventListener("DOMContentLoaded", () => {
         let today = new Date().toISOString().slice(0, 10);
         document.getElementById("dateInput").value = today;
         document.getElementById("advDate").value = today;
@@ -369,9 +291,158 @@
         document.getElementById("reportMonth").value = new Date().toISOString().slice(0, 7);
     });
 
+    const firebaseConfig = {
+      apiKey: "AIzaSyD1XNdHAgGO4teBASsQG35UuG4OJrVzV08",
+      authDomain: "smartbilling-6262c.firebaseapp.com",
+      databaseURL: "https://smartbilling-6262c-default-rtdb.firebaseio.com",
+      projectId: "smartbilling-6262c"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    firebase.database().ref(".info/connected").on("value", (snap) => {
+        let st = document.getElementById("syncStatus");
+        if (snap.val() === true) { st.innerText = "🟢 Cloud Connected"; st.style.background = "#10b981"; } 
+        else { st.innerText = "🔴 Offline"; st.style.background = "#ef4444"; }
+    });
+
+    const defaultFarmersList = ["1. सौदी", "2. पोपट", "3. बन्ने", "4. तानाजी", "5. आकाश", "6. शिवानंद", "7. हरी"];
+    let farmers = defaultFarmersList;
+    let merchants = ["Traders A"];
+    
+    let cropDataDB = []; let merchantDB = []; let bagDB = [];
+
+    function syncMissingNames() {
+        let fUpdate = false, mUpdate = false;
+        [...(cropDataDB||[]), ...(bagDB||[])].forEach(e => { if (e.name) { let n=e.name.trim(); if (n && !farmers.find(f=>f.toLowerCase()===n.toLowerCase())) { farmers.push(n); fUpdate=true; } } });
+        (merchantDB||[]).forEach(e => { if (e.name) { let n=e.name.trim(); if (n && !merchants.find(m=>m.toLowerCase()===n.toLowerCase())) { merchants.push(n); mUpdate=true; } } });
+        if(fUpdate) database.ref('farmers').set(farmers); if(mUpdate) database.ref('merchants').set(merchants);
+    }
+
+    database.ref('farmers').once('value', snap => { if(!snap.exists()) database.ref('farmers').set(defaultFarmersList); });
+    database.ref('merchants').once('value', snap => { if(!snap.exists()) database.ref('merchants').set(["Traders A"]); });
+
+    database.ref('farmers').on('value', snap => { if(snap.exists()) { farmers=snap.val(); loadFarmerList(); if(document.getElementById("listModal").style.display==="block") generateFarmerStatus(); } });
+    database.ref('merchants').on('value', snap => { if(snap.exists()) { merchants=snap.val(); loadMerchantList(); if(document.getElementById("merchantListModal").style.display==="block") renderMerList(); } });
+
+    database.ref('cropData').on('value', snap => { cropDataDB=snap.exists()?snap.val():[]; syncMissingNames(); refreshOpenModals('crop'); updateDashboard(); });
+    database.ref('merchantData').on('value', snap => { merchantDB=snap.exists()?snap.val():[]; syncMissingNames(); refreshOpenModals('merchant'); updateDashboard(); });
+    database.ref('bagData').on('value', snap => { bagDB=snap.exists()?snap.val():[]; syncMissingNames(); refreshOpenModals('bag'); });
+
+    function getData() { return cropDataDB || []; } function saveData(data) { cropDataDB = data; database.ref('cropData').set(data); }
+    function getMerchantDB() { return merchantDB || []; } function saveMerchantDB(data) { merchantDB = data; database.ref('merchantData').set(data); }
+    function getBagDB() { return bagDB || []; } function saveBagDB(data) { bagDB = data; database.ref('bagData').set(data); }
+
+    function toMarathi(num) { const map = { '0':'०','1':'१','2':'२','3':'३','4':'४','5':'५','6':'६','7':'७','8':'८','9':'९' }; return num.toString().split('').map(d => map[d] || d).join(''); }
+    function formatDate(dateStr) { if(!dateStr) return ""; let d = new Date(dateStr); return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}`; }
+    const marathiMonths = ["जानेवारी", "फेब्रुवारी", "मार्च", "एप्रिल", "मे", "जून", "जुलै", "ऑगस्ट", "सप्टेंबर", "ऑक्टोबर", "नोव्हेंबर", "डिसेंबर"];
+
+    /* ====== FEATURE 2 & 8: SMART DASHBOARD & ALERT LOGIC ====== */
+    function updateDashboard() {
+        let today = new Date().toISOString().slice(0, 10);
+        let tPurch = 0; let tAdv = 0;
+        (cropDataDB || []).forEach(e => {
+            if(e.date === today) {
+                if(e.type === 'crop') tPurch += e.total;
+                else if(e.type === 'advance' && e.amount > 0) tAdv += e.amount;
+            }
+        });
+        
+        let tSales = 0; let pendingVasuli = 0;
+        (merchantDB || []).forEach(e => {
+            if(e.date === today && e.type !== 'payment') tSales += e.total;
+            if(e.type === 'payment') pendingVasuli -= e.amount; else pendingVasuli += e.total;
+        });
+
+        document.getElementById("dashPurchase").innerText = `₹ ${tPurch.toLocaleString()}`;
+        document.getElementById("dashSales").innerText = `₹ ${tSales.toLocaleString()}`;
+        document.getElementById("dashPending").innerText = `₹ ${pendingVasuli.toLocaleString()}`;
+        document.getElementById("dashAdvance").innerText = `₹ ${tAdv.toLocaleString()}`;
+    }
+
     function loadFarmerList() { let dl=document.getElementById("farmerList"); dl.innerHTML=""; farmers.sort((a,b)=>(parseInt(a)||999)-(parseInt(b)||999)); farmers.forEach(f=>{let op=document.createElement("option");op.value=f;dl.appendChild(op);}); }
     function loadMerchantList() { let dl=document.getElementById("merchantList"); let dl2=document.getElementById("billNameSuggestions"); dl.innerHTML=""; dl2.innerHTML=""; merchants.forEach(m=>{let op=document.createElement("option");op.value=m;dl.appendChild(op);let op2=document.createElement("option");op2.value=m;dl2.appendChild(op2);}); }
     function autoSelectFarmerName() { let v=document.getElementById("farmerName").value.trim(); if(!isNaN(v)&&v!==""){let f=farmers.find(n=>n.startsWith(v+".")); if(f) document.getElementById("farmerName").value=f;}}
+
+    /* ====== FEATURE 15: VOICE TO FORM AI ====== */
+    function startVoiceRecognition() {
+        if (!('webkitSpeechRecognition' in window)) {
+            alert("तुमचा ब्राउझर व्हॉईस कमांड सपोर्ट करत नाही. कृपया Safari किंवा Google Chrome वापरा.");
+            return;
+        }
+        const recognition = new webkitSpeechRecognition();
+        recognition.lang = 'mr-IN'; // Marathi Language
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        let btn = document.getElementById("micBtn");
+        btn.classList.add("recording");
+
+        recognition.start();
+
+        recognition.onresult = function(event) {
+            const speechResult = event.results[0][0].transcript.toLowerCase();
+            processVoiceCommand(speechResult);
+            btn.classList.remove("recording");
+        };
+
+        recognition.onerror = function(event) {
+            alert("आवाज ओळखता आला नाही. कृपया पुन्हा प्रयत्न करा.");
+            btn.classList.remove("recording");
+        };
+        
+        recognition.onend = function() {
+            btn.classList.remove("recording");
+        };
+    }
+
+    function processVoiceCommand(text) {
+        // उदा: "पोपट ५० किलो १५ रुपये" -> Weight: 50, Rate: 15, Name: पोपट
+        let engText = text.replace(/[०-९]/g, d => '०१२३४५६७८९'.indexOf(d)); // Convert Marathi numbers to English
+        let nums = engText.match(/\d+(\.\d+)?/g);
+        let namePart = text.replace(/[0-9०-९.]/g, '').replace(/(kilo|kg|rupaye|rs|रुपये|किलो|रुपया|भाव|वजन|चे|चा)/gi, '').trim();
+        
+        if(namePart) {
+            let matchedFarmer = farmers.find(f => f.toLowerCase().includes(namePart.toLowerCase()));
+            if(matchedFarmer) document.getElementById("farmerName").value = matchedFarmer;
+            else document.getElementById("farmerName").value = namePart; 
+        }
+        if(nums && nums.length > 0) document.getElementById("weight").value = nums[0];
+        if(nums && nums.length > 1) document.getElementById("rate").value = nums[1];
+    }
+
+    /* ====== FEATURE 1: WHATSAPP INTEGRATION ====== */
+    function sendWhatsAppBill(areaId) {
+        let printArea = document.getElementById(areaId);
+        if(!printArea) return;
+        
+        let billText = "🧾 *SMART BILLING* 🧾\n-------------------------\n";
+        let name = document.getElementById(areaId === 'mainBillPrintableArea' ? "billHeaderName" : "bagBillHeaderName").innerText;
+        let date = document.getElementById(areaId === 'mainBillPrintableArea' ? "billMonthDisplay" : "bagBillDateDisplay").innerText;
+        
+        billText += `👤 नाव: *${name}*\n📅 तारीख: ${date}\n-------------------------\n`;
+        
+        let listItems = printArea.querySelectorAll(".bill-item, tr");
+        listItems.forEach(item => {
+            let text = item.innerText.replace(/\s+/g, ' ').trim();
+            if(text && text !== "तारीख तपशील रक्कम (₹)" && !text.includes("Total Amount") && !text.includes("No Data")) {
+                billText += text + "\n";
+            }
+        });
+        
+        billText += "-------------------------\n";
+        let totalSpan = document.getElementById(areaId === 'mainBillPrintableArea' ? "billTotalAmount" : "bagBillTotalAmount");
+        if(totalSpan) billText += `💰 *एकूण रक्कम: ${totalSpan.innerText}*\n`;
+        
+        let advSpan = document.getElementById("billAdvBox");
+        if(advSpan && advSpan.innerText) billText += `🛑 ${advSpan.innerText}\n`;
+        
+        billText += "-------------------------\n🙏 *धन्यवाद* 🙏";
+
+        let encodedText = encodeURIComponent(billText);
+        window.open(`https://wa.me/?text=${encodedText}`, '_blank');
+    }
 
     function downloadBillPDF(areaId, type) {
         let nameElement = type === 'BAG' ? document.getElementById("bagBillHeaderName") : document.getElementById("billHeaderName");
@@ -382,33 +453,20 @@
     }
 
     function resolveAndAddName(type, rawName) {
-        let name = rawName.trim();
-        if(!name) return "";
-        let nameLower = name.toLowerCase();
-        
+        let name = rawName.trim(); if(!name) return ""; let nameLower = name.toLowerCase();
         if (type === 'farmer') {
-            let existing = farmers.find(f => f.toLowerCase() === nameLower);
-            if (existing) return existing; 
-            farmers.push(name);
-            database.ref('farmers').set(farmers);
-            return name;
+            let existing = farmers.find(f => f.toLowerCase() === nameLower); if (existing) return existing; 
+            farmers.push(name); database.ref('farmers').set(farmers); return name;
         } else {
-            let existing = merchants.find(m => m.toLowerCase() === nameLower);
-            if (existing) return existing;
-            merchants.push(name);
-            database.ref('merchants').set(merchants);
-            return name;
+            let existing = merchants.find(m => m.toLowerCase() === nameLower); if (existing) return existing;
+            merchants.push(name); database.ref('merchants').set(merchants); return name;
         }
     }
 
-    /* 1. FARMER CROP */
     function onDateChange() { document.getElementById("rate").value=""; }
     function saveCrop() {
-        let date=document.getElementById("dateInput").value; 
-        let rawName=document.getElementById("farmerName").value;
-        let name = resolveAndAddName('farmer', rawName);
-        let w=parseFloat(document.getElementById("weight").value); 
-        let r=parseFloat(document.getElementById("rate").value);
+        let date=document.getElementById("dateInput").value; let name=resolveAndAddName('farmer', document.getElementById("farmerName").value);
+        let w=parseFloat(document.getElementById("weight").value); let r=parseFloat(document.getElementById("rate").value);
         if(!date||!name||!w||!r) { alert("Fill all details!"); return; }
         let data=getData(); if(data.some(e=>e.date===date && e.name===name && e.type==='crop')) { alert("⚠️ Double Entry Detected!"); return; }
         data.push({id:Date.now(), date, name, type:'crop', weight:w, rate:r, total:Math.floor((w*r)/5)*5}); saveData(data);
@@ -418,259 +476,101 @@
     function openPreviewModal() { document.getElementById("previewModal").style.display="block"; renderPreview(); }
     function renderPreview() { let date = document.getElementById("dateInput").value; let data = getData().filter(e => e.date === date); let tbody = document.getElementById("previewBody"); tbody.innerHTML = ""; data.sort((a, b) => (parseInt(a.name) || 999) - (parseInt(b.name) || 999)); data.forEach(e => { let details = e.type === 'crop' ? `${toMarathi(e.weight)}x${toMarathi(e.rate)}` : "Adv"; tbody.innerHTML += `<tr><td>${e.name}</td><td>${details}</td><td style="font-weight:bold;">${toMarathi(e.total||e.amount)}</td><td style="text-align:center;"><button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑️</button></td></tr>`; }); }
     function editEntry(id) { let data=getData(); let idx=data.findIndex(e=>e.id===id); if(idx===-1)return; let e=data[idx]; if(e.type==='crop'){ let w=prompt("Weight:",e.weight); let r=prompt("Rate:",e.rate); if(w&&r){e.weight=parseFloat(w);e.rate=parseFloat(r);e.total=Math.floor((e.weight*e.rate)/5)*5; saveData(data); }} else { let a = prompt("Amount:", Math.abs(e.amount)); if(a){e.amount = parseFloat(a)*(e.amount<0?-1:1); saveData(data); } } }
-    function delEntry(id) { if(prompt("Enter PIN to delete:")==="1504"){ let data=getData(); saveData(data.filter(e=>e.id!==id)); } else { alert("Wrong Password"); } }
+    function delEntry(id) { if(prompt("Enter PIN:")==="1504"){ let data=getData(); saveData(data.filter(e=>e.id!==id)); } }
     function openFarmerListModal() { document.getElementById("listModal").style.display="block"; generateFarmerStatus(); }
     let showAll=false; function toggleAllAmounts(){ showAll=!showAll; generateFarmerStatus(); }
     let listMode=false; function toggleEditMode(){ listMode=!listMode; document.getElementById("manageListBtn").innerText=listMode?"❌ Done":"⚙️ Manage"; generateFarmerStatus(); }
-    function generateFarmerStatus() { let data = getData(); let tbody = document.getElementById("farmerListBody"); tbody.innerHTML=""; farmers.sort((a,b)=>(parseInt(a)||999)-(parseInt(b)||999)); farmers.forEach(f => { let total = 0; data.forEach(e=>{ if(e.name===f && e.type==='crop') total+=e.total; }); let btns = listMode ? `<div style='float:right'><button class='manage-btn' style='color:#f39c12;' onclick="editFarmerName('${f}')">✎</button><button class='manage-btn' style='color:#e74c3c;' onclick="delFarmerName('${f}')">🗑</button></div>` : ""; tbody.innerHTML += `<tr class='premium-row'><td><div style="display:flex; align-items:center;"><div class="user-avatar">🧑‍🌾</div><span onclick="openDetailModal('${f}')" style="cursor:pointer; font-weight:600; color:var(--text-main);">${f}</span></div>${btns}</td><td style="text-align:right;"><span style="${showAll ? '' : 'display:none'}" class="badge-green">₹ ${total}</span><span style="${showAll ? 'display:none' : ''}" style="color:var(--text-muted);">****</span></td></tr>`; }); }
-    
+    function generateFarmerStatus() { let data = getData(); let tbody = document.getElementById("farmerListBody"); tbody.innerHTML=""; farmers.sort((a,b)=>(parseInt(a)||999)-(parseInt(b)||999)); farmers.forEach(f => { let total = 0; data.forEach(e=>{ if(e.name===f && e.type==='crop') total+=e.total; }); let btns = listMode ? `<div style='float:right'><button class='manage-btn' onclick="editFarmerName('${f}')">✎</button><button class='manage-btn' style='color:#e74c3c;' onclick="delFarmerName('${f}')">🗑</button></div>` : ""; tbody.innerHTML += `<tr class='premium-row'><td><div style="display:flex; align-items:center;"><div class="user-avatar">🧑‍🌾</div><span onclick="openDetailModal('${f}')" style="cursor:pointer; font-weight:600;">${f}</span></div>${btns}</td><td style="text-align:right;"><span style="${showAll ? '' : 'display:none'}" class="badge-green">₹ ${total}</span><span style="${showAll ? 'display:none' : ''}" style="color:var(--text-muted);">****</span></td></tr>`; }); }
     function addNewFarmerPrompt() { let n=prompt("New Farmer Name:"); if(n){ farmers.push(n); database.ref('farmers').set(farmers); } }
     function editFarmerName(old) { let n=prompt("Edit Name:",old); if(n&&n!==old){ let i=farmers.indexOf(old); if(i!==-1)farmers[i]=n; database.ref('farmers').set(farmers); let d=getData(); d.forEach(e=>{if(e.name===old)e.name=n;}); saveData(d); } }
     function delFarmerName(n) { if(prompt("Enter PIN:")==="1504"){ farmers=farmers.filter(f=>f!==n); database.ref('farmers').set(farmers); } }
-    
     function openDetailModal(n) { document.getElementById("detailModal").style.display="block"; document.getElementById("detailFarmerName").innerText=n; renderDetail(n); }
     function renderDetail(n) { let d = getData().filter(e=>e.name===n); d.sort((a,b)=>b.id-a.id); let tb = document.getElementById("detailBody"); tb.innerHTML=""; d.forEach(e=>{ let dt = e.type==='crop'?`${e.weight}x${e.rate}`:"<span style='color:var(--danger);'>Adv</span>"; let amtStyle = e.type==='crop'?'':'color:var(--danger);font-weight:bold;'; tb.innerHTML+=`<tr><td>${formatDate(e.date)}</td><td>${e.type}</td><td>${dt}</td><td style="font-weight:bold; ${amtStyle}">${e.total||e.amount}</td><td style="text-align:center;"><button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button></td></tr>`; }); if(d.length===0) tb.innerHTML="<tr><td colspan='5' style='text-align:center;'>नोंद नाही</td></tr>"; }
-    function calculateGrandTotal() { document.getElementById("grandTotalDisplay").innerText="₹ "+getData().reduce((sum,e)=>e.type==='crop'?sum+e.total:sum,0).toLocaleString(); document.getElementById("grandTotalModal").style.display="block"; }
 
-    /* 2. ADVANCE */
     function openAdvModal() { document.getElementById("advModal").style.display="block"; document.getElementById("advDate").value=document.getElementById("dateInput").value; }
-    function saveAdvance(act) { 
-        let rawName=document.getElementById("advFarmerName").value; 
-        let name = resolveAndAddName('farmer', rawName);
-        let a=parseFloat(document.getElementById("advAmount").value); 
-        if(!name||!a)return; 
-        let d=getData(); d.push({id:Date.now(), date:document.getElementById("advDate").value, name:name, type:'advance', amount:act==='GIVE'?a:-a}); saveData(d); alert("Advance Saved!"); document.getElementById("advAmount").value=""; document.getElementById("advModal").style.display="none"; 
-    }
+    function saveAdvance(act) { let name=resolveAndAddName('farmer', document.getElementById("advFarmerName").value); let a=parseFloat(document.getElementById("advAmount").value); if(!name||!a)return; let d=getData(); d.push({id:Date.now(), date:document.getElementById("advDate").value, name:name, type:'advance', amount:act==='GIVE'?a:-a}); saveData(d); document.getElementById("advAmount").value=""; document.getElementById("advModal").style.display="none"; }
     function openAdvListModal() { document.getElementById("advListModal").style.display="block"; renderAdvList(); }
     let isAdvMode = false; function toggleAdvEditMode(){ isAdvMode=!isAdvMode; document.getElementById("manageAdvListBtn").innerText=isAdvMode?"❌ Done":"⚙️ Manage"; renderAdvList(); }
-    function renderAdvList() { let d=getData().filter(e=>e.type==='advance'); d.sort((a,b)=>b.id-a.id); let tb=document.getElementById("advListBody"); tb.innerHTML=""; let t=0; d.forEach(e=>{ t+=e.amount; let b=isAdvMode?`<button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button>`:""; let typeSpan = e.amount>0?'<span style="color:var(--danger);font-weight:bold;">Given</span>':'<span style="color:var(--success);font-weight:bold;">Received</span>'; tb.innerHTML+=`<tr><td>${formatDate(e.date)}</td><td>${e.name}</td><td>${typeSpan}</td><td style="font-weight:bold;">${Math.abs(e.amount)}</td><td style="text-align:center;">${b}</td></tr>`; }); document.getElementById("totalAdvDisplay").innerText="Total Adv: ₹" + t; if(d.length===0) tb.innerHTML="<tr><td colspan='5' style='text-align:center;'>No Advances</td></tr>"; }
+    function renderAdvList() { let d=getData().filter(e=>e.type==='advance'); d.sort((a,b)=>b.id-a.id); let tb=document.getElementById("advListBody"); tb.innerHTML=""; let t=0; d.forEach(e=>{ t+=e.amount; let b=isAdvMode?`<button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button>`:""; let typeSpan = e.amount>0?'<span style="color:var(--danger);font-weight:bold;">Given</span>':'<span style="color:var(--success);font-weight:bold;">Received</span>'; tb.innerHTML+=`<tr><td>${formatDate(e.date)}</td><td>${e.name}</td><td>${typeSpan}</td><td style="font-weight:bold;">${Math.abs(e.amount)}</td><td style="text-align:center;">${b}</td></tr>`; }); document.getElementById("totalAdvDisplay").innerText="Total Adv: ₹" + t; }
 
-    /* 3. BAGS / POTI */
     function openBagModal() { document.getElementById("bagModal").style.display="block"; }
-    function saveBagEntry() { 
-        let date = document.getElementById("bagDate").value; 
-        let rawName = document.getElementById("bagName").value; 
-        let name = resolveAndAddName('farmer', rawName);
-        let qty = parseInt(document.getElementById("bagQty").value); 
-        let type = document.getElementById("bagType").value; 
-        let rate = parseFloat(document.getElementById("bagRate").value) || 0; 
-        if(!date || !name || !qty) return; 
-        let data = getBagDB(); if(data.some(e => e.date === date && e.name === name)) { alert("⚠️ Double Entry Detected!"); return; } 
-        data.push({ id: Date.now(), date, name, qty, type, rate, total: qty*rate }); saveBagDB(data); document.getElementById("bagQty").value = ""; document.getElementById("bagName").value = ""; alert("Bag Saved!"); 
-    }
+    function saveBagEntry() { let date = document.getElementById("bagDate").value; let name = resolveAndAddName('farmer', document.getElementById("bagName").value); let qty = parseInt(document.getElementById("bagQty").value); let type = document.getElementById("bagType").value; let rate = parseFloat(document.getElementById("bagRate").value) || 0; if(!date || !name || !qty) return; let data = getBagDB(); if(data.some(e => e.date === date && e.name === name)) return; data.push({ id: Date.now(), date, name, qty, type, rate, total: qty*rate }); saveBagDB(data); document.getElementById("bagQty").value = ""; document.getElementById("bagName").value = ""; }
     function openBagPreview() { document.getElementById("bagPreviewModal").style.display="block"; renderBagPreview(); }
-    function renderBagPreview() { let date = document.getElementById("bagDate").value; let data = getBagDB().filter(e => e.date === date); let tbody = document.getElementById("bagPreviewBody"); tbody.innerHTML = ""; data.sort((a,b) => b.id - a.id); data.forEach(e => { let t = e.type === 'Poti' ? 'पोती' : 'बॅग'; tbody.innerHTML += `<tr><td>${e.name}</td><td>${toMarathi(e.qty)} ${t} x ${e.rate||0}</td><td style="font-weight:bold;">₹${toMarathi(e.total||0)}</td><td style="text-align:center;"><button class="small-btn btn-edit" onclick="editBagEntry(${e.id}, 'preview')">✏️</button><button class="small-btn btn-del" onclick="delBagEntry(${e.id}, 'preview')">🗑</button></td></tr>`; }); if(data.length===0) tbody.innerHTML="<tr><td colspan='4' style='text-align:center;'>No Entries Today</td></tr>"; }
+    function renderBagPreview() { let date = document.getElementById("bagDate").value; let data = getBagDB().filter(e => e.date === date); let tbody = document.getElementById("bagPreviewBody"); tbody.innerHTML = ""; data.sort((a,b) => b.id - a.id); data.forEach(e => { let t = e.type === 'Poti' ? 'पोती' : 'बॅग'; tbody.innerHTML += `<tr><td>${e.name}</td><td>${toMarathi(e.qty)} ${t} x ${e.rate||0}</td><td style="font-weight:bold;">₹${toMarathi(e.total||0)}</td><td style="text-align:center;"><button class="small-btn btn-edit" onclick="editBagEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delBagEntry(${e.id})">🗑</button></td></tr>`; }); }
     let isBagListMode = false; function openBagList() { document.getElementById("bagListModal").style.display="block"; isBagListMode = false; document.getElementById("bagManageBtn").innerText="⚙️ Manage"; renderBagList(); }
     function toggleBagListMode() { isBagListMode = !isBagListMode; document.getElementById("bagManageBtn").innerText = isBagListMode ? "❌ Done" : "⚙️ Manage"; renderBagList(); }
-    function renderBagList() { let data = getBagDB(); let container = document.getElementById("bagListContainer"); container.innerHTML = ""; let grouped = {}; data.forEach(e => { if(!grouped[e.date]) grouped[e.date] = []; grouped[e.date].push(e); }); let dates = Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a)); dates.forEach(d => { let html = `<div class="date-group-header" style="padding:10px; font-weight:bold; background:#f1f5f9;">${formatDate(d)}</div>`; grouped[d].forEach(e => { let t = e.type === 'Poti' ? 'पोती' : 'बॅग'; let btns = isBagListMode ? `<div class="bag-actions"><button class="manage-btn" style="padding:4px 8px; font-size:12px; color:#f39c12; margin-left:0; margin-right:4px;" onclick="editBagEntry(${e.id}, 'list')">✏️</button><button class="manage-btn" style="padding:4px 8px; font-size:12px; color:#e74c3c; margin-left:0;" onclick="delBagEntry(${e.id}, 'list')">🗑</button></div>` : ""; html += `<div class="bag-row" style="border-radius:8px; margin-bottom:5px; border:1px solid #f1f5f9; padding:10px;"><div class="bag-name"><b>${e.name}</b></div><div class="bag-type" style="text-align:left; color:var(--text-main);">${toMarathi(e.qty)} ${t} x ₹${e.rate||0} = <span style="font-weight:bold;">₹${toMarathi(e.total||0)}</span></div>${btns}</div>`; }); container.innerHTML += html; }); if(dates.length===0) container.innerHTML="<p style='text-align:center; padding:20px; color:var(--text-muted);'>No History Found.</p>"; }
-    function editBagEntry(id, source) { let data=getBagDB(); let idx=data.findIndex(e=>e.id===id); if(idx===-1)return; let n=prompt("Name:", data[idx].name); if(!n)return; let q=prompt("Qty:", data[idx].qty); if(!q)return; let t=prompt("Poti/Bag:", data[idx].type); if(!t)return; let r=prompt("Rate:", data[idx].rate||0); if(!r)return; data[idx].name=n.trim(); data[idx].qty=parseInt(q); data[idx].type=(t.toLowerCase().includes('po')||t.includes('पो'))?'Poti':'Bag'; data[idx].rate=parseFloat(r)||0; data[idx].total=data[idx].qty*data[idx].rate; saveBagDB(data); }
-    function delBagEntry(id, source) { if(prompt("Enter PIN:")==="1504"){ saveBagDB(getBagDB().filter(e=>e.id!==id)); } else { alert("Wrong Password!"); } }
+    function renderBagList() { let data = getBagDB(); let container = document.getElementById("bagListContainer"); container.innerHTML = ""; let grouped = {}; data.forEach(e => { if(!grouped[e.date]) grouped[e.date] = []; grouped[e.date].push(e); }); let dates = Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a)); dates.forEach(d => { let html = `<div style="padding:10px; font-weight:bold; background:#f1f5f9;">${formatDate(d)}</div>`; grouped[d].forEach(e => { let t = e.type === 'Poti' ? 'पोती' : 'बॅग'; let btns = isBagListMode ? `<button class="manage-btn" onclick="editBagEntry(${e.id})">✏️</button><button class="manage-btn" onclick="delBagEntry(${e.id})">🗑</button>` : ""; html += `<div style="border-bottom:1px solid #eee; padding:10px;"><b>${e.name}</b><br>${toMarathi(e.qty)} ${t} x ₹${e.rate||0} = <b>₹${toMarathi(e.total||0)}</b>${btns}</div>`; }); container.innerHTML += html; }); }
+    function editBagEntry(id) { let data=getBagDB(); let idx=data.findIndex(e=>e.id===id); if(idx===-1)return; let q=prompt("Qty:", data[idx].qty); if(!q)return; data[idx].qty=parseInt(q); data[idx].total=data[idx].qty*(data[idx].rate||0); saveBagDB(data); }
+    function delBagEntry(id) { if(prompt("Enter PIN:")==="1504"){ saveBagDB(getBagDB().filter(e=>e.id!==id)); } }
     function openBagBillModal() { document.getElementById("bagBillModal").style.display="block"; }
-    function generateBagBill() { let name=document.getElementById("bagBillName").value.trim(); let start=document.getElementById("bagStartDate").value; let end=document.getElementById("bagEndDate").value; if(!name||!start||!end) { alert("Fill all details"); return;} document.getElementById("bagBillModal").style.display="none"; document.getElementById("finalBagBillModal").style.display="block"; document.getElementById("bagBillHeaderName").innerText=name; document.getElementById("bagBillDateDisplay").innerText=formatDate(start)+" ते "+formatDate(end); let data=getBagDB().filter(e=>e.name===name&&e.date>=start&&e.date<=end); data.sort((a,b)=>new Date(a.date)-new Date(b.date)); let list=document.getElementById("bagBillList"); list.innerHTML=""; let tSum=0; data.forEach(e=>{ tSum+=e.total||0; list.innerHTML+=`<li class="bill-item" style="border-bottom: 1px dashed #ccc; padding: 5px 0;"><span>${formatDate(e.date)} - ${toMarathi(e.qty)} ${e.type==='Poti'?'पोती':'बॅग'} x ${toMarathi(e.rate||0)} = ${toMarathi(e.total||0)}/-</span></li>`; }); if(list.innerHTML==="")list.innerHTML="<li style='text-align:center;'>No Data</li>"; document.getElementById("bagBillTotalAmount").innerText=toMarathi(tSum)+"/-"; }
+    function generateBagBill() { let name=document.getElementById("bagBillName").value.trim(); let start=document.getElementById("bagStartDate").value; let end=document.getElementById("bagEndDate").value; if(!name||!start||!end) return; document.getElementById("bagBillModal").style.display="none"; document.getElementById("finalBagBillModal").style.display="block"; document.getElementById("bagBillHeaderName").innerText=name; document.getElementById("bagBillDateDisplay").innerText=formatDate(start)+" ते "+formatDate(end); let data=getBagDB().filter(e=>e.name===name&&e.date>=start&&e.date<=end); data.sort((a,b)=>new Date(a.date)-new Date(b.date)); let list=document.getElementById("bagBillList"); list.innerHTML=""; let tSum=0; data.forEach(e=>{ tSum+=e.total||0; list.innerHTML+=`<li class="bill-item" style="border-bottom: 1px dashed #ccc; padding: 5px 0;"><span>${formatDate(e.date)} - ${toMarathi(e.qty)} ${e.type==='Poti'?'पोती':'बॅग'} x ${toMarathi(e.rate||0)} = ${toMarathi(e.total||0)}/-</span></li>`; }); document.getElementById("bagBillTotalAmount").innerText=toMarathi(tSum)+"/-"; }
 
-    /* 4. MERCHANT (TRADERS) */
     function openMerchantHub() { document.getElementById("merchantHubModal").style.display="block"; }
-    function saveMerchantEntry() {
-        let date=document.getElementById("merDate").value; 
-        let rawName=document.getElementById("merName").value; 
-        let name = resolveAndAddName('merchant', rawName);
-        let w=parseFloat(document.getElementById("merWeight").value); 
-        let r=parseFloat(document.getElementById("merRate").value);
-        let merType = document.getElementById("merTypeSel").value; 
-        if(!date||!name||!w||!r) { alert("Fill all trader details"); return; }
-        let data=getMerchantDB();
-        if(data.some(e => e.date === date && e.name === name && e.type !== 'payment' && e.merType === merType)) {
-            alert(`⚠️ Double Entry Detected!\nया व्यापाऱ्याची या तारखेला '${merType}' ची एंट्री आधीच झाली आहे.`); return; 
-        }
-        data.push({id:Date.now(), date, name, type: 'bill', merType: merType, weight:w, rate:r, total:Math.floor((w*r)/5)*5}); 
-        saveMerchantDB(data);
-        document.getElementById("merWeight").value=""; document.getElementById("merName").value=""; 
-        let btn = document.querySelector("#merchantHubModal .btn-add");
-        let orig = btn.innerText; btn.innerText = "✅ Saved!"; btn.style.background = "var(--success)";
-        setTimeout(() => { btn.innerText = orig; btn.style.background = "var(--merchant-color)"; document.getElementById("merName").focus(); }, 1000); 
-    }
-    
-    function openMerJamaModal() { document.getElementById("merJamaModal").style.display="block"; document.getElementById("merJamaDateOut").value = document.getElementById("dateInput").value; document.getElementById("merJamaNameOut").value = document.getElementById("merName").value; }
-    function saveMerJamaOutside() { 
-        let date = document.getElementById("merJamaDateOut").value; 
-        let rawName = document.getElementById("merJamaNameOut").value; 
-        let name = resolveAndAddName('merchant', rawName);
-        let amt = parseFloat(document.getElementById("merJamaAmountOut").value); 
-        if(!date || !name || !amt || amt <= 0) {alert("Fill correct details"); return;} 
-        let data = getMerchantDB(); data.push({ id: Date.now(), date: date, name: name, type: 'payment', amount: amt }); saveMerchantDB(data); 
-        alert("✅ " + name + " जमा: " + amt + "/-"); 
-        document.getElementById("merJamaAmountOut").value = ""; document.getElementById("merJamaModal").style.display="none"; 
-    }
-    
+    function saveMerchantEntry() { let date=document.getElementById("merDate").value; let name=resolveAndAddName('merchant', document.getElementById("merName").value); let w=parseFloat(document.getElementById("merWeight").value); let r=parseFloat(document.getElementById("merRate").value); let merType=document.getElementById("merTypeSel").value; if(!date||!name||!w||!r)return; let data=getMerchantDB(); data.push({id:Date.now(), date, name, type: 'bill', merType, weight:w, rate:r, total:Math.floor((w*r)/5)*5}); saveMerchantDB(data); document.getElementById("merWeight").value=""; document.getElementById("merName").value=""; }
+    function openMerJamaModal() { document.getElementById("merJamaModal").style.display="block"; document.getElementById("merJamaDateOut").value = document.getElementById("dateInput").value; }
+    function saveMerJamaOutside() { let date = document.getElementById("merJamaDateOut").value; let name = resolveAndAddName('merchant', document.getElementById("merJamaNameOut").value); let amt = parseFloat(document.getElementById("merJamaAmountOut").value); if(!date || !name || !amt) return; let data = getMerchantDB(); data.push({ id: Date.now(), date, name, type: 'payment', amount: amt }); saveMerchantDB(data); document.getElementById("merJamaAmountOut").value = ""; document.getElementById("merJamaModal").style.display="none"; }
     function openMerPreviewModal() { document.getElementById("merPreviewModal").style.display="block"; renderMerPreview(); }
-    function renderMerPreview() {
-        let date = document.getElementById("merDate").value; let data = getMerchantDB().filter(e => e.date === date && (!e.type || e.type === 'bill')); let tbody = document.getElementById("merPreviewBody"); tbody.innerHTML = "";
-        data.forEach(e => { tbody.innerHTML += `<tr><td>${e.name}</td><td><span style="color:var(--text-muted); font-size:12px;">${e.merType||''}</span> ${e.weight}x${e.rate}</td><td style="font-weight:bold;">${e.total}</td><td style="text-align:center;"><button class="small-btn btn-edit" onclick="openEditMerEntryModal(${e.id}, 'preview', '${e.name.replace(/'/g, "\\'")}')">✏️</button><button class="small-btn btn-del" onclick="delMerEntry(${e.id})">🗑</button></td></tr>`; });
-        if(data.length===0) tbody.innerHTML="<tr><td colspan='4' style='text-align:center;'>No Entries Today</td></tr>";
-    }
+    function renderMerPreview() { let date = document.getElementById("merDate").value; let data = getMerchantDB().filter(e => e.date === date && (!e.type || e.type === 'bill')); let tbody = document.getElementById("merPreviewBody"); tbody.innerHTML = ""; data.forEach(e => { tbody.innerHTML += `<tr><td>${e.name}</td><td>${e.weight}x${e.rate}</td><td style="font-weight:bold;">${e.total}</td><td style="text-align:center;"><button class="small-btn btn-edit" onclick="openEditMerEntryModal(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delMerEntry(${e.id})">🗑</button></td></tr>`; }); }
+    function calcEditMerTotal() { let w = parseFloat(document.getElementById('editMerWeight').value)||0; let r = parseFloat(document.getElementById('editMerRate').value)||0; document.getElementById('editMerTotal').value = Math.floor((w * r) / 5) * 5; }
+    function openEditMerEntryModal(id) { let data = getMerchantDB(); let idx = data.findIndex(e => e.id === id); if(idx===-1)return; let e=data[idx]; document.getElementById('editMerId').value=id; document.getElementById('editMerDate').value=e.date; if(e.type==='payment'){document.getElementById('editMerBillFields').style.display='none'; document.getElementById('editMerJamaFields').style.display='block'; document.getElementById('editMerJamaAmount').value=e.amount;}else{document.getElementById('editMerBillFields').style.display='block'; document.getElementById('editMerJamaFields').style.display='none'; document.getElementById('editMerWeight').value=e.weight; document.getElementById('editMerRate').value=e.rate; document.getElementById('editMerTotal').value=e.total;} document.getElementById('editMerEntryModal').style.display='block'; }
+    function saveMerEntryEdit() { let id=parseInt(document.getElementById('editMerId').value); let data=getMerchantDB(); let idx=data.findIndex(e=>e.id===id); if(idx===-1)return; data[idx].date=document.getElementById('editMerDate').value; if(data[idx].type==='payment')data[idx].amount=parseFloat(document.getElementById('editMerJamaAmount').value); else { data[idx].weight=parseFloat(document.getElementById('editMerWeight').value); data[idx].rate=parseFloat(document.getElementById('editMerRate').value); data[idx].total=parseFloat(document.getElementById('editMerTotal').value); } saveMerchantDB(data); document.getElementById('editMerEntryModal').style.display='none'; }
+    function delMerEntry(id) { if(prompt("PIN:")==="1504") saveMerchantDB(getMerchantDB().filter(e=>e.id!==id)); }
 
-    function calcEditMerTotal() {
-        let w = parseFloat(document.getElementById('editMerWeight').value) || 0;
-        let r = parseFloat(document.getElementById('editMerRate').value) || 0;
-        document.getElementById('editMerTotal').value = Math.floor((w * r) / 5) * 5;
-    }
-
-    function openEditMerEntryModal(id, source, merchantName) {
-        let data = getMerchantDB(); let idx = data.findIndex(e => e.id === id); if (idx === -1) return; let e = data[idx];
-        document.getElementById('editMerId').value = id; document.getElementById('editMerSource').value = source; document.getElementById('editMerNameHidden').value = merchantName || ''; document.getElementById('editMerDate').value = e.date;
-        if (e.type === 'payment') {
-            document.getElementById('editMerBillFields').style.display = 'none'; document.getElementById('editMerJamaFields').style.display = 'block'; document.getElementById('editMerJamaAmount').value = e.amount;
-        } else {
-            document.getElementById('editMerBillFields').style.display = 'block'; document.getElementById('editMerJamaFields').style.display = 'none'; document.getElementById('editMerWeight').value = e.weight; document.getElementById('editMerRate').value = e.rate; document.getElementById('editMerTypeSel').value = e.merType || 'नि'; document.getElementById('editMerTotal').value = e.total;
-        }
-        document.getElementById('editMerEntryModal').style.display = 'block';
-    }
-
-    function saveMerEntryEdit() {
-        let id = parseInt(document.getElementById('editMerId').value); let data = getMerchantDB(); let idx = data.findIndex(e => e.id === id); if (idx === -1) return;
-        data[idx].date = document.getElementById('editMerDate').value;
-        if (data[idx].type === 'payment') { let a = parseFloat(document.getElementById('editMerJamaAmount').value); if(a > 0) data[idx].amount = a;
-        } else {
-            let w = parseFloat(document.getElementById('editMerWeight').value); let r = parseFloat(document.getElementById('editMerRate').value); let t = parseFloat(document.getElementById('editMerTotal').value);
-            if(w && r && t !== undefined) { data[idx].weight = w; data[idx].rate = r; data[idx].merType = document.getElementById('editMerTypeSel').value; data[idx].total = t; }
-        }
-        saveMerchantDB(data); document.getElementById('editMerEntryModal').style.display = 'none';
-    }
-
-    function delMerEntry(id) { if(prompt("Enter PIN:")==="1504"){ saveMerchantDB(getMerchantDB().filter(e=>e.id!==id)); } else { alert("Wrong Password!");} }
-
+    /* ====== FEATURE 8: VASULI ALERT IN LIST ====== */
     let isMerListMode = false;
-    function openMerchantListModal() { document.getElementById("merchantListModal").style.display="block"; isMerListMode=false; renderMerList(); }
+    function openMerchantListModal() { document.getElementById("merchantListModal").style.display="block"; renderMerList(); }
     function toggleMerListMode() { isMerListMode = !isMerListMode; document.getElementById("merManageBtn").innerText=isMerListMode?"❌ Done":"⚙️ Manage"; renderMerList(); }
-    function addNewMerchantPrompt() { let n = prompt("Enter New Trader Name:"); if(n){ merchants.push(n); database.ref('merchants').set(merchants); } }
-    function editMerName(old) { let n=prompt("Edit Name:", old); if(n&&n!==old){ let i=merchants.indexOf(old); if(i!==-1)merchants[i]=n; database.ref('merchants').set(merchants); let d=getMerchantDB(); d.forEach(e=>{if(e.name===old)e.name=n;}); saveMerchantDB(d); } }
-    function delMerName(n) { if(prompt("Enter PIN:")==="1504"){ merchants=merchants.filter(m=>m!==n); database.ref('merchants').set(merchants); } else { alert("Wrong Password!");} }
+    function addNewMerchantPrompt() { let n = prompt("Trader Name:"); if(n){ merchants.push(n); database.ref('merchants').set(merchants); } }
     function renderMerList() {
         let tbody = document.getElementById("merchantListBody"); tbody.innerHTML = ""; let data = getMerchantDB();
         merchants.forEach(m => {
             let total = 0; data.filter(e => e.name === m).forEach(e => { if(e.type === 'payment') total -= e.amount; else total += e.total; });
-            let btns = isMerListMode ? `<div style='float:right'><button class='manage-btn' onclick="editMerName('${m}')">✎</button><button class='manage-btn' style='color:var(--danger)' onclick="delMerName('${m}')">🗑</button></div>` : "";
-            tbody.innerHTML += `<tr class='premium-row'><td><div style="display:flex; align-items:center;"><div class="user-avatar" style="color:var(--merchant-color); background:#fff7ed;">🏢</div><span onclick="openMerDetail('${m}')" style='cursor:pointer;font-weight:600;'>${m}</span></div>${btns}</td><td style="text-align:right;"><span class="badge-green" style="color:var(--merchant-color); border-color:var(--merchant-color); background:#fff7ed;">₹ ${total.toLocaleString()}</span></td></tr>`;
+            let btns = isMerListMode ? `<div style='float:right'><button class='manage-btn' onclick="if(prompt('PIN:')==='1504'){merchants=merchants.filter(x=>x!=='${m}');database.ref('merchants').set(merchants);}">🗑</button></div>` : "";
+            
+            // Pending Alert Logic
+            let badgeClass = "badge-green"; let alertIcon = ""; let styleStr = "color:var(--merchant-color); background:#fff7ed;";
+            if(total > 0) { badgeClass = "badge-red"; alertIcon = " ⚠️"; styleStr = ""; }
+
+            tbody.innerHTML += `<tr class='premium-row'><td><div style="display:flex; align-items:center;"><div class="user-avatar" style="color:var(--merchant-color); background:#fff7ed;">🏢</div><span onclick="openMerDetail('${m}')" style='cursor:pointer;font-weight:600;'>${m}</span></div>${btns}</td><td style="text-align:right;"><span class="${badgeClass}" style="${styleStr}">₹ ${total.toLocaleString()}${alertIcon}</span></td></tr>`;
         });
     }
-
-    function calculateMerGrandTotal() { let total=0; getMerchantDB().forEach(e=>{if(e.type==='payment')total-=e.amount;else total+=e.total;}); document.getElementById("merGrandTotalDisplay").innerText = "₹ " + total.toLocaleString(); document.getElementById("merGrandTotalModal").style.display = "block"; }
 
     let isMerHistMode = false;
-    function openMerDetail(name) { document.getElementById("merDetailModal").style.display="block"; document.getElementById("activeMerchantName").value = name; document.getElementById("merDetailName").innerText = name; isMerHistMode = false; document.getElementById("merHistManageBtn").innerHTML = "✏️ Edit / Delete Mode"; renderMerHistory(name); }
+    function openMerDetail(name) { document.getElementById("merDetailModal").style.display="block"; document.getElementById("activeMerchantName").value = name; document.getElementById("merDetailName").innerText = name; renderMerHistory(name); }
     function closeMerDetail() { document.getElementById("merDetailModal").style.display="none"; }
-    function toggleMerHistMode() { isMerHistMode = !isMerHistMode; document.getElementById("merHistManageBtn").innerHTML = isMerHistMode ? "❌ Done" : "✏️ Edit / Delete Mode"; let exactName = document.getElementById("activeMerchantName").value; renderMerHistory(exactName); }
-    
-    function renderMerHistory(name) {
-        let data = getMerchantDB().filter(e=>e.name===name); data.sort((a,b)=> new Date(a.date) - new Date(b.date)); 
-        let tbody = document.getElementById("merDetailBody"); tbody.innerHTML=""; let runningBal = 0; let lastDate = ""; 
-        data.forEach(e => {
-            let isBill = e.type !== 'payment'; let safeName = name.replace(/'/g, "\\'");
-            let btns = isMerHistMode ? `<button class="small-btn btn-edit" onclick="openEditMerEntryModal(${e.id}, 'history', '${safeName}')">✏️</button><button class="small-btn btn-del" onclick="delMerEntryHistory(${e.id}, '${safeName}')">🗑</button>` : "";
-            let tPrefix = (e.merType && e.merType !== 'undefined') ? `<span style="font-size:11px; color:var(--text-muted); background:#f1f5f9; padding:2px 6px; border-radius:4px;">${e.merType}</span> ` : "";
-            let displayDate = ""; if (e.date !== lastDate) { displayDate = formatDate(e.date); lastDate = e.date; }
-            if (isBill) {
-                runningBal += e.total;
-                tbody.innerHTML += `<tr><td style="padding: 12px 10px;">${displayDate}</td><td style="padding: 12px 10px;">${tPrefix}${e.weight} x ${e.rate}</td><td style="font-weight:bold; font-size:14px; padding: 12px 10px; text-align:right;">${e.total}</td><td style="text-align:center; padding: 12px 10px;">${btns}</td></tr>`;
-            } else {
-                tbody.innerHTML += `<tr><td></td><td style="text-align:right; font-weight:bold; font-size:13px; padding-top:15px; color:var(--text-muted);">Total :</td><td style="font-weight:bold; font-size:14px; padding-top:15px; text-align:right;">${runningBal}</td><td></td></tr>`;
-                runningBal -= e.amount; let payDate = (e.date !== lastDate) ? formatDate(e.date) : ""; if(e.date !== lastDate) lastDate = e.date;
-                tbody.innerHTML += `<tr><td style="padding: 12px 10px;">${payDate}</td><td style="text-align:right; font-weight:bold; font-size:13px; color:var(--success); padding: 12px 10px;">जमा :</td><td style="font-weight:bold; font-size:14px; border-bottom: 2px solid var(--text-main); color:var(--success); padding: 12px 10px; text-align:right;">- ${e.amount}</td><td style="text-align:center; padding: 12px 10px;">${btns}</td></tr>`;
-                tbody.innerHTML += `<tr><td></td><td></td><td style="padding-top:10px; padding-bottom:20px; text-align:right;"><span class="ledger-box">${runningBal} /-</span></td><td></td></tr>`;
-            }
-        });
-        if(data.length > 0 && data[data.length-1].type !== 'payment') { tbody.innerHTML += `<tr style="background:#eff6ff;"><td></td><td style="text-align:right; font-weight:bold; color:var(--primary);">सध्याची बाकी :</td><td style="padding-top:15px; padding-bottom:15px; text-align:right;"><span class="ledger-box" style="border-color:var(--primary); color:var(--primary);">${runningBal} /-</span></td><td></td></tr>`; }
-        if(data.length===0) tbody.innerHTML="<tr><td colspan='4' style='text-align:center; padding:20px; color:var(--text-muted);'>कोणतीही नोंद नाही</td></tr>";
-        document.getElementById("merTableContainer").scrollTop = document.getElementById("merTableContainer").scrollHeight; 
-    }
-    function delMerEntryHistory(id, name) { if(prompt("Enter PIN:")==="1504"){ saveMerchantDB(getMerchantDB().filter(e=>e.id!==id)); } else {alert("Wrong Password");} }
+    function toggleMerHistMode() { isMerHistMode = !isMerHistMode; document.getElementById("merHistManageBtn").innerHTML = isMerHistMode ? "❌ Done" : "✏️ Edit Mode"; renderMerHistory(document.getElementById("activeMerchantName").value); }
+    function renderMerHistory(name) { let data = getMerchantDB().filter(e=>e.name===name); data.sort((a,b)=> new Date(a.date) - new Date(b.date)); let tbody = document.getElementById("merDetailBody"); tbody.innerHTML=""; let runningBal = 0; data.forEach(e => { let isBill = e.type !== 'payment'; let btns = isMerHistMode ? `<button class="small-btn btn-edit" onclick="openEditMerEntryModal(${e.id})">✏️</button>` : ""; if (isBill) { runningBal += e.total; tbody.innerHTML += `<tr><td>${formatDate(e.date)}</td><td>${e.weight}x${e.rate}</td><td style="font-weight:bold; text-align:right;">${e.total}</td><td style="text-align:center;">${btns}</td></tr>`; } else { tbody.innerHTML += `<tr><td></td><td style="text-align:right; font-weight:bold;">Total:</td><td style="font-weight:bold; text-align:right;">${runningBal}</td><td></td></tr>`; runningBal -= e.amount; tbody.innerHTML += `<tr><td>${formatDate(e.date)}</td><td style="text-align:right; color:green;">जमा:</td><td style="font-weight:bold; color:green; text-align:right;">- ${e.amount}</td><td style="text-align:center;">${btns}</td></tr>`; } }); if(data.length > 0 && data[data.length-1].type !== 'payment') { tbody.innerHTML += `<tr style="background:#eff6ff;"><td></td><td style="text-align:right; font-weight:bold; color:var(--primary);">बाकी:</td><td style="font-weight:bold; text-align:right; color:var(--primary);">${runningBal}</td><td></td></tr>`; } }
 
-    /* COMMON BILL (MONTHLY OR MANUAL DATE) */
-    function toggleBillDateMode() {
-        let mode = document.querySelector('input[name="billDateMode"]:checked').value;
-        if(mode === 'month') { document.getElementById('monthlyBillDiv').style.display = 'block'; document.getElementById('customBillDiv').style.display = 'none'; } 
-        else { document.getElementById('monthlyBillDiv').style.display = 'none'; document.getElementById('customBillDiv').style.display = 'flex'; }
-    }
-
-    function openBillModal(type) { 
-        document.getElementById("billModal").style.display="block"; document.getElementById("billType").value=type; document.getElementById("billTitle").innerText=type==='FARMER'?"📜 Farmer Bill":"📜 Merchant Bill"; 
-        let dl = document.getElementById("billNameSuggestions"); dl.innerHTML = "";
-        if(type === 'FARMER') { farmers.forEach(f => { let op=document.createElement("option"); op.value=f; dl.appendChild(op); }); } else { merchants.forEach(m => { let op=document.createElement("option"); op.value=m; dl.appendChild(op); }); }
-        if(type==='MERCHANT') document.getElementById("searchName").value=document.getElementById("merName").value; else document.getElementById("searchName").value=""; 
-    }
+    function toggleBillDateMode() { let mode = document.querySelector('input[name="billDateMode"]:checked').value; if(mode === 'month') { document.getElementById('monthlyBillDiv').style.display = 'block'; document.getElementById('customBillDiv').style.display = 'none'; } else { document.getElementById('monthlyBillDiv').style.display = 'none'; document.getElementById('customBillDiv').style.display = 'flex'; } }
+    function openBillModal(type) { document.getElementById("billModal").style.display="block"; document.getElementById("billType").value=type; document.getElementById("billTitle").innerText=type==='FARMER'?"📜 Farmer Bill":"📜 Merchant Bill"; let dl = document.getElementById("billNameSuggestions"); dl.innerHTML = ""; if(type === 'FARMER') { farmers.forEach(f => { let op=document.createElement("option"); op.value=f; dl.appendChild(op); }); } else { merchants.forEach(m => { let op=document.createElement("option"); op.value=m; dl.appendChild(op); }); } }
     
     function generateFinalBill() {
-        let type=document.getElementById("billType").value; let n=document.getElementById("searchName").value.trim(); if(!n) { alert("नाव टाका!"); return; } 
-        let mode = document.querySelector('input[name="billDateMode"]:checked').value; let startFilter = ""; let endFilter = ""; let displayDate = ""; let openingBalDateFilter = "";
-
-        if(mode === 'month') {
-            let m = document.getElementById("reportMonth").value; if(!m) { alert("महिना निवडा!"); return; }
-            startFilter = m + "-01"; let year = parseInt(m.split('-')[0]); let month = parseInt(m.split('-')[1]); let lastDay = new Date(year, month, 0).getDate();
-            endFilter = m + "-" + String(lastDay).padStart(2, '0'); displayDate = `${marathiMonths[month-1]} ${year}`; openingBalDateFilter = startFilter;
-        } else {
-            let s = document.getElementById("billMainStartDate").value; let e = document.getElementById("billMainEndDate").value; if(!s || !e || s > e) { alert("कृपया योग्य तारीख निवडा!"); return; }
-            startFilter = s; endFilter = e; displayDate = formatDate(s) + " ते " + formatDate(e); openingBalDateFilter = s;
-        }
-
-        document.getElementById("billModal").style.display="none"; document.getElementById("finalBillModal").style.display="block";
-        document.getElementById("billMonthDisplay").innerText = displayDate; document.getElementById("billHeaderName").innerText = n; 
+        let type=document.getElementById("billType").value; let n=document.getElementById("searchName").value.trim(); if(!n) return;
+        let mode = document.querySelector('input[name="billDateMode"]:checked').value; let startFilter = "", endFilter = "", displayDate = "", openingBalDateFilter = "";
+        if(mode === 'month') { let m = document.getElementById("reportMonth").value; startFilter = m + "-01"; let year = parseInt(m.split('-')[0]); let month = parseInt(m.split('-')[1]); endFilter = m + "-" + String(new Date(year, month, 0).getDate()).padStart(2, '0'); displayDate = `${marathiMonths[month-1]} ${year}`; openingBalDateFilter = startFilter; } else { let s = document.getElementById("billMainStartDate").value; let e = document.getElementById("billMainEndDate").value; startFilter = s; endFilter = e; displayDate = formatDate(s) + " ते " + formatDate(e); openingBalDateFilter = s; }
+        document.getElementById("billModal").style.display="none"; document.getElementById("finalBillModal").style.display="block"; document.getElementById("billMonthDisplay").innerText = displayDate; document.getElementById("billHeaderName").innerText = n; 
         let list=document.getElementById("billList"); list.innerHTML=""; 
         
         if(type==='FARMER'){
             document.getElementById("billTotalRow").style.display = "block"; let tSum=0, aSum=0; let d=getData(); d.sort((a,b)=>new Date(a.date)-new Date(b.date));
-            d.forEach(e=>{ 
-                if(e.name===n && e.date >= startFilter && e.date <= endFilter) { 
-                    if(e.type==='crop'){ tSum+=e.total; list.innerHTML+=`<li class="bill-item" style="border-bottom: 1px dashed #ccc; padding: 5px 0;"><span>${formatDate(e.date)} नि ${e.weight} x ${e.rate} = ${e.total}/-</span></li>`; } 
-                    else aSum+=e.amount; 
-                }
-            });
+            d.forEach(e=>{ if(e.name===n && e.date >= startFilter && e.date <= endFilter) { if(e.type==='crop'){ tSum+=e.total; list.innerHTML+=`<li class="bill-item" style="border-bottom: 1px dashed #ccc; padding: 5px 0;"><span>${formatDate(e.date)} नि ${e.weight} x ${e.rate} = ${e.total}/-</span></li>`; } else aSum+=e.amount; } });
             document.getElementById("billAdvBox").innerText=`Adv: ${aSum}/-`; document.getElementById("billTotalAmount").innerText=tSum+"/-";
         } else {
             document.getElementById("billTotalRow").style.display = "none"; document.getElementById("billAdvBox").innerText="";
             let d=getMerchantDB(); d.sort((a,b)=>new Date(a.date)-new Date(b.date)); let openingBal = 0; let filteredData = [];
-            d.forEach(e => {
-                if(e.name === n) {
-                    if (e.date < openingBalDateFilter) { if(e.type !== 'payment') openingBal += e.total; else openingBal -= e.amount; } 
-                    else if (e.date >= startFilter && e.date <= endFilter) { filteredData.push(e); }
-                }
-            });
+            d.forEach(e => { if(e.name === n) { if (e.date < openingBalDateFilter) { if(e.type !== 'payment') openingBal += e.total; else openingBal -= e.amount; } else if (e.date >= startFilter && e.date <= endFilter) { filteredData.push(e); } } });
             
-            // --- NEW PREMIUM TRADER BILL UI ---
-            let html = `<li style="list-style:none;">
-                <div style="border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);">
-                <table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: left;">
-                <thead>
-                    <tr style="background: #f8fafc; color: #475569; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px;">
-                        <th style="padding: 14px 16px; border-bottom: 2px solid #e2e8f0;">तारीख</th>
-                        <th style="text-align:center; padding: 14px 16px; border-bottom: 2px solid #e2e8f0;">तपशील</th>
-                        <th style="text-align:right; padding: 14px 16px; border-bottom: 2px solid #e2e8f0;">रक्कम (₹)</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-            
+            let html = `<li style="list-style:none;"><div style="border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);"><table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: left;"><thead><tr style="background: #f8fafc; color: #475569; font-weight: 700; text-transform: uppercase; font-size: 12px;"><th style="padding: 14px 16px; border-bottom: 2px solid #e2e8f0;">तारीख</th><th style="text-align:center; padding: 14px 16px; border-bottom: 2px solid #e2e8f0;">तपशील</th><th style="text-align:right; padding: 14px 16px; border-bottom: 2px solid #e2e8f0;">रक्कम (₹)</th></tr></thead><tbody>`;
             let runningBal = openingBal; let lastBillDate = ""; 
             if(openingBal !== 0 || filteredData.length > 0) {
                 if(openingBal !== 0) { html += `<tr style="background: #fffbeb;"><td colspan="2" style="text-align:right; padding:12px 16px; font-weight:700; color:#d97706;">मागील बाकी :</td><td style="text-align:right; font-weight:800; padding:12px 16px; color:#d97706;">${openingBal}</td></tr>`; }
                 filteredData.forEach(e => {
                     let displayDate = ""; if (e.date !== lastBillDate) { displayDate = formatDate(e.date); lastBillDate = e.date; }
-                    if (e.type !== 'payment') {
-                        runningBal += e.total; let tPrefix = (e.merType && e.merType !== 'undefined') ? `<span style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:11px; color:#64748b; margin-right:4px;">${e.merType}</span> ` : "";
-                        html += `<tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding:14px 16px; color:#64748b; font-weight:500;">${displayDate}</td><td style="text-align:center; padding:14px 16px; font-weight:600; color:#334155;">${tPrefix}${e.weight} x ${e.rate}</td><td style="text-align:right; font-weight:700; padding:14px 16px; color:#0f172a;">${e.total}</td></tr>`;
-                    } else {
-                        html += `<tr style="background: #f8fafc; border-top: 1px solid #e2e8f0;"><td colspan="2" style="text-align:right; padding:10px 16px; font-weight:700; color:#475569;">एकूण रक्कम :</td><td style="text-align:right; font-weight:800; padding:10px 16px; color:#0f172a;">${runningBal}</td></tr>`;
-                        runningBal -= e.amount; let payDate = (e.date !== lastBillDate) ? formatDate(e.date) : ""; if(e.date !== lastBillDate) lastBillDate = e.date;
-                        html += `<tr style="background: #ecfdf5;"><td style="padding:14px 16px; color:#059669; font-weight:500;">${payDate}</td><td style="text-align:right; padding:14px 16px; font-weight:700; color:#059669;">जमा :</td><td style="text-align:right; padding:14px 16px; font-weight:800; color:#059669;">- ${e.amount}</td></tr>`;
-                        html += `<tr><td colspan="3" style="text-align:right; padding:12px 16px; border-bottom: 1px solid #e2e8f0;"><span style="background: #eff6ff; color: #1d4ed8; padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 13px;">बाकी: ${runningBal} /-</span></td></tr>`;
-                    }
+                    if (e.type !== 'payment') { runningBal += e.total; html += `<tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding:14px 16px; color:#64748b;">${displayDate}</td><td style="text-align:center; padding:14px 16px; font-weight:600;">${e.weight} x ${e.rate}</td><td style="text-align:right; font-weight:700; padding:14px 16px;">${e.total}</td></tr>`; } else { html += `<tr style="background: #f8fafc; border-top: 1px solid #e2e8f0;"><td colspan="2" style="text-align:right; padding:10px 16px; font-weight:700;">एकूण :</td><td style="text-align:right; font-weight:800; padding:10px 16px;">${runningBal}</td></tr>`; runningBal -= e.amount; let payDate = (e.date !== lastBillDate) ? formatDate(e.date) : ""; if(e.date !== lastBillDate) lastBillDate = e.date; html += `<tr style="background: #ecfdf5;"><td style="padding:14px 16px; color:#059669;">${payDate}</td><td style="text-align:right; padding:14px 16px; font-weight:700; color:#059669;">जमा :</td><td style="text-align:right; padding:14px 16px; font-weight:800; color:#059669;">- ${e.amount}</td></tr>`; html += `<tr><td colspan="3" style="text-align:right; padding:12px 16px; border-bottom: 1px solid #e2e8f0;"><span style="background: #eff6ff; color: #1d4ed8; padding: 6px 12px; border-radius: 8px; font-weight: 700;">बाकी: ${runningBal} /-</span></td></tr>`; }
                 });
-                if(filteredData.length > 0 && filteredData[filteredData.length-1].type !== 'payment') { 
-                    html += `<tr style="background: linear-gradient(135deg, #eff6ff, #e0eafc);"><td colspan="2" style="text-align:right; font-weight:800; padding:18px 16px; color:#1e3a8a; font-size:15px;">सध्याची बाकी :</td><td style="text-align:right; padding:18px 16px;"><span style="background: #1e3a8a; color: white; padding: 8px 16px; border-radius: 10px; font-weight: 800; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-size:16px;">₹ ${runningBal} /-</span></td></tr>`; 
-                }
-            } else { 
-                html += `<tr><td colspan="3" style="text-align:center; padding: 30px; color: #94a3b8; font-weight: 500;">No Data Found</td></tr>`; 
-            }
-            html += `</tbody></table></div></li>`; 
-            list.innerHTML = html;
+                if(filteredData.length > 0 && filteredData[filteredData.length-1].type !== 'payment') { html += `<tr style="background: #e0eafc;"><td colspan="2" style="text-align:right; font-weight:800; padding:18px 16px; color:#1e3a8a;">सध्याची बाकी :</td><td style="text-align:right; padding:18px 16px;"><span style="background: #1e3a8a; color: white; padding: 8px 16px; border-radius: 10px; font-weight: 800;">₹ ${runningBal} /-</span></td></tr>`; }
+            } else { html += `<tr><td colspan="3" style="text-align:center; padding: 30px; color: #94a3b8;">No Data</td></tr>`; }
+            html += `</tbody></table></div></li>`; list.innerHTML = html;
         }
     }
 </script>
