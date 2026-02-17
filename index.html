@@ -86,7 +86,7 @@
         .bg-gradient-red { background: linear-gradient(135deg, #f43f5e, #be123c); }
         .bg-gradient-merchant { background: linear-gradient(135deg, #f97316, #c2410c); }
         .bg-gradient-bag { background: linear-gradient(135deg, #db2777, #9d174d); }
-        .bg-gradient-whatsapp { background: linear-gradient(135deg, #25D366, #128C7E); } /* WhatsApp Green */
+        .bg-gradient-whatsapp { background: linear-gradient(135deg, #25D366, #128C7E); }
 
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px);}
         .modal-content { background: #ffffff; margin: 5% auto; padding: 20px; width: 92%; max-width: 650px; border-radius: var(--radius-xl); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); position: relative; max-height: 85vh; overflow-y: auto; }
@@ -166,7 +166,7 @@
                     <span class="dash-value text-red" id="dashPending">₹ 0</span>
                 </div>
                 <div class="dash-card">
-                    <span class="dash-title">आजचा उचल/ऍडव्हान्स</span>
+                    <span class="dash-title">एकूण उचल/ऍडव्हान्स</span>
                     <span class="dash-value text-green" id="dashAdvance">₹ 0</span>
                 </div>
             </div>
@@ -234,7 +234,7 @@
 
         <div id="bagModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">🎒 Bags / पोती Tracker</h3><div class="section-box" style="border-color: #ddd6fe; background: #f5f3ff;"><div class="input-row"><div class="input-group"><label>Date:</label><input type="date" id="bagDate"></div><div class="input-group" style="flex:2;"><label>Name:</label><input type="text" id="bagName" list="farmerList" placeholder="Search..."></div></div><div class="input-row"><div class="input-group"><label>Qty:</label><input type="number" id="bagQty" placeholder="0"></div><div class="input-group"><label>Type:</label><select id="bagType"><option value="Poti">पोती</option><option value="Bag">बॅग</option></select></div><div class="input-group"><label>Rate:</label><input type="number" id="bagRate" placeholder="0.00"></div></div><button class="btn-add bg-gradient-bag" style="margin-top:10px;" onclick="saveBagEntry()">✅ Save Entry (+)</button></div><div class="list-header-bar" style="background:transparent; padding:0;"><button class="btn-action-small" style="background:var(--secondary); color:white;" onclick="openBagPreview()">👁️ Preview</button><button class="btn-action-small" style="background:var(--text-main); color:white;" onclick="openBagList()">📋 All History</button><button class="btn-action-small bg-gradient-orange" onclick="openBagBillModal()">📜 Bag Bill</button></div></div></div>
         <div id="bagPreviewModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagPreviewModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">👁️ Today's Bags</h3><div class="table-container"><table class="styled-table"><thead><tr><th>Name</th><th>Details</th><th>Total</th><th>Action</th></tr></thead><tbody id="bagPreviewBody"></tbody></table></div></div></div>
-        <div id="bagListModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagListModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">📋 All Bags History</h3><div class="list-header-bar"><button class="btn-action-small" style="background:var(--secondary); color:white;" id="bagManageBtn" onclick="toggleBagListMode()">⚙️ Manage</button></div><div id="bagListContainer" style="overflow-x: auto; max-height: 55vh; background: #fff; border-radius: var(--radius-md); padding: 10px;"></div></div></div>
+        <div id="bagListModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagListModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">📋 All Bags History</h3><div class="list-header-bar"><button class="btn-action-small" style="background:var(--secondary); color:white;" id="bagManageBtn" onclick="toggleBagListMode()">⚙️ Manage</button></div><div id="bagListContainer" style="overflow-x: auto; max-height: 55vh; background: #fff; border-radius: var(--radius-md); padding: 5px;"></div></div></div>
         <div id="bagBillModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagBillModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">📜 Generate Bag Bill</h3><div class="section-box"><div class="input-group" style="margin-bottom: 15px;"><label>Select Name:</label><input type="text" id="bagBillName" list="farmerList" placeholder="Start typing..."></div><div class="input-row"><div class="input-group"><label>From:</label><input type="date" id="bagStartDate"></div><div class="input-group"><label>To:</label><input type="date" id="bagEndDate"></div></div></div><button class="btn-add bg-gradient-purple" onclick="generateBagBill()">Show Bill</button></div></div>
         <div id="finalBagBillModal" class="modal"><div class="modal-content" style="max-width: 650px; background: #fff;">
             <div class="no-print-in-bill" style="display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 15px;">
@@ -313,8 +313,6 @@
     
     let cropDataDB = []; let merchantDB = []; let bagDB = [];
 
-    // AUTO RECOVERY REMOVED (So deleted names stay deleted)
-
     database.ref('farmers').once('value', snap => { if(!snap.exists()) database.ref('farmers').set(defaultFarmersList); });
     database.ref('merchants').once('value', snap => { if(!snap.exists()) database.ref('merchants').set(["Traders A"]); });
 
@@ -333,23 +331,17 @@
     function formatDate(dateStr) { if(!dateStr) return ""; let d = new Date(dateStr); return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}`; }
     const marathiMonths = ["जानेवारी", "फेब्रुवारी", "मार्च", "एप्रिल", "मे", "जून", "जुलै", "ऑगस्ट", "सप्टेंबर", "ऑक्टोबर", "नोव्हेंबर", "डिसेंबर"];
 
-    /* ====== SMART DASHBOARD INSTANT FIX ====== */
     function updateDashboard() {
-        let selectedDate = document.getElementById("dateInput").value; // Links to main Date picker
-        let tPurch = 0; let tAdv = 0;
+        let selectedDate = document.getElementById("dateInput").value; 
+        let tPurch = 0; let tAdv = 0; 
         (cropDataDB || []).forEach(e => {
-            if(e.date === selectedDate) {
-                if(e.type === 'crop') tPurch += e.total;
-                else if(e.type === 'advance' && e.amount > 0) tAdv += e.amount;
-            }
+            if(e.type === 'advance') { tAdv += e.amount; } else if(e.type === 'crop' && e.date === selectedDate) { tPurch += e.total; }
         });
-        
         let tSales = 0; let pendingVasuli = 0;
         (merchantDB || []).forEach(e => {
             if(e.date === selectedDate && e.type !== 'payment') tSales += e.total;
             if(e.type === 'payment') pendingVasuli -= e.amount; else pendingVasuli += e.total;
         });
-
         document.getElementById("dashPurchase").innerText = `₹ ${tPurch.toLocaleString()}`;
         document.getElementById("dashSales").innerText = `₹ ${tSales.toLocaleString()}`;
         document.getElementById("dashPending").innerText = `₹ ${pendingVasuli.toLocaleString()}`;
@@ -360,7 +352,6 @@
     function loadMerchantList() { let dl=document.getElementById("merchantList"); let dl2=document.getElementById("billNameSuggestions"); dl.innerHTML=""; dl2.innerHTML=""; merchants.forEach(m=>{let op=document.createElement("option");op.value=m;dl.appendChild(op);let op2=document.createElement("option");op2.value=m;dl2.appendChild(op2);}); }
     function autoSelectFarmerName() { let v=document.getElementById("farmerName").value.trim(); if(!isNaN(v)&&v!==""){let f=farmers.find(n=>n.startsWith(v+".")); if(f) document.getElementById("farmerName").value=f;}}
 
-    /* ====== VOICE TO FORM AI ====== */
     function startVoiceRecognition() {
         if (!('webkitSpeechRecognition' in window)) { alert("तुमचा ब्राउझर व्हॉईस कमांड सपोर्ट करत नाही. कृपया Safari वापरा."); return; }
         const recognition = new webkitSpeechRecognition(); recognition.lang = 'mr-IN'; recognition.interimResults = false; recognition.maxAlternatives = 1;
@@ -380,20 +371,52 @@
         recognition.onend = function() { btn.classList.remove("recording"); };
     }
 
-    /* ====== WHATSAPP INTEGRATION ====== */
+    /* ====== ENHANCED WHATSAPP MESSAGE FORMAT ====== */
     function sendWhatsAppBill(areaId) {
         let printArea = document.getElementById(areaId); if(!printArea) return;
-        let billText = "🧾 *SMART BILLING* 🧾\n-------------------------\n";
+        let type = document.getElementById("billType") ? document.getElementById("billType").value : "BAG";
+        if (areaId !== 'mainBillPrintableArea') type = "BAG";
+        
         let name = document.getElementById(areaId === 'mainBillPrintableArea' ? "billHeaderName" : "bagBillHeaderName").innerText;
         let date = document.getElementById(areaId === 'mainBillPrintableArea' ? "billMonthDisplay" : "bagBillDateDisplay").innerText;
-        billText += `👤 नाव: *${name}*\n📅 तारीख: ${date}\n-------------------------\n`;
-        let listItems = printArea.querySelectorAll(".bill-item, tr");
-        listItems.forEach(item => { let text = item.innerText.replace(/\s+/g, ' ').trim(); if(text && text !== "तारीख तपशील रक्कम (₹)" && !text.includes("Total Amount") && !text.includes("No Data")) { billText += text + "\n"; } });
-        billText += "-------------------------\n";
-        let totalSpan = document.getElementById(areaId === 'mainBillPrintableArea' ? "billTotalAmount" : "bagBillTotalAmount");
-        if(totalSpan) billText += `💰 *एकूण रक्कम: ${totalSpan.innerText}*\n`;
-        let advSpan = document.getElementById("billAdvBox"); if(advSpan && advSpan.innerText) billText += `🛑 ${advSpan.innerText}\n`;
-        billText += "-------------------------\n🙏 *धन्यवाद* 🙏";
+        
+        let billText = `🧾 *SMART BILLING* 🧾\n`;
+        billText += `➖➖➖➖➖➖➖➖➖\n`;
+        billText += `👤 *नाव:* ${name}\n`;
+        billText += `📅 *तारीख:* ${date}\n`;
+        billText += `➖➖➖➖➖➖➖➖➖\n`;
+
+        if(type === 'MERCHANT') {
+            let rows = printArea.querySelectorAll("tbody tr");
+            rows.forEach(row => {
+                let cells = row.querySelectorAll("td");
+                if(cells.length === 3) {
+                    let c0 = cells[0].innerText.trim(); let c1 = cells[1].innerText.trim(); let c2 = cells[2].innerText.trim();
+                    if(c1 === "जमा :") billText += `✅ *${c0 ? c0 + ' | ' : ''}जमा: ${c2}*\n`;
+                    else billText += `🗓️ ${c0} | 📦 ${c1} | ₹ ${c2}\n`;
+                } else if (cells.length === 2) {
+                    let c0 = cells[0].innerText.trim(); let c1 = cells[1].innerText.trim();
+                    if(c0.includes("मागील")) billText += `\n⏳ *${c0} ${c1}*\n`;
+                    else if(c0.includes("एकूण")) billText += `💵 *${c0} ${c1}*\n`;
+                    else if(c0.includes("सध्याची")) billText += `\n🎯 *${c0} ${c1}*\n`;
+                } else if (cells.length === 1) {
+                    let c0 = cells[0].innerText.trim();
+                    if(c0 !== "No Data Found" && c0 !== "No Data") billText += `🔹 *${c0}*\n`;
+                }
+            });
+        } else {
+            let listItems = printArea.querySelectorAll(".bill-item");
+            listItems.forEach(item => { billText += `🔸 ${item.innerText.trim()}\n`; });
+            
+            billText += `➖➖➖➖➖➖➖➖➖\n`;
+            let totalSpan = document.getElementById(areaId === 'mainBillPrintableArea' ? "billTotalAmount" : "bagBillTotalAmount");
+            if(totalSpan && totalSpan.parentElement.style.display !== 'none') { billText += `💰 *एकूण रक्कम: ${totalSpan.innerText}*\n`; }
+            let advSpan = document.getElementById("billAdvBox"); 
+            if(advSpan && advSpan.innerText) { billText += `🛑 *${advSpan.innerText}*\n`; }
+        }
+
+        billText += `➖➖➖➖➖➖➖➖➖\n`;
+        billText += `🙏 *धन्यवाद* 🙏`;
         window.open(`https://wa.me/?text=${encodeURIComponent(billText)}`, '_blank');
     }
 
@@ -411,7 +434,7 @@
         else { let existing = merchants.find(m => m.toLowerCase() === nameLower); if (existing) return existing; merchants.push(name); database.ref('merchants').set(merchants); return name; }
     }
 
-    function onDateChange() { document.getElementById("rate").value=""; updateDashboard(); } // DASHBOARD INSTANT UPDATE LINKED HERE
+    function onDateChange() { document.getElementById("rate").value=""; updateDashboard(); }
     
     function saveCrop() {
         let date=document.getElementById("dateInput").value; let name=resolveAndAddName('farmer', document.getElementById("farmerName").value);
@@ -431,12 +454,9 @@
     let showAll=false; function toggleAllAmounts(){ showAll=!showAll; generateFarmerStatus(); }
     let listMode=false; function toggleEditMode(){ listMode=!listMode; document.getElementById("manageListBtn").innerText=listMode?"❌ Done":"⚙️ Manage"; generateFarmerStatus(); }
     function generateFarmerStatus() { let data = getData(); let tbody = document.getElementById("farmerListBody"); tbody.innerHTML=""; farmers.sort((a,b)=>(parseInt(a)||999)-(parseInt(b)||999)); farmers.forEach(f => { let total = 0; data.forEach(e=>{ if(e.name===f && e.type==='crop') total+=e.total; }); let btns = listMode ? `<div style='float:right'><button class='manage-btn' onclick="editFarmerName('${f}')">✎</button><button class='manage-btn' style='color:#e74c3c;' onclick="delFarmerName('${f}')">🗑</button></div>` : ""; tbody.innerHTML += `<tr class='premium-row'><td><div style="display:flex; align-items:center;"><div class="user-avatar">🧑‍🌾</div><span onclick="openDetailModal('${f}')" style="cursor:pointer; font-weight:600;">${f}</span></div>${btns}</td><td style="text-align:right;"><span style="${showAll ? '' : 'display:none'}" class="badge-green">₹ ${total}</span><span style="${showAll ? 'display:none' : ''}" style="color:var(--text-muted);">****</span></td></tr>`; }); }
-    
-    // DELETE FARMER NAME FIX
     function addNewFarmerPrompt() { let n=prompt("New Farmer Name:"); if(n){ farmers.push(n); database.ref('farmers').set(farmers); } }
     function editFarmerName(old) { let n=prompt("Edit Name:",old); if(n&&n!==old){ let i=farmers.indexOf(old); if(i!==-1)farmers[i]=n; database.ref('farmers').set(farmers); let d=getData(); d.forEach(e=>{if(e.name===old)e.name=n;}); saveData(d); } }
     function delFarmerName(n) { if(prompt("Enter PIN:")==="1504"){ farmers=farmers.filter(f=>f!==n); database.ref('farmers').set(farmers); generateFarmerStatus(); } }
-    
     function openDetailModal(n) { document.getElementById("detailModal").style.display="block"; document.getElementById("detailFarmerName").innerText=n; renderDetail(n); }
     function renderDetail(n) { let d = getData().filter(e=>e.name===n); d.sort((a,b)=>b.id-a.id); let tb = document.getElementById("detailBody"); tb.innerHTML=""; d.forEach(e=>{ let dt = e.type==='crop'?`${e.weight}x${e.rate}`:"<span style='color:var(--danger);'>Adv</span>"; let amtStyle = e.type==='crop'?'':'color:var(--danger);font-weight:bold;'; tb.innerHTML+=`<tr><td>${formatDate(e.date)}</td><td>${e.type}</td><td>${dt}</td><td style="font-weight:bold; ${amtStyle}">${e.total||e.amount}</td><td style="text-align:center;"><button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button></td></tr>`; }); if(d.length===0) tb.innerHTML="<tr><td colspan='5' style='text-align:center;'>नोंद नाही</td></tr>"; }
 
@@ -450,9 +470,40 @@
     function saveBagEntry() { let date = document.getElementById("bagDate").value; let name = resolveAndAddName('farmer', document.getElementById("bagName").value); let qty = parseInt(document.getElementById("bagQty").value); let type = document.getElementById("bagType").value; let rate = parseFloat(document.getElementById("bagRate").value) || 0; if(!date || !name || !qty) return; let data = getBagDB(); if(data.some(e => e.date === date && e.name === name)) return; data.push({ id: Date.now(), date, name, qty, type, rate, total: qty*rate }); saveBagDB(data); document.getElementById("bagQty").value = ""; document.getElementById("bagName").value = ""; }
     function openBagPreview() { document.getElementById("bagPreviewModal").style.display="block"; renderBagPreview(); }
     function renderBagPreview() { let date = document.getElementById("bagDate").value; let data = getBagDB().filter(e => e.date === date); let tbody = document.getElementById("bagPreviewBody"); tbody.innerHTML = ""; data.sort((a,b) => b.id - a.id); data.forEach(e => { let t = e.type === 'Poti' ? 'पोती' : 'बॅग'; tbody.innerHTML += `<tr><td>${e.name}</td><td>${toMarathi(e.qty)} ${t} x ${e.rate||0}</td><td style="font-weight:bold;">₹${toMarathi(e.total||0)}</td><td style="text-align:center;"><button class="small-btn btn-edit" onclick="editBagEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delBagEntry(${e.id})">🗑</button></td></tr>`; }); }
+    
+    /* ====== FEATURE: BAGS DATE-WISE TOTAL ====== */
     let isBagListMode = false; function openBagList() { document.getElementById("bagListModal").style.display="block"; isBagListMode = false; document.getElementById("bagManageBtn").innerText="⚙️ Manage"; renderBagList(); }
     function toggleBagListMode() { isBagListMode = !isBagListMode; document.getElementById("bagManageBtn").innerText = isBagListMode ? "❌ Done" : "⚙️ Manage"; renderBagList(); }
-    function renderBagList() { let data = getBagDB(); let container = document.getElementById("bagListContainer"); container.innerHTML = ""; let grouped = {}; data.forEach(e => { if(!grouped[e.date]) grouped[e.date] = []; grouped[e.date].push(e); }); let dates = Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a)); dates.forEach(d => { let html = `<div style="padding:10px; font-weight:bold; background:#f1f5f9;">${formatDate(d)}</div>`; grouped[d].forEach(e => { let t = e.type === 'Poti' ? 'पोती' : 'बॅग'; let btns = isBagListMode ? `<button class="manage-btn" onclick="editBagEntry(${e.id})">✏️</button><button class="manage-btn" onclick="delBagEntry(${e.id})">🗑</button>` : ""; html += `<div style="border-bottom:1px solid #eee; padding:10px;"><b>${e.name}</b><br>${toMarathi(e.qty)} ${t} x ₹${e.rate||0} = <b>₹${toMarathi(e.total||0)}</b>${btns}</div>`; }); container.innerHTML += html; }); }
+    
+    function renderBagList() { 
+        let data = getBagDB(); let container = document.getElementById("bagListContainer"); container.innerHTML = ""; 
+        let grouped = {}; data.forEach(e => { if(!grouped[e.date]) grouped[e.date] = []; grouped[e.date].push(e); }); 
+        let dates = Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a)); 
+        
+        dates.forEach(d => { 
+            let html = `<div style="padding:10px 15px; font-weight:bold; background:#e2e8f0; border-radius:10px 10px 0 0; color:#0f172a; margin-top:15px; border:1px solid #cbd5e1; border-bottom:none;">📅 ${formatDate(d)}</div>`; 
+            let dailyQty = 0; let dailyAmt = 0;
+            
+            grouped[d].forEach(e => { 
+                dailyQty += e.qty; dailyAmt += (e.total || 0);
+                let t = e.type === 'Poti' ? 'पोती' : 'बॅग'; 
+                let btns = isBagListMode ? `<button class="manage-btn" onclick="editBagEntry(${e.id})">✏️</button><button class="manage-btn" onclick="delBagEntry(${e.id})">🗑</button>` : ""; 
+                html += `<div style="border-bottom:1px solid #e2e8f0; border-left:1px solid #cbd5e1; border-right:1px solid #cbd5e1; padding:12px 15px; display:flex; justify-content:space-between; align-items:center; background:#fff;">
+                            <div><b style="font-size:15px;">${e.name}</b><br><span style="color:var(--text-muted); font-size:13px; font-weight:600;">${e.qty} ${t} x ₹${e.rate||0}</span></div>
+                            <div style="text-align:right; font-weight:800; color:var(--text-main); font-size:15px;">₹${e.total||0}<br>${btns}</div>
+                         </div>`; 
+            }); 
+            
+            // DAILY TOTAL FOOTER
+            html += `<div style="padding:10px 15px; background:#eff6ff; text-align:right; border-radius:0 0 10px 10px; font-weight:800; color:#1d4ed8; font-size:14px; border:1px solid #bfdbfe; border-top:none;">
+                        एकूण: ${dailyQty} नग | ₹ ${dailyAmt}/-
+                     </div>`;
+            container.innerHTML += html; 
+        }); 
+        
+        if(dates.length===0) container.innerHTML="<p style='text-align:center; padding:20px; color:var(--text-muted); font-weight:600;'>No History Found.</p>"; 
+    }
+    
     function editBagEntry(id) { let data=getBagDB(); let idx=data.findIndex(e=>e.id===id); if(idx===-1)return; let q=prompt("Qty:", data[idx].qty); if(!q)return; data[idx].qty=parseInt(q); data[idx].total=data[idx].qty*(data[idx].rate||0); saveBagDB(data); }
     function delBagEntry(id) { if(prompt("Enter PIN:")==="1504"){ saveBagDB(getBagDB().filter(e=>e.id!==id)); } }
     function openBagBillModal() { document.getElementById("bagBillModal").style.display="block"; }
@@ -469,32 +520,19 @@
     function saveMerEntryEdit() { let id=parseInt(document.getElementById('editMerId').value); let data=getMerchantDB(); let idx=data.findIndex(e=>e.id===id); if(idx===-1)return; data[idx].date=document.getElementById('editMerDate').value; if(data[idx].type==='payment')data[idx].amount=parseFloat(document.getElementById('editMerJamaAmount').value); else { data[idx].weight=parseFloat(document.getElementById('editMerWeight').value); data[idx].rate=parseFloat(document.getElementById('editMerRate').value); data[idx].total=parseFloat(document.getElementById('editMerTotal').value); } saveMerchantDB(data); document.getElementById('editMerEntryModal').style.display='none'; }
     function delMerEntry(id) { if(prompt("PIN:")==="1504") saveMerchantDB(getMerchantDB().filter(e=>e.id!==id)); }
 
-    /* ====== DELETE TRADER FIX ====== */
     let isMerListMode = false;
     function openMerchantListModal() { document.getElementById("merchantListModal").style.display="block"; renderMerList(); }
     function toggleMerListMode() { isMerListMode = !isMerListMode; document.getElementById("merManageBtn").innerText=isMerListMode?"❌ Done":"⚙️ Manage"; renderMerList(); }
     function addNewMerchantPrompt() { let n = prompt("Trader Name:"); if(n){ merchants.push(n); database.ref('merchants').set(merchants); } }
-    
-    // NEW INSTANT DELETE FUNCTION
-    function delMerName(n) { 
-        if(prompt("Enter PIN:")==="1504") { 
-            merchants = merchants.filter(m => m !== n); 
-            database.ref('merchants').set(merchants); 
-            renderMerList(); // Instant UI Update
-        } else { alert("Wrong Password!"); } 
-    }
+    function delMerName(n) { if(prompt("Enter PIN:")==="1504") { merchants = merchants.filter(m => m !== n); database.ref('merchants').set(merchants); renderMerList(); } else { alert("Wrong Password!"); } }
 
     function renderMerList() {
         let tbody = document.getElementById("merchantListBody"); tbody.innerHTML = ""; let data = getMerchantDB();
         merchants.forEach(m => {
             let total = 0; data.filter(e => e.name === m).forEach(e => { if(e.type === 'payment') total -= e.amount; else total += e.total; });
-            
-            // Fixed Delete Button Call
             let btns = isMerListMode ? `<div style='float:right'><button class='manage-btn' style='color:var(--danger)' onclick="delMerName('${m}')">🗑</button></div>` : "";
-            
             let badgeClass = "badge-green"; let alertIcon = ""; let styleStr = "color:var(--merchant-color); background:#fff7ed;";
             if(total > 0) { badgeClass = "badge-red"; alertIcon = " ⚠️"; styleStr = ""; }
-
             tbody.innerHTML += `<tr class='premium-row'><td><div style="display:flex; align-items:center;"><div class="user-avatar" style="color:var(--merchant-color); background:#fff7ed;">🏢</div><span onclick="openMerDetail('${m}')" style='cursor:pointer;font-weight:600;'>${m}</span></div>${btns}</td><td style="text-align:right;"><span class="${badgeClass}" style="${styleStr}">₹ ${total.toLocaleString()}${alertIcon}</span></td></tr>`;
         });
     }
