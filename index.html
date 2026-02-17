@@ -313,12 +313,7 @@
     
     let cropDataDB = []; let merchantDB = []; let bagDB = [];
 
-    function syncMissingNames() {
-        let fUpdate = false, mUpdate = false;
-        [...(cropDataDB||[]), ...(bagDB||[])].forEach(e => { if (e.name) { let n=e.name.trim(); if (n && !farmers.find(f=>f.toLowerCase()===n.toLowerCase())) { farmers.push(n); fUpdate=true; } } });
-        (merchantDB||[]).forEach(e => { if (e.name) { let n=e.name.trim(); if (n && !merchants.find(m=>m.toLowerCase()===n.toLowerCase())) { merchants.push(n); mUpdate=true; } } });
-        if(fUpdate) database.ref('farmers').set(farmers); if(mUpdate) database.ref('merchants').set(merchants);
-    }
+    // AUTO RECOVERY REMOVED (So deleted names stay deleted)
 
     database.ref('farmers').once('value', snap => { if(!snap.exists()) database.ref('farmers').set(defaultFarmersList); });
     database.ref('merchants').once('value', snap => { if(!snap.exists()) database.ref('merchants').set(["Traders A"]); });
@@ -326,24 +321,24 @@
     database.ref('farmers').on('value', snap => { if(snap.exists()) { farmers=snap.val(); loadFarmerList(); if(document.getElementById("listModal").style.display==="block") generateFarmerStatus(); } });
     database.ref('merchants').on('value', snap => { if(snap.exists()) { merchants=snap.val(); loadMerchantList(); if(document.getElementById("merchantListModal").style.display==="block") renderMerList(); } });
 
-    database.ref('cropData').on('value', snap => { cropDataDB=snap.exists()?snap.val():[]; syncMissingNames(); refreshOpenModals('crop'); updateDashboard(); });
-    database.ref('merchantData').on('value', snap => { merchantDB=snap.exists()?snap.val():[]; syncMissingNames(); refreshOpenModals('merchant'); updateDashboard(); });
-    database.ref('bagData').on('value', snap => { bagDB=snap.exists()?snap.val():[]; syncMissingNames(); refreshOpenModals('bag'); });
+    database.ref('cropData').on('value', snap => { cropDataDB=snap.exists()?snap.val():[]; refreshOpenModals('crop'); updateDashboard(); });
+    database.ref('merchantData').on('value', snap => { merchantDB=snap.exists()?snap.val():[]; refreshOpenModals('merchant'); updateDashboard(); });
+    database.ref('bagData').on('value', snap => { bagDB=snap.exists()?snap.val():[]; refreshOpenModals('bag'); });
 
-    function getData() { return cropDataDB || []; } function saveData(data) { cropDataDB = data; database.ref('cropData').set(data); }
-    function getMerchantDB() { return merchantDB || []; } function saveMerchantDB(data) { merchantDB = data; database.ref('merchantData').set(data); }
+    function getData() { return cropDataDB || []; } function saveData(data) { cropDataDB = data; database.ref('cropData').set(data); updateDashboard(); }
+    function getMerchantDB() { return merchantDB || []; } function saveMerchantDB(data) { merchantDB = data; database.ref('merchantData').set(data); updateDashboard(); }
     function getBagDB() { return bagDB || []; } function saveBagDB(data) { bagDB = data; database.ref('bagData').set(data); }
 
     function toMarathi(num) { const map = { '0':'०','1':'१','2':'२','3':'३','4':'४','5':'५','6':'६','7':'७','8':'८','9':'९' }; return num.toString().split('').map(d => map[d] || d).join(''); }
     function formatDate(dateStr) { if(!dateStr) return ""; let d = new Date(dateStr); return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}`; }
     const marathiMonths = ["जानेवारी", "फेब्रुवारी", "मार्च", "एप्रिल", "मे", "जून", "जुलै", "ऑगस्ट", "सप्टेंबर", "ऑक्टोबर", "नोव्हेंबर", "डिसेंबर"];
 
-    /* ====== FEATURE 2 & 8: SMART DASHBOARD & ALERT LOGIC ====== */
+    /* ====== SMART DASHBOARD INSTANT FIX ====== */
     function updateDashboard() {
-        let today = new Date().toISOString().slice(0, 10);
+        let selectedDate = document.getElementById("dateInput").value; // Links to main Date picker
         let tPurch = 0; let tAdv = 0;
         (cropDataDB || []).forEach(e => {
-            if(e.date === today) {
+            if(e.date === selectedDate) {
                 if(e.type === 'crop') tPurch += e.total;
                 else if(e.type === 'advance' && e.amount > 0) tAdv += e.amount;
             }
@@ -351,7 +346,7 @@
         
         let tSales = 0; let pendingVasuli = 0;
         (merchantDB || []).forEach(e => {
-            if(e.date === today && e.type !== 'payment') tSales += e.total;
+            if(e.date === selectedDate && e.type !== 'payment') tSales += e.total;
             if(e.type === 'payment') pendingVasuli -= e.amount; else pendingVasuli += e.total;
         });
 
@@ -365,83 +360,41 @@
     function loadMerchantList() { let dl=document.getElementById("merchantList"); let dl2=document.getElementById("billNameSuggestions"); dl.innerHTML=""; dl2.innerHTML=""; merchants.forEach(m=>{let op=document.createElement("option");op.value=m;dl.appendChild(op);let op2=document.createElement("option");op2.value=m;dl2.appendChild(op2);}); }
     function autoSelectFarmerName() { let v=document.getElementById("farmerName").value.trim(); if(!isNaN(v)&&v!==""){let f=farmers.find(n=>n.startsWith(v+".")); if(f) document.getElementById("farmerName").value=f;}}
 
-    /* ====== FEATURE 15: VOICE TO FORM AI ====== */
+    /* ====== VOICE TO FORM AI ====== */
     function startVoiceRecognition() {
-        if (!('webkitSpeechRecognition' in window)) {
-            alert("तुमचा ब्राउझर व्हॉईस कमांड सपोर्ट करत नाही. कृपया Safari किंवा Google Chrome वापरा.");
-            return;
-        }
-        const recognition = new webkitSpeechRecognition();
-        recognition.lang = 'mr-IN'; // Marathi Language
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 1;
-
-        let btn = document.getElementById("micBtn");
-        btn.classList.add("recording");
-
+        if (!('webkitSpeechRecognition' in window)) { alert("तुमचा ब्राउझर व्हॉईस कमांड सपोर्ट करत नाही. कृपया Safari वापरा."); return; }
+        const recognition = new webkitSpeechRecognition(); recognition.lang = 'mr-IN'; recognition.interimResults = false; recognition.maxAlternatives = 1;
+        let btn = document.getElementById("micBtn"); btn.classList.add("recording");
         recognition.start();
-
         recognition.onresult = function(event) {
-            const speechResult = event.results[0][0].transcript.toLowerCase();
-            processVoiceCommand(speechResult);
+            const text = event.results[0][0].transcript.toLowerCase();
+            let engText = text.replace(/[०-९]/g, d => '०१२३४५६७८९'.indexOf(d));
+            let nums = engText.match(/\d+(\.\d+)?/g);
+            let namePart = text.replace(/[0-9०-९.]/g, '').replace(/(kilo|kg|rupaye|rs|रुपये|किलो|रुपया|भाव|वजन|चे|चा)/gi, '').trim();
+            if(namePart) { let m = farmers.find(f => f.toLowerCase().includes(namePart.toLowerCase())); document.getElementById("farmerName").value = m ? m : namePart; }
+            if(nums && nums.length > 0) document.getElementById("weight").value = nums[0];
+            if(nums && nums.length > 1) document.getElementById("rate").value = nums[1];
             btn.classList.remove("recording");
         };
-
-        recognition.onerror = function(event) {
-            alert("आवाज ओळखता आला नाही. कृपया पुन्हा प्रयत्न करा.");
-            btn.classList.remove("recording");
-        };
-        
-        recognition.onend = function() {
-            btn.classList.remove("recording");
-        };
+        recognition.onerror = function() { alert("आवाज ओळखता आला नाही. कृपया पुन्हा प्रयत्न करा."); btn.classList.remove("recording"); };
+        recognition.onend = function() { btn.classList.remove("recording"); };
     }
 
-    function processVoiceCommand(text) {
-        // उदा: "पोपट ५० किलो १५ रुपये" -> Weight: 50, Rate: 15, Name: पोपट
-        let engText = text.replace(/[०-९]/g, d => '०१२३४५६७८९'.indexOf(d)); // Convert Marathi numbers to English
-        let nums = engText.match(/\d+(\.\d+)?/g);
-        let namePart = text.replace(/[0-9०-९.]/g, '').replace(/(kilo|kg|rupaye|rs|रुपये|किलो|रुपया|भाव|वजन|चे|चा)/gi, '').trim();
-        
-        if(namePart) {
-            let matchedFarmer = farmers.find(f => f.toLowerCase().includes(namePart.toLowerCase()));
-            if(matchedFarmer) document.getElementById("farmerName").value = matchedFarmer;
-            else document.getElementById("farmerName").value = namePart; 
-        }
-        if(nums && nums.length > 0) document.getElementById("weight").value = nums[0];
-        if(nums && nums.length > 1) document.getElementById("rate").value = nums[1];
-    }
-
-    /* ====== FEATURE 1: WHATSAPP INTEGRATION ====== */
+    /* ====== WHATSAPP INTEGRATION ====== */
     function sendWhatsAppBill(areaId) {
-        let printArea = document.getElementById(areaId);
-        if(!printArea) return;
-        
+        let printArea = document.getElementById(areaId); if(!printArea) return;
         let billText = "🧾 *SMART BILLING* 🧾\n-------------------------\n";
         let name = document.getElementById(areaId === 'mainBillPrintableArea' ? "billHeaderName" : "bagBillHeaderName").innerText;
         let date = document.getElementById(areaId === 'mainBillPrintableArea' ? "billMonthDisplay" : "bagBillDateDisplay").innerText;
-        
         billText += `👤 नाव: *${name}*\n📅 तारीख: ${date}\n-------------------------\n`;
-        
         let listItems = printArea.querySelectorAll(".bill-item, tr");
-        listItems.forEach(item => {
-            let text = item.innerText.replace(/\s+/g, ' ').trim();
-            if(text && text !== "तारीख तपशील रक्कम (₹)" && !text.includes("Total Amount") && !text.includes("No Data")) {
-                billText += text + "\n";
-            }
-        });
-        
+        listItems.forEach(item => { let text = item.innerText.replace(/\s+/g, ' ').trim(); if(text && text !== "तारीख तपशील रक्कम (₹)" && !text.includes("Total Amount") && !text.includes("No Data")) { billText += text + "\n"; } });
         billText += "-------------------------\n";
         let totalSpan = document.getElementById(areaId === 'mainBillPrintableArea' ? "billTotalAmount" : "bagBillTotalAmount");
         if(totalSpan) billText += `💰 *एकूण रक्कम: ${totalSpan.innerText}*\n`;
-        
-        let advSpan = document.getElementById("billAdvBox");
-        if(advSpan && advSpan.innerText) billText += `🛑 ${advSpan.innerText}\n`;
-        
+        let advSpan = document.getElementById("billAdvBox"); if(advSpan && advSpan.innerText) billText += `🛑 ${advSpan.innerText}\n`;
         billText += "-------------------------\n🙏 *धन्यवाद* 🙏";
-
-        let encodedText = encodeURIComponent(billText);
-        window.open(`https://wa.me/?text=${encodedText}`, '_blank');
+        window.open(`https://wa.me/?text=${encodeURIComponent(billText)}`, '_blank');
     }
 
     function downloadBillPDF(areaId, type) {
@@ -454,21 +407,17 @@
 
     function resolveAndAddName(type, rawName) {
         let name = rawName.trim(); if(!name) return ""; let nameLower = name.toLowerCase();
-        if (type === 'farmer') {
-            let existing = farmers.find(f => f.toLowerCase() === nameLower); if (existing) return existing; 
-            farmers.push(name); database.ref('farmers').set(farmers); return name;
-        } else {
-            let existing = merchants.find(m => m.toLowerCase() === nameLower); if (existing) return existing;
-            merchants.push(name); database.ref('merchants').set(merchants); return name;
-        }
+        if (type === 'farmer') { let existing = farmers.find(f => f.toLowerCase() === nameLower); if (existing) return existing; farmers.push(name); database.ref('farmers').set(farmers); return name; } 
+        else { let existing = merchants.find(m => m.toLowerCase() === nameLower); if (existing) return existing; merchants.push(name); database.ref('merchants').set(merchants); return name; }
     }
 
-    function onDateChange() { document.getElementById("rate").value=""; }
+    function onDateChange() { document.getElementById("rate").value=""; updateDashboard(); } // DASHBOARD INSTANT UPDATE LINKED HERE
+    
     function saveCrop() {
         let date=document.getElementById("dateInput").value; let name=resolveAndAddName('farmer', document.getElementById("farmerName").value);
         let w=parseFloat(document.getElementById("weight").value); let r=parseFloat(document.getElementById("rate").value);
         if(!date||!name||!w||!r) { alert("Fill all details!"); return; }
-        let data=getData(); if(data.some(e=>e.date===date && e.name===name && e.type==='crop')) { alert("⚠️ Double Entry Detected!"); return; }
+        let data=getData(); if(data.some(e=>e.date===date && e.name===name && e.type==='crop')) { alert("⚠️ Double Entry!"); return; }
         data.push({id:Date.now(), date, name, type:'crop', weight:w, rate:r, total:Math.floor((w*r)/5)*5}); saveData(data);
         document.getElementById("weight").value=""; document.getElementById("farmerName").value=""; let btn = document.getElementById("mainBtn"); btn.innerText = "✅ Saved!"; setTimeout(() => { btn.innerHTML = "✅ Save Entry"; document.getElementById("farmerName").focus(); }, 1000);
     }
@@ -477,13 +426,17 @@
     function renderPreview() { let date = document.getElementById("dateInput").value; let data = getData().filter(e => e.date === date); let tbody = document.getElementById("previewBody"); tbody.innerHTML = ""; data.sort((a, b) => (parseInt(a.name) || 999) - (parseInt(b.name) || 999)); data.forEach(e => { let details = e.type === 'crop' ? `${toMarathi(e.weight)}x${toMarathi(e.rate)}` : "Adv"; tbody.innerHTML += `<tr><td>${e.name}</td><td>${details}</td><td style="font-weight:bold;">${toMarathi(e.total||e.amount)}</td><td style="text-align:center;"><button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑️</button></td></tr>`; }); }
     function editEntry(id) { let data=getData(); let idx=data.findIndex(e=>e.id===id); if(idx===-1)return; let e=data[idx]; if(e.type==='crop'){ let w=prompt("Weight:",e.weight); let r=prompt("Rate:",e.rate); if(w&&r){e.weight=parseFloat(w);e.rate=parseFloat(r);e.total=Math.floor((e.weight*e.rate)/5)*5; saveData(data); }} else { let a = prompt("Amount:", Math.abs(e.amount)); if(a){e.amount = parseFloat(a)*(e.amount<0?-1:1); saveData(data); } } }
     function delEntry(id) { if(prompt("Enter PIN:")==="1504"){ let data=getData(); saveData(data.filter(e=>e.id!==id)); } }
+    
     function openFarmerListModal() { document.getElementById("listModal").style.display="block"; generateFarmerStatus(); }
     let showAll=false; function toggleAllAmounts(){ showAll=!showAll; generateFarmerStatus(); }
     let listMode=false; function toggleEditMode(){ listMode=!listMode; document.getElementById("manageListBtn").innerText=listMode?"❌ Done":"⚙️ Manage"; generateFarmerStatus(); }
     function generateFarmerStatus() { let data = getData(); let tbody = document.getElementById("farmerListBody"); tbody.innerHTML=""; farmers.sort((a,b)=>(parseInt(a)||999)-(parseInt(b)||999)); farmers.forEach(f => { let total = 0; data.forEach(e=>{ if(e.name===f && e.type==='crop') total+=e.total; }); let btns = listMode ? `<div style='float:right'><button class='manage-btn' onclick="editFarmerName('${f}')">✎</button><button class='manage-btn' style='color:#e74c3c;' onclick="delFarmerName('${f}')">🗑</button></div>` : ""; tbody.innerHTML += `<tr class='premium-row'><td><div style="display:flex; align-items:center;"><div class="user-avatar">🧑‍🌾</div><span onclick="openDetailModal('${f}')" style="cursor:pointer; font-weight:600;">${f}</span></div>${btns}</td><td style="text-align:right;"><span style="${showAll ? '' : 'display:none'}" class="badge-green">₹ ${total}</span><span style="${showAll ? 'display:none' : ''}" style="color:var(--text-muted);">****</span></td></tr>`; }); }
+    
+    // DELETE FARMER NAME FIX
     function addNewFarmerPrompt() { let n=prompt("New Farmer Name:"); if(n){ farmers.push(n); database.ref('farmers').set(farmers); } }
     function editFarmerName(old) { let n=prompt("Edit Name:",old); if(n&&n!==old){ let i=farmers.indexOf(old); if(i!==-1)farmers[i]=n; database.ref('farmers').set(farmers); let d=getData(); d.forEach(e=>{if(e.name===old)e.name=n;}); saveData(d); } }
-    function delFarmerName(n) { if(prompt("Enter PIN:")==="1504"){ farmers=farmers.filter(f=>f!==n); database.ref('farmers').set(farmers); } }
+    function delFarmerName(n) { if(prompt("Enter PIN:")==="1504"){ farmers=farmers.filter(f=>f!==n); database.ref('farmers').set(farmers); generateFarmerStatus(); } }
+    
     function openDetailModal(n) { document.getElementById("detailModal").style.display="block"; document.getElementById("detailFarmerName").innerText=n; renderDetail(n); }
     function renderDetail(n) { let d = getData().filter(e=>e.name===n); d.sort((a,b)=>b.id-a.id); let tb = document.getElementById("detailBody"); tb.innerHTML=""; d.forEach(e=>{ let dt = e.type==='crop'?`${e.weight}x${e.rate}`:"<span style='color:var(--danger);'>Adv</span>"; let amtStyle = e.type==='crop'?'':'color:var(--danger);font-weight:bold;'; tb.innerHTML+=`<tr><td>${formatDate(e.date)}</td><td>${e.type}</td><td>${dt}</td><td style="font-weight:bold; ${amtStyle}">${e.total||e.amount}</td><td style="text-align:center;"><button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button></td></tr>`; }); if(d.length===0) tb.innerHTML="<tr><td colspan='5' style='text-align:center;'>नोंद नाही</td></tr>"; }
 
@@ -516,18 +469,29 @@
     function saveMerEntryEdit() { let id=parseInt(document.getElementById('editMerId').value); let data=getMerchantDB(); let idx=data.findIndex(e=>e.id===id); if(idx===-1)return; data[idx].date=document.getElementById('editMerDate').value; if(data[idx].type==='payment')data[idx].amount=parseFloat(document.getElementById('editMerJamaAmount').value); else { data[idx].weight=parseFloat(document.getElementById('editMerWeight').value); data[idx].rate=parseFloat(document.getElementById('editMerRate').value); data[idx].total=parseFloat(document.getElementById('editMerTotal').value); } saveMerchantDB(data); document.getElementById('editMerEntryModal').style.display='none'; }
     function delMerEntry(id) { if(prompt("PIN:")==="1504") saveMerchantDB(getMerchantDB().filter(e=>e.id!==id)); }
 
-    /* ====== FEATURE 8: VASULI ALERT IN LIST ====== */
+    /* ====== DELETE TRADER FIX ====== */
     let isMerListMode = false;
     function openMerchantListModal() { document.getElementById("merchantListModal").style.display="block"; renderMerList(); }
     function toggleMerListMode() { isMerListMode = !isMerListMode; document.getElementById("merManageBtn").innerText=isMerListMode?"❌ Done":"⚙️ Manage"; renderMerList(); }
     function addNewMerchantPrompt() { let n = prompt("Trader Name:"); if(n){ merchants.push(n); database.ref('merchants').set(merchants); } }
+    
+    // NEW INSTANT DELETE FUNCTION
+    function delMerName(n) { 
+        if(prompt("Enter PIN:")==="1504") { 
+            merchants = merchants.filter(m => m !== n); 
+            database.ref('merchants').set(merchants); 
+            renderMerList(); // Instant UI Update
+        } else { alert("Wrong Password!"); } 
+    }
+
     function renderMerList() {
         let tbody = document.getElementById("merchantListBody"); tbody.innerHTML = ""; let data = getMerchantDB();
         merchants.forEach(m => {
             let total = 0; data.filter(e => e.name === m).forEach(e => { if(e.type === 'payment') total -= e.amount; else total += e.total; });
-            let btns = isMerListMode ? `<div style='float:right'><button class='manage-btn' onclick="if(prompt('PIN:')==='1504'){merchants=merchants.filter(x=>x!=='${m}');database.ref('merchants').set(merchants);}">🗑</button></div>` : "";
             
-            // Pending Alert Logic
+            // Fixed Delete Button Call
+            let btns = isMerListMode ? `<div style='float:right'><button class='manage-btn' style='color:var(--danger)' onclick="delMerName('${m}')">🗑</button></div>` : "";
+            
             let badgeClass = "badge-green"; let alertIcon = ""; let styleStr = "color:var(--merchant-color); background:#fff7ed;";
             if(total > 0) { badgeClass = "badge-red"; alertIcon = " ⚠️"; styleStr = ""; }
 
