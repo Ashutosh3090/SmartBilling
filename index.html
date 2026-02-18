@@ -250,12 +250,7 @@
                     <div class="header-month" id="billMonthDisplay" style="color: #4338ca; background: #e0e7ff; display: inline-block; padding: 5px 15px; border-radius: 8px; font-weight: 700; font-size: 14px; margin-top: 6px; border: 1px solid #c7d2fe;">---</div>
                     <hr style="margin-top: 15px; border: 0; border-top: 2px dashed #cbd5e1;">
                 </div>
-                <div class="table-container" style="border:none; box-shadow:none;">
-                    <table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: left;">
-                        <thead><tr style="background: #f8fafc; color: #475569; font-weight: 700; text-transform: uppercase; font-size: 12px;"><th style="padding: 14px 16px; border-bottom: 2px solid #e2e8f0; width:90px;">तारीख</th><th style="text-align:center; padding: 14px 16px; border-bottom: 2px solid #e2e8f0;">तपशील</th><th style="text-align:right; padding: 14px 16px; border-bottom: 2px solid #e2e8f0;">रक्कम (₹)</th></tr></thead>
-                        <tbody id="billList"></tbody>
-                    </table>
-                </div>
+                <div id="billTableWrapper" class="table-container" style="border:none; box-shadow:none;"></div>
                 <div class="advance-box" id="billAdvBox" style="color: red; font-weight: bold; margin-top: 15px; text-align:right;"></div>
             </div>
         </div></div>
@@ -287,6 +282,7 @@
                 <div style="font-size:12px; opacity:0.8; text-transform:uppercase; font-weight:600; letter-spacing:1px;">एकूण पोत्यांचे देणे बाकी</div>
                 <div id="bagGrandTotalDisplay" style="font-size:28px; font-weight:800; margin-top:5px;">₹ 0</div>
             </div>
+            <div class="list-header-bar"><button class="btn-action-small" style="background:var(--secondary); color:white;" id="bagManageBtn" onclick="toggleBagListMode()">⚙️ Manage</button></div>
             <div style="overflow-x: auto; max-height: 45vh;"><table class="premium-list-table"><tbody id="bagPersonListBody"></tbody></table></div>
         </div></div>
 
@@ -300,7 +296,8 @@
         </div></div>
         
         <div id="bagPreviewModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagPreviewModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">👁️ Today's Bags</h3><div class="table-container"><table class="styled-table"><thead><tr><th>Name</th><th>Details</th><th>Total</th><th>Action</th></tr></thead><tbody id="bagPreviewBody"></tbody></table></div></div></div>
-        <div id="bagListModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagListModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">📋 All Bags History</h3><div class="list-header-bar"><button class="btn-action-small" style="background:var(--secondary); color:white;" id="bagManageBtn" onclick="toggleBagListMode()">⚙️ Manage</button></div><div id="bagListContainer" style="overflow-x: auto; max-height: 55vh; background: #fff; border-radius: var(--radius-md); padding: 10px;"></div></div></div>
+        
+        <div id="bagListModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagListModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">📋 All Bags History (तारीख-निहाय)</h3><div id="bagListContainer" style="overflow-x: auto; max-height: 55vh; background: #fff; border-radius: var(--radius-md); padding: 10px;"></div></div></div>
         
         <div id="bagBillModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagBillModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">📜 Generate Bag Bill</h3><div class="section-box"><div class="input-group" style="margin-bottom: 15px;"><label>Select Name:</label><input type="text" id="bagBillName" list="bagBillPersonList" placeholder="Start typing..."><datalist id="bagBillPersonList"></datalist></div><div class="input-row"><div class="input-group"><label>From:</label><input type="date" id="bagStartDate"></div><div class="input-group"><label>To:</label><input type="date" id="bagEndDate"></div></div></div><button class="btn-add bg-gradient-purple" onclick="generateBagBill()">Show Bill</button></div></div>
         
@@ -317,12 +314,7 @@
                     <div class="header-month" id="bagBillDateDisplay" style="color: #db2777; background: #fce7f3; display: inline-block; padding: 5px 15px; border-radius: 8px; font-weight: 700; font-size: 14px; margin-top: 6px; border: 1px solid #fbcfe8;">---</div>
                     <hr style="margin-top: 15px; border: 0; border-top: 2px dashed #cbd5e1;">
                 </div>
-                <div class="table-container" style="border:none; box-shadow:none;">
-                    <table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: left;">
-                        <thead><tr style="background: #f8fafc; color: #475569; font-weight: 700; text-transform: uppercase; font-size: 12px;"><th style="padding: 14px 16px; border-bottom: 2px solid #e2e8f0; width:90px;">तारीख</th><th style="text-align:center; padding: 14px 16px; border-bottom: 2px solid #e2e8f0;">तपशील</th><th style="text-align:right; padding: 14px 16px; border-bottom: 2px solid #e2e8f0;">रक्कम (₹)</th></tr></thead>
-                        <tbody id="bagBillList"></tbody>
-                    </table>
-                </div>
+                <div id="bagBillTableWrapper" class="table-container" style="border:none; box-shadow:none;"></div>
             </div>
         </div></div>
 
@@ -470,19 +462,32 @@
     database.ref('merchantData').on('value', snap => { merchantDB = sanitizeData(snap.val()); updateDashboard(); });
     database.ref('bagData').on('value', snap => { bagDB = sanitizeData(snap.val()); });
 
+    // SMART AUTO-CLEANER & DATA RECOVERY
     setTimeout(() => {
         if(currentUserRole === 'admin') {
             let cropNames = new Set();
             (cropDataDB||[]).forEach(e => { if(e&&e.name) cropNames.add(e.name.trim().toLowerCase())});
-            let bagNames = new Set((bagDB||[]).map(e=>e&&e.name?e.name.trim().toLowerCase():''));
-            let merNames = new Set((merchantDB||[]).map(e=>e&&e.name?e.name.trim().toLowerCase():''));
+            
+            let bagSet = new Set(bagPersons); let bChanged = false;
+            let merSet = new Set(merchants); let mChanged = false;
+
+            // Recover Bags automatically into Bags List
+            (bagDB||[]).forEach(e => {
+                if(e && e.name) {
+                    let n = e.name.trim(); let nl = n.toLowerCase();
+                    if(!bagSet.has(n) && !bagSet.has(nl)) { bagSet.add(n); bagPersons.push(n); bChanged=true; }
+                }
+            });
+            if(bChanged) database.ref('bagPersons').set(bagPersons);
 
             let cleanedFarmers = farmers.filter(f => {
                 if(!f) return false;
                 let fl = f.trim().toLowerCase();
                 if(defaultFarmersList.includes(f)) return true;
                 if(cropNames.has(fl)) return true;
-                if(bagNames.has(fl) || merNames.has(fl)) return false; 
+                let isBag = Array.from(bagSet).some(b => b.toLowerCase() === fl);
+                let isMer = Array.from(merSet).some(m => m.toLowerCase() === fl);
+                if(isBag || isMer) return false; 
                 return true;
             });
 
@@ -492,7 +497,7 @@
                 loadFarmerList();
             }
         }
-    }, 3000);
+    }, 3500);
 
     function getData() { return cropDataDB || []; } 
     function saveData(data) { let cleanData = sanitizeData(data); cropDataDB = cleanData; database.ref('cropData').set(cleanData); updateDashboard(); }
@@ -616,6 +621,8 @@
 
     function sendWhatsAppBill(areaId) {
         let printArea = document.getElementById(areaId); if(!printArea) return;
+        let type = document.getElementById("billType") ? document.getElementById("billType").value : "BAG";
+        if (areaId !== 'mainBillPrintableArea') type = "BAG";
         
         let rawName = document.getElementById(areaId === 'mainBillPrintableArea' ? "billHeaderName" : "bagBillHeaderName").innerText;
         let rawDate = document.getElementById(areaId === 'mainBillPrintableArea' ? "billMonthDisplay" : "bagBillDateDisplay").innerText;
@@ -838,7 +845,28 @@
 
     let isBagListMode = false; function openBagList() { document.getElementById("bagListModal").style.display="block"; isBagListMode = false; document.getElementById("bagManageBtn").innerText="⚙️ Manage"; renderBagList(); }
     function toggleBagListMode() { if(currentUserRole !== 'admin') { alert("❌ फक्त मालक सेटिंग्ज बदलू शकतात."); return; } isBagListMode = !isBagListMode; document.getElementById("bagManageBtn").innerText = isBagListMode ? "❌ Done" : "⚙️ Manage"; renderBagList(); }
-    function renderBagList() { let data = getBagDB(); let container = document.getElementById("bagListContainer"); container.innerHTML = ""; let grouped = {}; data.forEach(e => { if(!e) return; if(!grouped[e.date]) grouped[e.date] = []; grouped[e.date].push(e); }); let dates = Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a)); dates.forEach(d => { let html = `<div style="padding:10px 15px; font-weight:bold; background:#e2e8f0; border-radius:10px 10px 0 0; color:#0f172a; margin-top:15px; border:1px solid #cbd5e1; border-bottom:none;">📅 ${formatDate(d)}</div>`; let dailyQty = 0; let dailyAmt = 0; grouped[d].forEach(e => { let btns = isBagListMode ? `<button class="manage-btn" onclick="editBagEntry(${e.id})">✏️</button><button class="manage-btn" onclick="delBagEntry(${e.id})">🗑</button>` : ""; if(e.type === 'payment') { dailyAmt -= (e.amount || 0); html += `<div style="border-bottom:1px solid #e2e8f0; border-left:1px solid #cbd5e1; border-right:1px solid #cbd5e1; padding:12px 15px; display:flex; justify-content:space-between; align-items:center; background:#ecfdf5;"><div><b style="font-size:15px;">${e.name}</b><br><span style="color:green; font-size:13px; font-weight:600;">जमा रक्कम</span></div><div style="text-align:right; font-weight:800; color:green; font-size:15px;">- ₹${e.amount||0}<br>${btns}</div></div>`; } else { dailyQty += e.qty; dailyAmt += (e.total || 0); let t = e.type === 'Poti' ? 'पोती' : 'बॅग'; html += `<div style="border-bottom:1px solid #e2e8f0; border-left:1px solid #cbd5e1; border-right:1px solid #cbd5e1; padding:12px 15px; display:flex; justify-content:space-between; align-items:center; background:#fff;"><div><b style="font-size:15px;">${e.name}</b><br><span style="color:var(--text-muted); font-size:13px; font-weight:600;">${e.qty} ${t} x ₹${e.rate||0}</span></div><div style="text-align:right; font-weight:800; color:var(--text-main); font-size:15px;">₹${e.total||0}<br>${btns}</div></div>`; } }); html += `<div style="padding:10px 15px; background:#eff6ff; text-align:right; border-radius:0 0 10px 10px; font-weight:800; color:#1d4ed8; font-size:14px; border:1px solid #bfdbfe; border-top:none;">एकूण: ${dailyQty} नग | ₹ ${dailyAmt}/-</div>`; container.innerHTML += html; }); if(dates.length===0) container.innerHTML="<p style='text-align:center; padding:20px; color:var(--text-muted); font-weight:600;'>No History Found.</p>"; }
+    function renderBagList() { 
+        let data = getBagDB(); let container = document.getElementById("bagListContainer"); container.innerHTML = ""; let grouped = {}; 
+        data.forEach(e => { if(!e) return; if(!grouped[e.date]) grouped[e.date] = []; grouped[e.date].push(e); }); 
+        let dates = Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a)); 
+        dates.forEach(d => { 
+            let html = `<div style="padding:10px 15px; font-weight:bold; background:#e2e8f0; border-radius:10px 10px 0 0; color:#0f172a; margin-top:15px; border:1px solid #cbd5e1; border-bottom:none;">📅 ${formatDate(d)}</div>`; 
+            let dailyQty = 0; let dailyAmt = 0; 
+            grouped[d].forEach(e => { 
+                let btns = isBagListMode ? `<button class="manage-btn" onclick="editBagEntry(${e.id})">✏️</button><button class="manage-btn" onclick="delBagEntry(${e.id})">🗑</button>` : ""; 
+                if(e.type === 'payment') { 
+                    dailyAmt -= (e.amount || 0); 
+                    html += `<div style="border-bottom:1px solid #e2e8f0; border-left:1px solid #cbd5e1; border-right:1px solid #cbd5e1; padding:12px 15px; display:flex; justify-content:space-between; align-items:center; background:#ecfdf5;"><div><b style="font-size:15px;">${e.name}</b><br><span style="color:green; font-size:13px; font-weight:600;">जमा रक्कम</span></div><div style="text-align:right; font-weight:800; color:green; font-size:15px;">- ₹${e.amount||0}<br>${btns}</div></div>`; 
+                } else { 
+                    dailyQty += e.qty; dailyAmt += (e.total || 0); let t = e.type === 'Poti' ? 'पोती' : 'बॅग'; 
+                    html += `<div style="border-bottom:1px solid #e2e8f0; border-left:1px solid #cbd5e1; border-right:1px solid #cbd5e1; padding:12px 15px; display:flex; justify-content:space-between; align-items:center; background:#fff;"><div><b style="font-size:15px;">${e.name}</b><br><span style="color:var(--text-muted); font-size:13px; font-weight:600;">${e.qty} ${t} x ₹${e.rate||0}</span></div><div style="text-align:right; font-weight:800; color:var(--text-main); font-size:15px;">₹${e.total||0}<br>${btns}</div></div>`; 
+                } 
+            }); 
+            html += `<div style="padding:10px 15px; background:#eff6ff; text-align:right; border-radius:0 0 10px 10px; font-weight:800; color:#1d4ed8; font-size:14px; border:1px solid #bfdbfe; border-top:none;">एकूण: ${dailyQty} नग | ₹ ${dailyAmt}/-</div>`; 
+            container.innerHTML += html; 
+        }); 
+        if(dates.length===0) container.innerHTML="<p style='text-align:center; padding:20px; color:var(--text-muted); font-weight:600;'>No History Found.</p>"; 
+    }
     
     function editBagEntry(id) { 
         if(currentUserRole !== 'admin') { alert("❌ हे फक्त मालक करू शकतात."); return; } 
@@ -869,50 +897,58 @@
     }
     
     function openBagBillModal() { document.getElementById("bagBillModal").style.display="block"; }
+    
+    /* ====== FIXED BAG BILL GENERATION (TABLE FORMAT) ====== */
     function generateBagBill() { 
         let name=document.getElementById("bagBillName").value.trim(); let start=document.getElementById("bagStartDate").value; let end=document.getElementById("bagEndDate").value; if(!name||!start||!end) return; 
         document.getElementById("bagBillModal").style.display="none"; document.getElementById("finalBagBillModal").style.display="block"; 
         document.getElementById("bagBillHeaderName").innerText=name; document.getElementById("bagBillDateDisplay").innerText = `📅 ${formatDate(start)} ते ${formatDate(end)}`; 
         
         let data=getBagDB(); data.sort((a,b)=>new Date(a.date)-new Date(b.date)); 
-        let openingBal = 0; let filteredData = [];
+        let openingBalQty = 0; let openingBalAmt = 0; let filteredData = [];
+        
         data.forEach(e => { 
             if(e && e.name === name) { 
                 if (e.date < start) { 
-                    if(e.type === 'payment') openingBal -= (Number(e.amount)||0); else openingBal += (Number(e.total)||0); 
+                    if(e.type === 'payment') openingBalAmt -= (Number(e.amount)||0); 
+                    else { openingBalQty += (Number(e.qty)||0); openingBalAmt += (Number(e.total)||0); }
                 } else if (e.date >= start && e.date <= end) { 
                     filteredData.push(e); 
                 } 
             } 
         });
 
-        let list=document.getElementById("bagBillList"); list.innerHTML="";
+        let listWrapper=document.getElementById("bagBillTableWrapper"); 
         
-        let html = `<table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: left;"><thead><tr style="background: #f8fafc; color: #475569; font-weight: 700; text-transform: uppercase; font-size: 12px;"><th style="padding: 14px 16px; border-bottom: 2px solid #e2e8f0; width:90px;">तारीख</th><th style="text-align:center; padding: 14px 16px; border-bottom: 2px solid #e2e8f0;">तपशील</th><th style="text-align:right; padding: 14px 16px; border-bottom: 2px solid #e2e8f0;">रक्कम (₹)</th></tr></thead><tbody>`;
-        let runningBal = openingBal; let lastBillDate = ""; 
+        let html = `<table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: left;"><thead><tr style="background: #fce7f3; color: #9d174d; font-weight: 700; text-transform: uppercase; font-size: 12px;"><th style="padding: 14px 16px; border-bottom: 2px solid #fbcfe8; width:90px;">तारीख</th><th style="text-align:center; padding: 14px 16px; border-bottom: 2px solid #fbcfe8;">तपशील</th><th style="text-align:right; padding: 14px 16px; border-bottom: 2px solid #fbcfe8;">रक्कम (₹)</th></tr></thead><tbody>`;
+        let runningQty = openingBalQty; let runningAmt = openingBalAmt; let lastBillDate = ""; 
         
-        if(openingBal !== 0 || filteredData.length > 0) {
-            if(openingBal !== 0) { html += `<tr style="background: #fffbeb;"><td colspan="2" style="text-align:right; padding:12px 16px; font-weight:700; color:#d97706;">मागील बाकी :</td><td style="text-align:right; font-weight:800; padding:12px 16px; color:#d97706;">${openingBal}</td></tr>`; }
+        if(openingBalAmt !== 0 || filteredData.length > 0) {
+            if(openingBalAmt !== 0) { html += `<tr style="background: #fffbeb;"><td colspan="2" style="text-align:right; padding:12px 16px; font-weight:700; color:#d97706;">मागील बाकी :</td><td style="text-align:right; font-weight:800; padding:12px 16px; color:#d97706;">${openingBalAmt}</td></tr>`; }
+            
             filteredData.forEach(e => {
                 if (e.type !== 'payment') { 
                     let displayDate = (e.date !== lastBillDate) ? formatDate(e.date) : ""; 
                     lastBillDate = e.date; 
-                    runningBal += e.total; 
-                    html += `<tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding:14px 16px; color:#64748b; font-weight:600;">${displayDate}</td><td style="text-align:center; padding:14px 16px; font-weight:600;">${e.qty} ${e.type==='Poti'?'पोती':'बॅग'} x ${e.rate}</td><td style="text-align:right; font-weight:700; padding:14px 16px;">${e.total}</td></tr>`; 
+                    runningQty += e.qty; runningAmt += e.total; 
+                    html += `<tr style="border-bottom: 1px solid #fdf2f8;"><td style="padding:14px 16px; color:#64748b; font-weight:600;">${displayDate}</td><td style="text-align:center; padding:14px 16px; font-weight:600;">${e.qty} ${e.type==='Poti'?'पोती':'बॅग'} x ${e.rate}</td><td style="text-align:right; font-weight:700; padding:14px 16px;">${e.total}</td></tr>`; 
                 } else { 
-                    html += `<tr style="background: #f8fafc; border-top: 1px solid #e2e8f0;"><td colspan="2" style="text-align:right; padding:10px 16px; font-weight:700;">एकूण :</td><td style="text-align:right; font-weight:800; padding:10px 16px;">${runningBal}</td></tr>`; 
-                    runningBal -= e.amount; 
+                    html += `<tr style="background: #fdf2f8; border-top: 1px solid #fbcfe8;"><td colspan="2" style="text-align:right; padding:10px 16px; font-weight:700;">एकूण :</td><td style="text-align:right; font-weight:800; padding:10px 16px;">${runningAmt}</td></tr>`; 
+                    runningAmt -= e.amount; 
                     let payDate = formatDate(e.date); 
                     html += `<tr style="background: #ecfdf5;"><td style="padding:14px 16px; color:#059669; font-weight:600;">${payDate}</td><td style="text-align:right; padding:14px 16px; font-weight:700; color:#059669;">जमा :</td><td style="text-align:right; padding:14px 16px; font-weight:800; color:#059669;">- ${e.amount}</td></tr>`; 
-                    html += `<tr><td colspan="3" style="text-align:right; padding:12px 16px; border-bottom: 1px solid #e2e8f0;"><span style="background: #eff6ff; color: #1d4ed8; padding: 6px 12px; border-radius: 8px; font-weight: 700;">बाकी: ${runningBal} /-</span></td></tr>`; 
+                    html += `<tr><td colspan="3" style="text-align:right; padding:12px 16px; border-bottom: 1px solid #fbcfe8;"><span style="background: #fce7f3; color: #db2777; padding: 6px 12px; border-radius: 8px; font-weight: 700;">बाकी: ${runningAmt} /-</span></td></tr>`; 
                     lastBillDate = "";
                 }
             });
-            if(filteredData.length > 0 && filteredData[filteredData.length-1].type !== 'payment') { html += `<tr style="background: #fce7f3;"><td colspan="2" style="text-align:right; font-weight:800; padding:18px 16px; color:#db2777;">सध्याची बाकी :</td><td style="text-align:right; padding:18px 16px;"><span style="background: #db2777; color: white; padding: 8px 16px; border-radius: 10px; font-weight: 800;">₹ ${runningBal} /-</span></td></tr>`; }
+            
+            if(filteredData.length > 0 && filteredData[filteredData.length-1].type !== 'payment') { 
+                html += `<tr style="background: #fce7f3;"><td colspan="2" style="text-align:right; font-weight:800; padding:18px 16px; color:#9d174d;">सध्याची बाकी :</td><td style="text-align:right; padding:18px 16px;"><span style="background: #9d174d; color: white; padding: 8px 16px; border-radius: 10px; font-weight: 800;">₹ ${runningAmt} /-</span></td></tr>`; 
+            }
         } else { html += `<tr><td colspan="3" style="text-align:center; padding: 30px; color: #94a3b8;">No Data</td></tr>`; }
         html += `</tbody></table>`; 
-        list.innerHTML = html;
-        document.getElementById("bagBillTotalAmount").parentElement.style.display = 'none'; // hide old total line
+        
+        listWrapper.innerHTML = html;
     }
 
     function openMerchantHub() { document.getElementById("merchantHubModal").style.display="block"; }
@@ -1037,10 +1073,10 @@
         document.getElementById("billModal").style.display="none"; document.getElementById("finalBillModal").style.display="block"; 
         document.getElementById("billMonthDisplay").innerText = displayDate; 
         document.getElementById("billHeaderName").innerText = n; 
-        let list=document.getElementById("billList"); list.innerHTML=""; 
+        let list=document.getElementById("billTableWrapper"); list.innerHTML=""; // FIX
         
         if(type==='FARMER'){
-            document.getElementById("billTotalRow").style.display = "none"; document.getElementById("billAdvBox").innerText="";
+            document.getElementById("billAdvBox").innerText="";
             let d=getData(); d.sort((a,b)=>new Date(a.date)-new Date(b.date)); 
             let openingBal = 0; let filteredData = []; let totalAdvInPeriod = 0;
             
@@ -1095,8 +1131,9 @@
                     html += `<tr style="background: ${finalBg};"><td colspan="2" style="text-align:right; font-weight:800; padding:18px 16px; color:${finalColor};">${finalPrefix}</td><td style="text-align:right; padding:18px 16px;"><span style="background: ${finalColor}; color: white; padding: 8px 16px; border-radius: 10px; font-weight: 800;">₹ ${Math.abs(runningBal)} /-</span></td></tr>`; 
                 }
             } else { html += `<tr><td colspan="3" style="text-align:center; padding: 30px; color: #94a3b8;">No Data</td></tr>`; }
+            html += `</tbody></table>`; 
             
-            list.innerHTML = html;
+            list.innerHTML = html; // FIX
             
             if(totalAdvInPeriod !== 0) { 
                  document.getElementById("billAdvBox").innerText = `⚠️ या कालावधीत नेलेली एकूण उचल : ₹ ${totalAdvInPeriod}`; 
@@ -1131,7 +1168,8 @@
                 });
                 if(filteredData.length > 0 && filteredData[filteredData.length-1].type !== 'payment') { html += `<tr style="background: #e0eafc;"><td colspan="2" style="text-align:right; font-weight:800; padding:18px 16px; color:#1e3a8a;">सध्याची बाकी :</td><td style="text-align:right; padding:18px 16px;"><span style="background: #1e3a8a; color: white; padding: 8px 16px; border-radius: 10px; font-weight: 800;">₹ ${runningBal} /-</span></td></tr>`; }
             } else { html += `<tr><td colspan="3" style="text-align:center; padding: 30px; color: #94a3b8;">No Data</td></tr>`; }
-            list.innerHTML = html;
+            html += `</tbody></table>`; 
+            list.innerHTML = html; // FIX
         }
     }
 </script>
