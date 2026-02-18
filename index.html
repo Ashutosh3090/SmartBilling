@@ -87,6 +87,7 @@
         .bg-gradient-merchant { background: linear-gradient(135deg, #f97316, #c2410c); }
         .bg-gradient-bag { background: linear-gradient(135deg, #db2777, #9d174d); }
         .bg-gradient-whatsapp { background: linear-gradient(135deg, #25D366, #128C7E); }
+        .bg-gradient-ai { background: linear-gradient(135deg, #0f172a, #334155); }
 
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px);}
         .modal-content { background: #ffffff; margin: 5% auto; padding: 20px; width: 92%; max-width: 650px; border-radius: var(--radius-xl); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); position: relative; max-height: 85vh; overflow-y: auto; }
@@ -120,7 +121,7 @@
         #syncStatus { position: fixed; top: 10px; right: 10px; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; color: white; background: var(--success); z-index: 9999; box-shadow: 0 4px 10px rgba(16,185,129,0.3); display: none;}
         #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 99999; display: flex; align-items: center; justify-content: center; }
         .login-box { background: rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 24px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); text-align: center; width: 90%; max-width: 350px; color: white; border: 1px solid rgba(255,255,255,0.1);}
-        .login-box input { text-align: center; font-size: 24px; letter-spacing: 10px; font-weight: 800; background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.2); color: white; padding: 15px; border-radius: 16px; margin-bottom: 20px; width: 100%;}
+        .login-box input { text-align: center; font-size: 24px; letter-spacing: 10px; font-weight: 800; background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.2); color: white; padding: 15px; border-radius: 16px; margin-bottom: 15px; width: 100%;}
         
         #appContent { display: none; }
         .bill-area-printable { background: #ffffff; padding: 15px; color: #000000; border-radius: 12px; }
@@ -139,7 +140,8 @@
 <div id="loginScreen">
     <div class="login-box">
         <div style="font-size: 50px; margin-bottom: 10px;">🔒</div>
-        <h2 style="font-weight: 700; margin-bottom: 10px;">Secure Login</h2>
+        <h2 style="font-weight: 700; margin-bottom: 5px;">Secure Login</h2>
+        <p style="font-size: 11px; color: #94a3b8; margin-bottom: 20px;">मालक (Admin) किंवा कामगार (Staff) पिन टाका.</p>
         <input type="password" id="loginPin" inputmode="numeric" placeholder="••••" maxlength="4" onkeypress="if(event.key === 'Enter') verifyPin()">
         <button class="btn-add" style="background: linear-gradient(135deg, #6366f1, #4f46e5);" onclick="verifyPin()">Unlock System</button>
     </div>
@@ -150,9 +152,9 @@
 <div id="appContent">
     <div class="container">
         <div class="section no-print">
-            <h3 class="app-title">✨ Smart Billing Hub</h3>
+            <h3 class="app-title" id="mainAppTitle">✨ Smart Billing Hub</h3>
             
-            <div class="dashboard-grid">
+            <div class="dashboard-grid" id="mainDashboard">
                 <div class="dash-card">
                     <span class="dash-title">आजची खरेदी (शेतकरी)</span>
                     <span class="dash-value text-blue" id="dashPurchase">₹ 0</span>
@@ -198,9 +200,17 @@
                 <button class="action-btn bg-gradient-green" onclick="openFarmerListModal()"><i>👥</i> Farmers</button>
                 <button class="action-btn bg-gradient-merchant" onclick="openMerchantHub()"><i>🏢</i> Traders</button>
                 <button class="action-btn bg-gradient-bag" onclick="openBagModal()"><i>🎒</i> Bags</button>
+                <button class="action-btn bg-gradient-ai" onclick="openAIModal()" style="grid-column: span 2;"><i>🤖</i> AI ॲडव्हायझर</button>
             </div>
         </div>
 
+        <div id="aiModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('aiModal').style.display='none'">✕</div>
+            <h3 style="color: #0f172a;">🤖 AI बिझनेस ॲडव्हायझर</h3>
+            <div id="aiReportContent" style="margin-top: 15px; font-size: 14px; line-height: 1.6;">
+                <p style="text-align:center; color:gray;">⏳ AI तुमचा डेटा स्कॅन करत आहे...</p>
+            </div>
+        </div></div>
+        
         <div id="merchantHubModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('merchantHubModal').style.display='none'">✕</div><h3 style="color: var(--merchant-color);">🏢 Vyapari / Merchant</h3><div class="section-box"><div class="input-row"><div class="input-group"><label>Date:</label><input type="date" id="merDate" onchange="document.getElementById('merRate').value='';"></div><div class="input-group" style="flex:2;"><label>Trader Name:</label><input type="text" id="merName" list="merchantList" placeholder="Select Trader..."><datalist id="merchantList"></datalist></div></div><div class="input-row"><div class="input-group"><label>Weight:</label><input type="number" id="merWeight" placeholder="0.00"></div><div class="input-group"><label>Rate:</label><input type="number" id="merRate" placeholder="0.00"></div><div class="input-group"><label>Type:</label><select id="merTypeSel"><option value="नि">नि</option><option value="पि">पि</option><option value="के">के</option><option value="शे">शे</option><option value="रु">रु</option></select></div></div><button class="btn-add bg-gradient-merchant" style="margin-top: 5px;" onclick="saveMerchantEntry()">Save Entry (+)</button></div><div class="list-header-bar" style="background: transparent; padding: 0;"><button class="btn-action-small bg-gradient-purple" onclick="openMerPreviewModal()">👁️ Preview</button><button class="btn-action-small bg-gradient-green" onclick="openMerJamaModal()">💸 रक्कम जमा</button><button class="btn-action-small bg-gradient-orange" onclick="openMerchantListModal()">👥 Trader List</button><button class="btn-action-small bg-gradient-blue" onclick="openBillModal('MERCHANT')">📜 Bill</button></div></div></div>
         
         <div id="merJamaModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('merJamaModal').style.display='none'">✕</div><h3 style="color: var(--success);">💸 व्यापारी रक्कम जमा</h3><div class="section-box" style="border: none; background: #ecfdf5;"><div class="input-group" style="margin-bottom: 15px;"><label>तारीख (Date):</label><input type="date" id="merJamaDateOut"></div><div class="input-group" style="margin-bottom: 15px;"><label>व्यापाऱ्याचे नाव:</label><input type="text" id="merJamaNameOut" list="merchantList" placeholder="नाव निवडा..."></div><div class="input-group" style="margin-bottom: 20px;"><label>जमा रक्कम (₹):</label><input type="number" id="merJamaAmountOut" placeholder="0" style="font-size: 18px; font-weight: bold; color: var(--success);"></div><button class="btn-add bg-gradient-green" onclick="saveMerJamaOutside()">✅ जमा करा</button></div></div></div>
@@ -234,7 +244,7 @@
 
         <div id="bagModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">🎒 Bags / पोती Tracker</h3><div class="section-box" style="border-color: #ddd6fe; background: #f5f3ff;"><div class="input-row"><div class="input-group"><label>Date:</label><input type="date" id="bagDate"></div><div class="input-group" style="flex:2;"><label>Name:</label><input type="text" id="bagName" list="farmerList" placeholder="Search..."></div></div><div class="input-row"><div class="input-group"><label>Qty:</label><input type="number" id="bagQty" placeholder="0"></div><div class="input-group"><label>Type:</label><select id="bagType"><option value="Poti">पोती</option><option value="Bag">बॅग</option></select></div><div class="input-group"><label>Rate:</label><input type="number" id="bagRate" placeholder="0.00"></div></div><button class="btn-add bg-gradient-bag" style="margin-top:10px;" onclick="saveBagEntry()">✅ Save Entry (+)</button></div><div class="list-header-bar" style="background:transparent; padding:0;"><button class="btn-action-small" style="background:var(--secondary); color:white;" onclick="openBagPreview()">👁️ Preview</button><button class="btn-action-small" style="background:var(--text-main); color:white;" onclick="openBagList()">📋 All History</button><button class="btn-action-small bg-gradient-orange" onclick="openBagBillModal()">📜 Bag Bill</button></div></div></div>
         <div id="bagPreviewModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagPreviewModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">👁️ Today's Bags</h3><div class="table-container"><table class="styled-table"><thead><tr><th>Name</th><th>Details</th><th>Total</th><th>Action</th></tr></thead><tbody id="bagPreviewBody"></tbody></table></div></div></div>
-        <div id="bagListModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagListModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">📋 All Bags History</h3><div class="list-header-bar"><button class="btn-action-small" style="background:var(--secondary); color:white;" id="bagManageBtn" onclick="toggleBagListMode()">⚙️ Manage</button></div><div id="bagListContainer" style="overflow-x: auto; max-height: 55vh; background: #fff; border-radius: var(--radius-md); padding: 5px;"></div></div></div>
+        <div id="bagListModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagListModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">📋 All Bags History</h3><div class="list-header-bar"><button class="btn-action-small" style="background:var(--secondary); color:white;" id="bagManageBtn" onclick="toggleBagListMode()">⚙️ Manage</button></div><div id="bagListContainer" style="overflow-x: auto; max-height: 55vh; background: #fff; border-radius: var(--radius-md); padding: 10px;"></div></div></div>
         <div id="bagBillModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="document.getElementById('bagBillModal').style.display='none'">✕</div><h3 style="color: var(--bag-color);">📜 Generate Bag Bill</h3><div class="section-box"><div class="input-group" style="margin-bottom: 15px;"><label>Select Name:</label><input type="text" id="bagBillName" list="farmerList" placeholder="Start typing..."></div><div class="input-row"><div class="input-group"><label>From:</label><input type="date" id="bagStartDate"></div><div class="input-group"><label>To:</label><input type="date" id="bagEndDate"></div></div></div><button class="btn-add bg-gradient-purple" onclick="generateBagBill()">Show Bill</button></div></div>
         <div id="finalBagBillModal" class="modal"><div class="modal-content" style="max-width: 650px; background: #fff;">
             <div class="no-print-in-bill" style="display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 15px;">
@@ -257,26 +267,48 @@
 </div>
 
 <script>
-    const APP_PIN = "1504";
+    const ADMIN_PIN = "1504";
+    const STAFF_PIN = "2000";
+    let currentUserRole = "staff"; // Default
 
     function verifyPin() {
-        if (document.getElementById("loginPin").value === APP_PIN) {
+        let pin = document.getElementById("loginPin").value;
+        if (pin === ADMIN_PIN) {
             sessionStorage.setItem("isLoggedIn", "true");
-            document.getElementById("loginScreen").style.display = "none";
-            document.getElementById("appContent").style.display = "block";
-            document.getElementById("syncStatus").style.display = "block";
-            updateDashboard();
+            sessionStorage.setItem("userRole", "admin");
+            currentUserRole = "admin";
+            unlockApp();
+        } else if (pin === STAFF_PIN) {
+            sessionStorage.setItem("isLoggedIn", "true");
+            sessionStorage.setItem("userRole", "staff");
+            currentUserRole = "staff";
+            unlockApp();
         } else {
-            alert("❌ चुकीचा पिन!");
+            alert("❌ चुकीचा पिन! कृपया पुन्हा प्रयत्न करा.");
             document.getElementById("loginPin").value = "";
         }
     }
 
+    function unlockApp() {
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("appContent").style.display = "block";
+        document.getElementById("syncStatus").style.display = "block";
+        
+        if(currentUserRole === "staff") {
+            document.getElementById("mainDashboard").style.display = "none";
+            document.getElementById("mainAppTitle").innerText = "✨ Smart Billing (Staff Mode)";
+            document.getElementById("syncStatus").innerText = "🟡 Staff Active";
+        } else {
+            document.getElementById("mainDashboard").style.display = "grid";
+            document.getElementById("mainAppTitle").innerText = "✨ Smart Billing Hub";
+        }
+        updateDashboard();
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
         if (sessionStorage.getItem("isLoggedIn") === "true") {
-            document.getElementById("loginScreen").style.display = "none";
-            document.getElementById("appContent").style.display = "block";
-            document.getElementById("syncStatus").style.display = "block";
+            currentUserRole = sessionStorage.getItem("userRole") || "staff";
+            unlockApp();
         }
         let today = new Date().toISOString().slice(0, 10);
         document.getElementById("dateInput").value = today;
@@ -291,26 +323,26 @@
         document.getElementById("reportMonth").value = new Date().toISOString().slice(0, 7);
     });
 
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyD1XNdHAgGO4teBASsQG35UuG4OJrVzV08",
       authDomain: "smartbilling-6262c.firebaseapp.com",
       databaseURL: "https://smartbilling-6262c-default-rtdb.firebaseio.com",
       projectId: "smartbilling-6262c"
     };
-    
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
     firebase.database().ref(".info/connected").on("value", (snap) => {
-        let st = document.getElementById("syncStatus");
-        if (snap.val() === true) { st.innerText = "🟢 Cloud Connected"; st.style.background = "#10b981"; } 
-        else { st.innerText = "🔴 Offline"; st.style.background = "#ef4444"; }
+        if(currentUserRole !== "staff") {
+            let st = document.getElementById("syncStatus");
+            if (snap.val() === true) { st.innerText = "🟢 Cloud Connected"; st.style.background = "#10b981"; } 
+            else { st.innerText = "🔴 Offline"; st.style.background = "#ef4444"; }
+        }
     });
 
     const defaultFarmersList = ["1. सौदी", "2. पोपट", "3. बन्ने", "4. तानाजी", "5. आकाश", "6. शिवानंद", "7. हरी"];
-    let farmers = defaultFarmersList;
-    let merchants = ["Traders A"];
-    
+    let farmers = defaultFarmersList; let merchants = ["Traders A"];
     let cropDataDB = []; let merchantDB = []; let bagDB = [];
 
     database.ref('farmers').once('value', snap => { if(!snap.exists()) database.ref('farmers').set(defaultFarmersList); });
@@ -352,6 +384,48 @@
     function loadMerchantList() { let dl=document.getElementById("merchantList"); let dl2=document.getElementById("billNameSuggestions"); dl.innerHTML=""; dl2.innerHTML=""; merchants.forEach(m=>{let op=document.createElement("option");op.value=m;dl.appendChild(op);let op2=document.createElement("option");op2.value=m;dl2.appendChild(op2);}); }
     function autoSelectFarmerName() { let v=document.getElementById("farmerName").value.trim(); if(!isNaN(v)&&v!==""){let f=farmers.find(n=>n.startsWith(v+".")); if(f) document.getElementById("farmerName").value=f;}}
 
+    /* ====== AI ADVISOR FEATURE ====== */
+    function openAIModal() {
+        if(currentUserRole !== 'admin') { alert("❌ प्रवेश नाकारला! AI रिपोर्ट फक्त 'मालक' बघू शकतात."); return; }
+        document.getElementById("aiModal").style.display = "block";
+        generateAIReport();
+    }
+
+    function generateAIReport() {
+        let reportDiv = document.getElementById("aiReportContent");
+        reportDiv.innerHTML = "<p style='text-align:center; color:gray;'>⏳ AI डेटा स्कॅन करत आहे...</p>";
+        
+        setTimeout(() => {
+            let totalPending = 0; let topDebtor = {name: "कोणी नाही", amt: 0}; let mData = {};
+            (merchantDB || []).forEach(e => {
+                if(!mData[e.name]) mData[e.name] = 0;
+                if(e.type !== 'payment') mData[e.name] += e.total; else mData[e.name] -= e.amount;
+            });
+            for(let m in mData) {
+                totalPending += mData[m];
+                if(mData[m] > topDebtor.amt) { topDebtor.amt = mData[m]; topDebtor.name = m; }
+            }
+
+            let topFarmer = {name: "कोणी नाही", amt: 0}; let fData = {};
+            (cropDataDB || []).forEach(e => {
+                if(e.type === 'crop') { if(!fData[e.name]) fData[e.name] = 0; fData[e.name] += e.total; }
+            });
+            for(let f in fData) {
+                if(fData[f] > topFarmer.amt) { topFarmer.amt = fData[f]; topFarmer.name = f; }
+            }
+
+            let html = `<div style='background:#f8fafc; padding:15px; border-radius:10px; margin-bottom:12px; border-left:4px solid #3b82f6;'><b>📊 मार्केट अलर्ट:</b> व्यापाऱ्यांकडे एकूण <b>₹ ${totalPending.toLocaleString()}</b> अडकले आहेत.</div>`;
+            if(topDebtor.amt > 0) {
+                html += `<div style='background:#fef2f2; padding:15px; border-radius:10px; margin-bottom:12px; border-left:4px solid #ef4444;'><b>⚠️ वसुली लक्ष:</b> <b>${topDebtor.name}</b> कडून सर्वात जास्त <b>₹ ${topDebtor.amt.toLocaleString()}</b> येणे बाकी आहे. त्यांना लवकर माल देण्यापूर्वी विचार करा!</div>`;
+            }
+            if(topFarmer.amt > 0) {
+                html += `<div style='background:#ecfdf5; padding:15px; border-radius:10px; margin-bottom:12px; border-left:4px solid #10b981;'><b>🏆 टॉप शेतकरी:</b> <b>${topFarmer.name}</b> ने आतापर्यंत सर्वात जास्त <b>₹ ${topFarmer.amt.toLocaleString()}</b> चा माल आणला आहे. त्यांच्याशी चांगले संबंध ठेवा!</div>`;
+            }
+            html += `<p style='font-size:12px; color:gray; text-align:center; margin-top:15px;'>🤖 हा रिपोर्ट तुमच्या क्लाउड डेटावरून लाईव्ह तयार केला आहे.</p>`;
+            reportDiv.innerHTML = html;
+        }, 1000); // 1 sec delay for realistic AI feel
+    }
+
     function startVoiceRecognition() {
         if (!('webkitSpeechRecognition' in window)) { alert("तुमचा ब्राउझर व्हॉईस कमांड सपोर्ट करत नाही. कृपया Safari वापरा."); return; }
         const recognition = new webkitSpeechRecognition(); recognition.lang = 'mr-IN'; recognition.interimResults = false; recognition.maxAlternatives = 1;
@@ -371,7 +445,6 @@
         recognition.onend = function() { btn.classList.remove("recording"); };
     }
 
-    /* ====== ENHANCED WHATSAPP MESSAGE FORMAT ====== */
     function sendWhatsAppBill(areaId) {
         let printArea = document.getElementById(areaId); if(!printArea) return;
         let type = document.getElementById("billType") ? document.getElementById("billType").value : "BAG";
@@ -380,11 +453,7 @@
         let name = document.getElementById(areaId === 'mainBillPrintableArea' ? "billHeaderName" : "bagBillHeaderName").innerText;
         let date = document.getElementById(areaId === 'mainBillPrintableArea' ? "billMonthDisplay" : "bagBillDateDisplay").innerText;
         
-        let billText = `🧾 *SMART BILLING* 🧾\n`;
-        billText += `➖➖➖➖➖➖➖➖➖\n`;
-        billText += `👤 *नाव:* ${name}\n`;
-        billText += `📅 *तारीख:* ${date}\n`;
-        billText += `➖➖➖➖➖➖➖➖➖\n`;
+        let billText = `🧾 *SMART BILLING* 🧾\n➖➖➖➖➖➖➖➖➖\n👤 *नाव:* ${name}\n📅 *तारीख:* ${date}\n➖➖➖➖➖➖➖➖➖\n`;
 
         if(type === 'MERCHANT') {
             let rows = printArea.querySelectorAll("tbody tr");
@@ -400,23 +469,19 @@
                     else if(c0.includes("एकूण")) billText += `💵 *${c0} ${c1}*\n`;
                     else if(c0.includes("सध्याची")) billText += `\n🎯 *${c0} ${c1}*\n`;
                 } else if (cells.length === 1) {
-                    let c0 = cells[0].innerText.trim();
-                    if(c0 !== "No Data Found" && c0 !== "No Data") billText += `🔹 *${c0}*\n`;
+                    let c0 = cells[0].innerText.trim(); if(c0 !== "No Data Found" && c0 !== "No Data") billText += `🔹 *${c0}*\n`;
                 }
             });
         } else {
             let listItems = printArea.querySelectorAll(".bill-item");
             listItems.forEach(item => { billText += `🔸 ${item.innerText.trim()}\n`; });
-            
             billText += `➖➖➖➖➖➖➖➖➖\n`;
             let totalSpan = document.getElementById(areaId === 'mainBillPrintableArea' ? "billTotalAmount" : "bagBillTotalAmount");
             if(totalSpan && totalSpan.parentElement.style.display !== 'none') { billText += `💰 *एकूण रक्कम: ${totalSpan.innerText}*\n`; }
             let advSpan = document.getElementById("billAdvBox"); 
             if(advSpan && advSpan.innerText) { billText += `🛑 *${advSpan.innerText}*\n`; }
         }
-
-        billText += `➖➖➖➖➖➖➖➖➖\n`;
-        billText += `🙏 *धन्यवाद* 🙏`;
+        billText += `➖➖➖➖➖➖➖➖➖\n🙏 *धन्यवाद* 🙏`;
         window.open(`https://wa.me/?text=${encodeURIComponent(billText)}`, '_blank');
     }
 
@@ -447,65 +512,34 @@
     
     function openPreviewModal() { document.getElementById("previewModal").style.display="block"; renderPreview(); }
     function renderPreview() { let date = document.getElementById("dateInput").value; let data = getData().filter(e => e.date === date); let tbody = document.getElementById("previewBody"); tbody.innerHTML = ""; data.sort((a, b) => (parseInt(a.name) || 999) - (parseInt(b.name) || 999)); data.forEach(e => { let details = e.type === 'crop' ? `${toMarathi(e.weight)}x${toMarathi(e.rate)}` : "Adv"; tbody.innerHTML += `<tr><td>${e.name}</td><td>${details}</td><td style="font-weight:bold;">${toMarathi(e.total||e.amount)}</td><td style="text-align:center;"><button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑️</button></td></tr>`; }); }
-    function editEntry(id) { let data=getData(); let idx=data.findIndex(e=>e.id===id); if(idx===-1)return; let e=data[idx]; if(e.type==='crop'){ let w=prompt("Weight:",e.weight); let r=prompt("Rate:",e.rate); if(w&&r){e.weight=parseFloat(w);e.rate=parseFloat(r);e.total=Math.floor((e.weight*e.rate)/5)*5; saveData(data); }} else { let a = prompt("Amount:", Math.abs(e.amount)); if(a){e.amount = parseFloat(a)*(e.amount<0?-1:1); saveData(data); } } }
-    function delEntry(id) { if(prompt("Enter PIN:")==="1504"){ let data=getData(); saveData(data.filter(e=>e.id!==id)); } }
+    function editEntry(id) { if(currentUserRole !== 'admin') { alert("❌ हे फक्त मालक करू शकतात."); return; } let data=getData(); let idx=data.findIndex(e=>e.id===id); if(idx===-1)return; let e=data[idx]; if(e.type==='crop'){ let w=prompt("Weight:",e.weight); let r=prompt("Rate:",e.rate); if(w&&r){e.weight=parseFloat(w);e.rate=parseFloat(r);e.total=Math.floor((e.weight*e.rate)/5)*5; saveData(data); }} else { let a = prompt("Amount:", Math.abs(e.amount)); if(a){e.amount = parseFloat(a)*(e.amount<0?-1:1); saveData(data); } } }
+    function delEntry(id) { if(currentUserRole !== 'admin') { alert("❌ प्रवेश नाकारला! हे फक्त मालक डिलीट करू शकतात."); return; } if(prompt("Enter PIN:")===ADMIN_PIN){ let data=getData(); saveData(data.filter(e=>e.id!==id)); } }
     
     function openFarmerListModal() { document.getElementById("listModal").style.display="block"; generateFarmerStatus(); }
     let showAll=false; function toggleAllAmounts(){ showAll=!showAll; generateFarmerStatus(); }
-    let listMode=false; function toggleEditMode(){ listMode=!listMode; document.getElementById("manageListBtn").innerText=listMode?"❌ Done":"⚙️ Manage"; generateFarmerStatus(); }
+    let listMode=false; function toggleEditMode(){ if(currentUserRole !== 'admin') { alert("❌ फक्त मालक सेटिंग्ज बदलू शकतात."); return; } listMode=!listMode; document.getElementById("manageListBtn").innerText=listMode?"❌ Done":"⚙️ Manage"; generateFarmerStatus(); }
     function generateFarmerStatus() { let data = getData(); let tbody = document.getElementById("farmerListBody"); tbody.innerHTML=""; farmers.sort((a,b)=>(parseInt(a)||999)-(parseInt(b)||999)); farmers.forEach(f => { let total = 0; data.forEach(e=>{ if(e.name===f && e.type==='crop') total+=e.total; }); let btns = listMode ? `<div style='float:right'><button class='manage-btn' onclick="editFarmerName('${f}')">✎</button><button class='manage-btn' style='color:#e74c3c;' onclick="delFarmerName('${f}')">🗑</button></div>` : ""; tbody.innerHTML += `<tr class='premium-row'><td><div style="display:flex; align-items:center;"><div class="user-avatar">🧑‍🌾</div><span onclick="openDetailModal('${f}')" style="cursor:pointer; font-weight:600;">${f}</span></div>${btns}</td><td style="text-align:right;"><span style="${showAll ? '' : 'display:none'}" class="badge-green">₹ ${total}</span><span style="${showAll ? 'display:none' : ''}" style="color:var(--text-muted);">****</span></td></tr>`; }); }
     function addNewFarmerPrompt() { let n=prompt("New Farmer Name:"); if(n){ farmers.push(n); database.ref('farmers').set(farmers); } }
     function editFarmerName(old) { let n=prompt("Edit Name:",old); if(n&&n!==old){ let i=farmers.indexOf(old); if(i!==-1)farmers[i]=n; database.ref('farmers').set(farmers); let d=getData(); d.forEach(e=>{if(e.name===old)e.name=n;}); saveData(d); } }
-    function delFarmerName(n) { if(prompt("Enter PIN:")==="1504"){ farmers=farmers.filter(f=>f!==n); database.ref('farmers').set(farmers); generateFarmerStatus(); } }
+    function delFarmerName(n) { if(prompt("Enter PIN:")===ADMIN_PIN){ farmers=farmers.filter(f=>f!==n); database.ref('farmers').set(farmers); generateFarmerStatus(); } }
     function openDetailModal(n) { document.getElementById("detailModal").style.display="block"; document.getElementById("detailFarmerName").innerText=n; renderDetail(n); }
     function renderDetail(n) { let d = getData().filter(e=>e.name===n); d.sort((a,b)=>b.id-a.id); let tb = document.getElementById("detailBody"); tb.innerHTML=""; d.forEach(e=>{ let dt = e.type==='crop'?`${e.weight}x${e.rate}`:"<span style='color:var(--danger);'>Adv</span>"; let amtStyle = e.type==='crop'?'':'color:var(--danger);font-weight:bold;'; tb.innerHTML+=`<tr><td>${formatDate(e.date)}</td><td>${e.type}</td><td>${dt}</td><td style="font-weight:bold; ${amtStyle}">${e.total||e.amount}</td><td style="text-align:center;"><button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button></td></tr>`; }); if(d.length===0) tb.innerHTML="<tr><td colspan='5' style='text-align:center;'>नोंद नाही</td></tr>"; }
 
     function openAdvModal() { document.getElementById("advModal").style.display="block"; document.getElementById("advDate").value=document.getElementById("dateInput").value; }
     function saveAdvance(act) { let name=resolveAndAddName('farmer', document.getElementById("advFarmerName").value); let a=parseFloat(document.getElementById("advAmount").value); if(!name||!a)return; let d=getData(); d.push({id:Date.now(), date:document.getElementById("advDate").value, name:name, type:'advance', amount:act==='GIVE'?a:-a}); saveData(d); document.getElementById("advAmount").value=""; document.getElementById("advModal").style.display="none"; }
     function openAdvListModal() { document.getElementById("advListModal").style.display="block"; renderAdvList(); }
-    let isAdvMode = false; function toggleAdvEditMode(){ isAdvMode=!isAdvMode; document.getElementById("manageAdvListBtn").innerText=isAdvMode?"❌ Done":"⚙️ Manage"; renderAdvList(); }
+    let isAdvMode = false; function toggleAdvEditMode(){ if(currentUserRole !== 'admin') { alert("❌ फक्त मालक सेटिंग्ज बदलू शकतात."); return; } isAdvMode=!isAdvMode; document.getElementById("manageAdvListBtn").innerText=isAdvMode?"❌ Done":"⚙️ Manage"; renderAdvList(); }
     function renderAdvList() { let d=getData().filter(e=>e.type==='advance'); d.sort((a,b)=>b.id-a.id); let tb=document.getElementById("advListBody"); tb.innerHTML=""; let t=0; d.forEach(e=>{ t+=e.amount; let b=isAdvMode?`<button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button>`:""; let typeSpan = e.amount>0?'<span style="color:var(--danger);font-weight:bold;">Given</span>':'<span style="color:var(--success);font-weight:bold;">Received</span>'; tb.innerHTML+=`<tr><td>${formatDate(e.date)}</td><td>${e.name}</td><td>${typeSpan}</td><td style="font-weight:bold;">${Math.abs(e.amount)}</td><td style="text-align:center;">${b}</td></tr>`; }); document.getElementById("totalAdvDisplay").innerText="Total Adv: ₹" + t; }
 
     function openBagModal() { document.getElementById("bagModal").style.display="block"; }
     function saveBagEntry() { let date = document.getElementById("bagDate").value; let name = resolveAndAddName('farmer', document.getElementById("bagName").value); let qty = parseInt(document.getElementById("bagQty").value); let type = document.getElementById("bagType").value; let rate = parseFloat(document.getElementById("bagRate").value) || 0; if(!date || !name || !qty) return; let data = getBagDB(); if(data.some(e => e.date === date && e.name === name)) return; data.push({ id: Date.now(), date, name, qty, type, rate, total: qty*rate }); saveBagDB(data); document.getElementById("bagQty").value = ""; document.getElementById("bagName").value = ""; }
     function openBagPreview() { document.getElementById("bagPreviewModal").style.display="block"; renderBagPreview(); }
     function renderBagPreview() { let date = document.getElementById("bagDate").value; let data = getBagDB().filter(e => e.date === date); let tbody = document.getElementById("bagPreviewBody"); tbody.innerHTML = ""; data.sort((a,b) => b.id - a.id); data.forEach(e => { let t = e.type === 'Poti' ? 'पोती' : 'बॅग'; tbody.innerHTML += `<tr><td>${e.name}</td><td>${toMarathi(e.qty)} ${t} x ${e.rate||0}</td><td style="font-weight:bold;">₹${toMarathi(e.total||0)}</td><td style="text-align:center;"><button class="small-btn btn-edit" onclick="editBagEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delBagEntry(${e.id})">🗑</button></td></tr>`; }); }
-    
-    /* ====== FEATURE: BAGS DATE-WISE TOTAL ====== */
     let isBagListMode = false; function openBagList() { document.getElementById("bagListModal").style.display="block"; isBagListMode = false; document.getElementById("bagManageBtn").innerText="⚙️ Manage"; renderBagList(); }
-    function toggleBagListMode() { isBagListMode = !isBagListMode; document.getElementById("bagManageBtn").innerText = isBagListMode ? "❌ Done" : "⚙️ Manage"; renderBagList(); }
-    
-    function renderBagList() { 
-        let data = getBagDB(); let container = document.getElementById("bagListContainer"); container.innerHTML = ""; 
-        let grouped = {}; data.forEach(e => { if(!grouped[e.date]) grouped[e.date] = []; grouped[e.date].push(e); }); 
-        let dates = Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a)); 
-        
-        dates.forEach(d => { 
-            let html = `<div style="padding:10px 15px; font-weight:bold; background:#e2e8f0; border-radius:10px 10px 0 0; color:#0f172a; margin-top:15px; border:1px solid #cbd5e1; border-bottom:none;">📅 ${formatDate(d)}</div>`; 
-            let dailyQty = 0; let dailyAmt = 0;
-            
-            grouped[d].forEach(e => { 
-                dailyQty += e.qty; dailyAmt += (e.total || 0);
-                let t = e.type === 'Poti' ? 'पोती' : 'बॅग'; 
-                let btns = isBagListMode ? `<button class="manage-btn" onclick="editBagEntry(${e.id})">✏️</button><button class="manage-btn" onclick="delBagEntry(${e.id})">🗑</button>` : ""; 
-                html += `<div style="border-bottom:1px solid #e2e8f0; border-left:1px solid #cbd5e1; border-right:1px solid #cbd5e1; padding:12px 15px; display:flex; justify-content:space-between; align-items:center; background:#fff;">
-                            <div><b style="font-size:15px;">${e.name}</b><br><span style="color:var(--text-muted); font-size:13px; font-weight:600;">${e.qty} ${t} x ₹${e.rate||0}</span></div>
-                            <div style="text-align:right; font-weight:800; color:var(--text-main); font-size:15px;">₹${e.total||0}<br>${btns}</div>
-                         </div>`; 
-            }); 
-            
-            // DAILY TOTAL FOOTER
-            html += `<div style="padding:10px 15px; background:#eff6ff; text-align:right; border-radius:0 0 10px 10px; font-weight:800; color:#1d4ed8; font-size:14px; border:1px solid #bfdbfe; border-top:none;">
-                        एकूण: ${dailyQty} नग | ₹ ${dailyAmt}/-
-                     </div>`;
-            container.innerHTML += html; 
-        }); 
-        
-        if(dates.length===0) container.innerHTML="<p style='text-align:center; padding:20px; color:var(--text-muted); font-weight:600;'>No History Found.</p>"; 
-    }
-    
-    function editBagEntry(id) { let data=getBagDB(); let idx=data.findIndex(e=>e.id===id); if(idx===-1)return; let q=prompt("Qty:", data[idx].qty); if(!q)return; data[idx].qty=parseInt(q); data[idx].total=data[idx].qty*(data[idx].rate||0); saveBagDB(data); }
-    function delBagEntry(id) { if(prompt("Enter PIN:")==="1504"){ saveBagDB(getBagDB().filter(e=>e.id!==id)); } }
+    function toggleBagListMode() { if(currentUserRole !== 'admin') { alert("❌ फक्त मालक सेटिंग्ज बदलू शकतात."); return; } isBagListMode = !isBagListMode; document.getElementById("bagManageBtn").innerText = isBagListMode ? "❌ Done" : "⚙️ Manage"; renderBagList(); }
+    function renderBagList() { let data = getBagDB(); let container = document.getElementById("bagListContainer"); container.innerHTML = ""; let grouped = {}; data.forEach(e => { if(!grouped[e.date]) grouped[e.date] = []; grouped[e.date].push(e); }); let dates = Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a)); dates.forEach(d => { let html = `<div style="padding:10px 15px; font-weight:bold; background:#e2e8f0; border-radius:10px 10px 0 0; color:#0f172a; margin-top:15px; border:1px solid #cbd5e1; border-bottom:none;">📅 ${formatDate(d)}</div>`; let dailyQty = 0; let dailyAmt = 0; grouped[d].forEach(e => { dailyQty += e.qty; dailyAmt += (e.total || 0); let t = e.type === 'Poti' ? 'पोती' : 'बॅग'; let btns = isBagListMode ? `<button class="manage-btn" onclick="editBagEntry(${e.id})">✏️</button><button class="manage-btn" onclick="delBagEntry(${e.id})">🗑</button>` : ""; html += `<div style="border-bottom:1px solid #e2e8f0; border-left:1px solid #cbd5e1; border-right:1px solid #cbd5e1; padding:12px 15px; display:flex; justify-content:space-between; align-items:center; background:#fff;"><div><b style="font-size:15px;">${e.name}</b><br><span style="color:var(--text-muted); font-size:13px; font-weight:600;">${e.qty} ${t} x ₹${e.rate||0}</span></div><div style="text-align:right; font-weight:800; color:var(--text-main); font-size:15px;">₹${e.total||0}<br>${btns}</div></div>`; }); html += `<div style="padding:10px 15px; background:#eff6ff; text-align:right; border-radius:0 0 10px 10px; font-weight:800; color:#1d4ed8; font-size:14px; border:1px solid #bfdbfe; border-top:none;">एकूण: ${dailyQty} नग | ₹ ${dailyAmt}/-</div>`; container.innerHTML += html; }); if(dates.length===0) container.innerHTML="<p style='text-align:center; padding:20px; color:var(--text-muted); font-weight:600;'>No History Found.</p>"; }
+    function editBagEntry(id) { if(currentUserRole !== 'admin') { alert("❌ हे फक्त मालक करू शकतात."); return; } let data=getBagDB(); let idx=data.findIndex(e=>e.id===id); if(idx===-1)return; let q=prompt("Qty:", data[idx].qty); if(!q)return; data[idx].qty=parseInt(q); data[idx].total=data[idx].qty*(data[idx].rate||0); saveBagDB(data); }
+    function delBagEntry(id) { if(currentUserRole !== 'admin') { alert("❌ प्रवेश नाकारला!"); return; } if(prompt("Enter PIN:")===ADMIN_PIN){ saveBagDB(getBagDB().filter(e=>e.id!==id)); } }
     function openBagBillModal() { document.getElementById("bagBillModal").style.display="block"; }
     function generateBagBill() { let name=document.getElementById("bagBillName").value.trim(); let start=document.getElementById("bagStartDate").value; let end=document.getElementById("bagEndDate").value; if(!name||!start||!end) return; document.getElementById("bagBillModal").style.display="none"; document.getElementById("finalBagBillModal").style.display="block"; document.getElementById("bagBillHeaderName").innerText=name; document.getElementById("bagBillDateDisplay").innerText=formatDate(start)+" ते "+formatDate(end); let data=getBagDB().filter(e=>e.name===name&&e.date>=start&&e.date<=end); data.sort((a,b)=>new Date(a.date)-new Date(b.date)); let list=document.getElementById("bagBillList"); list.innerHTML=""; let tSum=0; data.forEach(e=>{ tSum+=e.total||0; list.innerHTML+=`<li class="bill-item" style="border-bottom: 1px dashed #ccc; padding: 5px 0;"><span>${formatDate(e.date)} - ${toMarathi(e.qty)} ${e.type==='Poti'?'पोती':'बॅग'} x ${toMarathi(e.rate||0)} = ${toMarathi(e.total||0)}/-</span></li>`; }); document.getElementById("bagBillTotalAmount").innerText=toMarathi(tSum)+"/-"; }
 
@@ -516,15 +550,15 @@
     function openMerPreviewModal() { document.getElementById("merPreviewModal").style.display="block"; renderMerPreview(); }
     function renderMerPreview() { let date = document.getElementById("merDate").value; let data = getMerchantDB().filter(e => e.date === date && (!e.type || e.type === 'bill')); let tbody = document.getElementById("merPreviewBody"); tbody.innerHTML = ""; data.forEach(e => { tbody.innerHTML += `<tr><td>${e.name}</td><td>${e.weight}x${e.rate}</td><td style="font-weight:bold;">${e.total}</td><td style="text-align:center;"><button class="small-btn btn-edit" onclick="openEditMerEntryModal(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delMerEntry(${e.id})">🗑</button></td></tr>`; }); }
     function calcEditMerTotal() { let w = parseFloat(document.getElementById('editMerWeight').value)||0; let r = parseFloat(document.getElementById('editMerRate').value)||0; document.getElementById('editMerTotal').value = Math.floor((w * r) / 5) * 5; }
-    function openEditMerEntryModal(id) { let data = getMerchantDB(); let idx = data.findIndex(e => e.id === id); if(idx===-1)return; let e=data[idx]; document.getElementById('editMerId').value=id; document.getElementById('editMerDate').value=e.date; if(e.type==='payment'){document.getElementById('editMerBillFields').style.display='none'; document.getElementById('editMerJamaFields').style.display='block'; document.getElementById('editMerJamaAmount').value=e.amount;}else{document.getElementById('editMerBillFields').style.display='block'; document.getElementById('editMerJamaFields').style.display='none'; document.getElementById('editMerWeight').value=e.weight; document.getElementById('editMerRate').value=e.rate; document.getElementById('editMerTotal').value=e.total;} document.getElementById('editMerEntryModal').style.display='block'; }
+    function openEditMerEntryModal(id) { if(currentUserRole !== 'admin') { alert("❌ हे फक्त मालक करू शकतात."); return; } let data = getMerchantDB(); let idx = data.findIndex(e => e.id === id); if(idx===-1)return; let e=data[idx]; document.getElementById('editMerId').value=id; document.getElementById('editMerDate').value=e.date; if(e.type==='payment'){document.getElementById('editMerBillFields').style.display='none'; document.getElementById('editMerJamaFields').style.display='block'; document.getElementById('editMerJamaAmount').value=e.amount;}else{document.getElementById('editMerBillFields').style.display='block'; document.getElementById('editMerJamaFields').style.display='none'; document.getElementById('editMerWeight').value=e.weight; document.getElementById('editMerRate').value=e.rate; document.getElementById('editMerTotal').value=e.total;} document.getElementById('editMerEntryModal').style.display='block'; }
     function saveMerEntryEdit() { let id=parseInt(document.getElementById('editMerId').value); let data=getMerchantDB(); let idx=data.findIndex(e=>e.id===id); if(idx===-1)return; data[idx].date=document.getElementById('editMerDate').value; if(data[idx].type==='payment')data[idx].amount=parseFloat(document.getElementById('editMerJamaAmount').value); else { data[idx].weight=parseFloat(document.getElementById('editMerWeight').value); data[idx].rate=parseFloat(document.getElementById('editMerRate').value); data[idx].total=parseFloat(document.getElementById('editMerTotal').value); } saveMerchantDB(data); document.getElementById('editMerEntryModal').style.display='none'; }
-    function delMerEntry(id) { if(prompt("PIN:")==="1504") saveMerchantDB(getMerchantDB().filter(e=>e.id!==id)); }
+    function delMerEntry(id) { if(currentUserRole !== 'admin') { alert("❌ प्रवेश नाकारला!"); return; } if(prompt("PIN:")===ADMIN_PIN) saveMerchantDB(getMerchantDB().filter(e=>e.id!==id)); }
 
     let isMerListMode = false;
     function openMerchantListModal() { document.getElementById("merchantListModal").style.display="block"; renderMerList(); }
-    function toggleMerListMode() { isMerListMode = !isMerListMode; document.getElementById("merManageBtn").innerText=isMerListMode?"❌ Done":"⚙️ Manage"; renderMerList(); }
+    function toggleMerListMode() { if(currentUserRole !== 'admin') { alert("❌ फक्त मालक सेटिंग्ज बदलू शकतात."); return; } isMerListMode = !isMerListMode; document.getElementById("merManageBtn").innerText=isMerListMode?"❌ Done":"⚙️ Manage"; renderMerList(); }
     function addNewMerchantPrompt() { let n = prompt("Trader Name:"); if(n){ merchants.push(n); database.ref('merchants').set(merchants); } }
-    function delMerName(n) { if(prompt("Enter PIN:")==="1504") { merchants = merchants.filter(m => m !== n); database.ref('merchants').set(merchants); renderMerList(); } else { alert("Wrong Password!"); } }
+    function delMerName(n) { if(prompt("Enter PIN:")===ADMIN_PIN) { merchants = merchants.filter(m => m !== n); database.ref('merchants').set(merchants); renderMerList(); } else { alert("Wrong Password!"); } }
 
     function renderMerList() {
         let tbody = document.getElementById("merchantListBody"); tbody.innerHTML = ""; let data = getMerchantDB();
@@ -540,7 +574,7 @@
     let isMerHistMode = false;
     function openMerDetail(name) { document.getElementById("merDetailModal").style.display="block"; document.getElementById("activeMerchantName").value = name; document.getElementById("merDetailName").innerText = name; renderMerHistory(name); }
     function closeMerDetail() { document.getElementById("merDetailModal").style.display="none"; }
-    function toggleMerHistMode() { isMerHistMode = !isMerHistMode; document.getElementById("merHistManageBtn").innerHTML = isMerHistMode ? "❌ Done" : "✏️ Edit Mode"; renderMerHistory(document.getElementById("activeMerchantName").value); }
+    function toggleMerHistMode() { if(currentUserRole !== 'admin') { alert("❌ फक्त मालक सेटिंग्ज बदलू शकतात."); return; } isMerHistMode = !isMerHistMode; document.getElementById("merHistManageBtn").innerHTML = isMerHistMode ? "❌ Done" : "✏️ Edit Mode"; renderMerHistory(document.getElementById("activeMerchantName").value); }
     function renderMerHistory(name) { let data = getMerchantDB().filter(e=>e.name===name); data.sort((a,b)=> new Date(a.date) - new Date(b.date)); let tbody = document.getElementById("merDetailBody"); tbody.innerHTML=""; let runningBal = 0; data.forEach(e => { let isBill = e.type !== 'payment'; let btns = isMerHistMode ? `<button class="small-btn btn-edit" onclick="openEditMerEntryModal(${e.id})">✏️</button>` : ""; if (isBill) { runningBal += e.total; tbody.innerHTML += `<tr><td>${formatDate(e.date)}</td><td>${e.weight}x${e.rate}</td><td style="font-weight:bold; text-align:right;">${e.total}</td><td style="text-align:center;">${btns}</td></tr>`; } else { tbody.innerHTML += `<tr><td></td><td style="text-align:right; font-weight:bold;">Total:</td><td style="font-weight:bold; text-align:right;">${runningBal}</td><td></td></tr>`; runningBal -= e.amount; tbody.innerHTML += `<tr><td>${formatDate(e.date)}</td><td style="text-align:right; color:green;">जमा:</td><td style="font-weight:bold; color:green; text-align:right;">- ${e.amount}</td><td style="text-align:center;">${btns}</td></tr>`; } }); if(data.length > 0 && data[data.length-1].type !== 'payment') { tbody.innerHTML += `<tr style="background:#eff6ff;"><td></td><td style="text-align:right; font-weight:bold; color:var(--primary);">बाकी:</td><td style="font-weight:bold; text-align:right; color:var(--primary);">${runningBal}</td><td></td></tr>`; } }
 
     function toggleBillDateMode() { let mode = document.querySelector('input[name="billDateMode"]:checked').value; if(mode === 'month') { document.getElementById('monthlyBillDiv').style.display = 'block'; document.getElementById('customBillDiv').style.display = 'none'; } else { document.getElementById('monthlyBillDiv').style.display = 'none'; document.getElementById('customBillDiv').style.display = 'flex'; } }
