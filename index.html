@@ -552,9 +552,8 @@
         const btn = document.getElementById("ocrProcessBtn"); 
         btn.disabled = true; 
         btn.style.opacity = '0.5'; 
-        statusLabel.innerHTML = '⚡ स्कॅन सुरू आहे... (सर्व नावे शोधत आहे)';
+        statusLabel.innerHTML = '⚡ स्कॅन सुरू आहे... (AI मॉडेल शोधत आहे)';
 
-        // 🌟 AI ला सर्व नावे स्कॅन करण्यासाठी कडक सूचना (Strong Prompt) 🌟
         const promptText = `Act as an expert Marathi data entry operator. Your task is to extract EVERY SINGLE row from the handwritten notebook image. DO NOT SKIP ANY NAME OR NUMBER.
         
 Known Names List: [${getMergedFarmers().join(', ')}]
@@ -569,11 +568,32 @@ CRITICAL RULES:
 
         const payload = { contents: [{ parts: [ { text: promptText }, { inlineData: { mimeType: "image/jpeg", data: currentBase64Image } } ] }] };
         
-        let url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        // 🌟 गुगलचे उपलब्ध मॉडेल्स एक-एक करून तपासण्याची सिस्टीम (Fallback Logic) 🌟
+        const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash-latest"];
+        let response = null;
+        let successfulModel = "";
+        let lastErrorMsg = "";
+
+        for (let model of modelsToTry) {
+            let url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+            try { 
+                response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }); 
+                if (response.ok) { 
+                    successfulModel = model; 
+                    break; // मॉडेल चालले तर लूप थांबेल
+                } else { 
+                    let errData = await response.json(); 
+                    lastErrorMsg = errData.error?.message || "Error"; 
+                } 
+            } catch (e) { 
+                lastErrorMsg = e.message; 
+            }
+        }
 
         try {
-            let response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-            if (!response.ok) throw new Error("API_FAIL");
+            if (!response || !response.ok) {
+                throw new Error(lastErrorMsg || "तुमच्या API Key साठी कोणतेही मॉडेल उपलब्ध नाही.");
+            }
             
             const result = await response.json(); 
             let aiText = result.candidates[0].content.parts[0].text;
@@ -582,22 +602,20 @@ CRITICAL RULES:
             if (jsonMatch) { 
                 const extractedData = JSON.parse(jsonMatch[0]); 
                 renderAiResult(extractedData, rate); 
-                statusLabel.innerHTML = `✅ स्कॅनिंग पूर्ण! (${extractedData.length} नावे सापडली)`; 
+                statusLabel.innerHTML = `✅ स्कॅनिंग पूर्ण! (${extractedData.length} नावे सापडली) <br><span style="font-size:10px; color:gray;">(वापरलेले AI: ${successfulModel})</span>`; 
                 document.getElementById("ocrResultSection").style.display = 'block'; 
                 document.getElementById("apiKeySection").style.display = "none"; 
-            } else throw new Error("No JSON found");
-        } catch (error) {
-            if(error.message.includes("API_FAIL")) { 
-                statusLabel.innerHTML = `❌ API Key चुकीची आहे किंवा लिमिट संपले आहे.`; 
-                document.getElementById("apiKeySection").style.display = "block"; 
-            } else { 
-                statusLabel.innerHTML = '❌ फोटो समजला नाही. पुन्हा ट्राय करा.'; 
+            } else {
+                throw new Error("No JSON found in response");
             }
+        } catch (error) {
+            console.error("Vision AI Error: ", error);
+            statusLabel.innerHTML = `<span style="color:red; font-weight:700;">❌ Error: ${error.message}</span>`; 
+            document.getElementById("apiKeySection").style.display = "block"; 
         } finally { 
             btn.disabled = false; btn.style.opacity = '1'; 
         }
     }
-
     function renderAiResult(dataArray, rate) {
         const tbody = document.getElementById("ocrResultBody"); tbody.innerHTML = ''; let idCounter = 0;
         dataArray.forEach(item => {
@@ -1093,6 +1111,7 @@ CRITICAL RULES:
     function saveAdvance(mode) { let d=val("advDate"); let n=val("advFarmerName").trim(); let a=parseFloat(val("advAmount")); if(!d||!n||!a) return; let mArr = safeArray(farmers); if(!mArr.includes(n)) { mArr.push(n); database.ref('farmers').set(mArr); } let finalAmt = mode === 'GIVE' ? a : -a; let data = getData(); data.push({id:Date.now(), date:d, name:n, type:'advance', amount:finalAmt}); saveData(data); document.getElementById("advAmount").value=""; document.getElementById("advFarmerName").value=""; alert("✅ उचल नोंदवली!"); if(document.getElementById("advListModal").classList.contains("show")) renderAdvList(); }
     let isAdvEditMode = false; function toggleAdvEditMode() { if(currentUserRole !== 'admin') return; isAdvEditMode = !isAdvEditMode; document.getElementById("manageAdvListBtn").innerHTML = isAdvEditMode ? "❌ Done" : "⚙️ Manage"; renderAdvList(); }
     function renderAdvList() { let data = getData().filter(e => e && e.type === 'advance'); data.sort((a,b) => new Date(b.date) - new Date(a.date)); let tbody = document.getElementById("advListBody"); let html = ""; let tot = 0; data.forEach(e => { let isGive = e.amount > 0; let col = isGive ? "#ea580c" : "#10b981"; let lbl = isGive ? "दिली" : "जमा"; let sign = isGive ? "" : "+ "; tot += e.amount; let btns = isAdvEditMode ? `<button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button>` : ""; html += `<tr><td style="font-weight:600; color:#8e8e93;">${formatDate(e.date)}</td><td style="font-weight:600;">${e.name}</td><td style="color:${col}; font-weight:600;">${lbl}</td><td style="font-weight:700; color:${col};">${sign}${Math.abs(e.amount)}</td><td style="text-align:center;">${btns}</td></tr>`; }); document.getElementById("totalAdvDisplay").innerText = `Total: ₹ ${tot}`; tbody.innerHTML = html; }
+
 </script>
 </body>
 </html>
