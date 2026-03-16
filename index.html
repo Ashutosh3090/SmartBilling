@@ -573,9 +573,21 @@
     }
 
     function toggleBillDateMode() { let mode = document.querySelector('input[name="billDateMode"]:checked').value; if(mode === 'month') { document.getElementById("monthlyBillDiv").style.display = 'block'; document.getElementById("customBillDiv").style.display = 'none'; } else { document.getElementById("monthlyBillDiv").style.display = 'none'; document.getElementById("customBillDiv").style.display = 'flex'; } }
-    function initFarmerBill() { document.getElementById("billType").value='FARMER'; document.getElementById("billTitle").innerText="📜 Farmer Bill"; let dl = document.getElementById("billNameSuggestions"); dl.innerHTML = ""; getMergedFarmers().forEach(f => { let op=document.createElement("option"); op.value=f; dl.appendChild(op); }); }
-    function initMerBill() { document.getElementById("billType").value='MERCHANT'; document.getElementById("billTitle").innerText="📜 Merchant Bill"; let dl = document.getElementById("billNameSuggestions"); dl.innerHTML = ""; getMergedMerchants().forEach(m => { let op=document.createElement("option"); op.value=m; dl.appendChild(op); }); }
-
+    function initFarmerBill() { 
+        document.getElementById("searchName").value = ""; // प्रत्येक वेळी नाव रिकामे करण्यासाठी
+        document.getElementById("billType").value = 'FARMER'; 
+        document.getElementById("billTitle").innerText = "📜 Farmer Bill"; 
+        let dl = document.getElementById("billNameSuggestions"); dl.innerHTML = ""; 
+        getMergedFarmers().forEach(f => { let op=document.createElement("option"); op.value=f; dl.appendChild(op); }); 
+    }
+    
+    function initMerBill() { 
+        document.getElementById("searchName").value = ""; // प्रत्येक वेळी नाव रिकामे करण्यासाठी
+        document.getElementById("billType").value = 'MERCHANT'; 
+        document.getElementById("billTitle").innerText = "📜 Merchant Bill"; 
+        let dl = document.getElementById("billNameSuggestions"); dl.innerHTML = ""; 
+        getMergedMerchants().forEach(m => { let op=document.createElement("option"); op.value=m; dl.appendChild(op); }); 
+    }
     function generateFinalBill() {
         let type=val("billType"); let n=val("searchName"); if(!n) return;
         let mode = document.querySelector('input[name="billDateMode"]:checked').value; let startFilter = "", endFilter = "", displayDate = "", openingBalDateFilter = "";
@@ -890,8 +902,52 @@
 
     function openDetailModal(name) { openModal("detailModal"); document.getElementById("activeFarmerName").value = name; document.getElementById("detailFarmerName").innerText = name; renderDetail(name); }
     let isFarmerHistMode = false; function toggleFarmerHistMode() { if(currentUserRole !== 'admin') return; isFarmerHistMode = !isFarmerHistMode; document.getElementById("farmerHistManageBtn").innerHTML = isFarmerHistMode ? "❌ Done" : "✏️ Edit"; renderDetail(val("activeFarmerName")); }
-    function renderDetail(name) { let data = getData().filter(e => e && e.name === name); data.sort((a,b) => new Date(a.date) - new Date(b.date)); let tbody = document.getElementById("detailBody"); let html = ""; let runningBal = 0; let lastDate = ""; data.forEach(e => { let btns = isFarmerHistMode ? `<button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button>` : ""; if(e.type === 'payment') { html += `<tr><td></td><td style="text-align:right; font-weight:600;">Total:</td><td style="font-weight:700; text-align:right;">${runningBal}</td><td></td></tr>`; runningBal -= e.amount; html += `<tr><td style="font-weight:600; color:#8e8e93;">${formatDate(e.date)}</td><td style="text-align:right; font-weight:600; color:#10b981;">पैसे दिले:</td><td style="font-weight:700; color:#10b981; text-align:right;">- ${e.amount}</td><td style="text-align:center;">${btns}</td></tr>`; lastDate = ""; } else if(e.type === 'advance') { let isGive = e.amount > 0; let col = isGive ? "#ea580c" : "#10b981"; let lbl = isGive ? "उचल (दिली)" : "उचल (जमा)"; let sign = isGive ? "" : "+ "; html += `<tr><td style="font-weight:600; color:#8e8e93;">${formatDate(e.date)}</td><td style="text-align:center; font-weight:600; color:${col};">${lbl}:</td><td style="font-weight:700; color:${col}; text-align:right;">${sign}${Math.abs(e.amount)}</td><td style="text-align:center;">${btns}</td></tr>`; lastDate = ""; } else { let displayDate = (e.date !== lastDate) ? formatDate(e.date) : ""; lastDate = e.date; runningBal += e.total; html += `<tr><td style="font-weight:600; color:#8e8e93;">${displayDate}</td><td style="font-weight:500;">${e.weight}x${e.rate}</td><td style="font-weight:700; text-align:right;">${e.total}</td><td style="text-align:center;">${btns}</td></tr>`; } }); if(data.length > 0 && data[data.length-1].type !== 'payment') { html += `<tr style="background:#e0eafc;"><td></td><td style="text-align:right; font-weight:700; color:var(--primary);">बाकी:</td><td style="font-weight:700; text-align:right; color:var(--primary); font-size:16px;">₹ ${runningBal}</td><td></td></tr>`; } tbody.innerHTML = html; }
-    
+    function renderDetail(name) { 
+        let data = getData().filter(e => e && e.name === name); 
+        data.sort((a,b) => new Date(a.date) - new Date(b.date)); 
+        
+        let selMonth = document.getElementById("farmerListMonth") ? document.getElementById("farmerListMonth").value : "";
+        let tbody = document.getElementById("detailBody"); 
+        let html = ""; 
+        let runningBal = 0; 
+        let lastDate = ""; 
+        let filteredData = [];
+
+        // जर महिना निवडला असेल, तर फक्त त्याच महिन्याची माहिती घेईल (मागील बाकी घेणार नाही)
+        if (selMonth) {
+            filteredData = data.filter(e => e.date && e.date.startsWith(selMonth));
+        } else {
+            filteredData = data;
+        }
+
+        filteredData.forEach(e => { 
+            let btns = isFarmerHistMode ? `<button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button>` : ""; 
+            if(e.type === 'payment') { 
+                html += `<tr><td></td><td style="text-align:right; font-weight:600;">Total:</td><td style="font-weight:700; text-align:right;">${runningBal}</td><td></td></tr>`; 
+                runningBal -= e.amount; 
+                html += `<tr><td style="font-weight:600; color:#8e8e93;">${formatDate(e.date)}</td><td style="text-align:right; font-weight:600; color:#10b981;">पैसे दिले:</td><td style="font-weight:700; color:#10b981; text-align:right;">- ${e.amount}</td><td style="text-align:center;">${btns}</td></tr>`; 
+                lastDate = ""; 
+            } else if(e.type === 'advance') { 
+                let isGive = e.amount > 0; let col = isGive ? "#ea580c" : "#10b981"; let lbl = isGive ? "उचल (दिली)" : "उचल (जमा)"; let sign = isGive ? "" : "+ "; 
+                html += `<tr><td style="font-weight:600; color:#8e8e93;">${formatDate(e.date)}</td><td style="text-align:center; font-weight:600; color:${col};">${lbl}:</td><td style="font-weight:700; color:${col}; text-align:right;">${sign}${Math.abs(e.amount)}</td><td style="text-align:center;">${btns}</td></tr>`; 
+                lastDate = ""; 
+            } else { 
+                let displayDate = (e.date !== lastDate) ? formatDate(e.date) : ""; 
+                lastDate = e.date; 
+                runningBal += e.total; 
+                html += `<tr><td style="font-weight:600; color:#8e8e93;">${displayDate}</td><td style="font-weight:500;">${e.weight}x${e.rate}</td><td style="font-weight:700; text-align:right;">${e.total}</td><td style="text-align:center;">${btns}</td></tr>`; 
+            } 
+        }); 
+        
+        if(filteredData.length > 0 && filteredData[filteredData.length-1].type !== 'payment') { 
+            html += `<tr style="background:#e0eafc;"><td></td><td style="text-align:right; font-weight:700; color:var(--primary);">सध्याची बाकी:</td><td style="font-weight:700; text-align:right; color:var(--primary); font-size:16px;">₹ ${runningBal}</td><td></td></tr>`; 
+        }
+        
+        if(filteredData.length === 0) { 
+            html = "<tr><td colspan='4' style='text-align:center; padding:20px; color:#8e8e93; font-weight:600;'>या महिन्यात कोणतीही नोंद नाही</td></tr>"; 
+        }
+        tbody.innerHTML = html; 
+    }
     function initFarmerJama() { document.getElementById("farmerJamaDate").value = val("dateInput"); }
     function saveFarmerPayment() { let d=val("farmerJamaDate"); let n=val("farmerJamaName").trim(); let a=parseFloat(val("farmerJamaAmount")); if(!d||!n||!a) return; let mArr = safeArray(farmers); if(!mArr.includes(n)) { mArr.push(n); database.ref('farmers').set(mArr); } let data=getData(); data.push({id:Date.now(), date:d, name:n, type:'payment', amount:a}); saveData(data); document.getElementById("farmerJamaAmount").value=""; closeModal('farmerPaymentModal'); if(document.getElementById("listModal").classList.contains("show")) generateFarmerStatus(); }
     
