@@ -232,7 +232,8 @@
         <div id="farmerPaymentModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('farmerPaymentModal')">✕</div><h3 style="color: var(--primary);">💸 शेतकरी जमा</h3><div class="section-box" style="background: #eff6ff;"><div class="input-group" style="margin-bottom: 15px;"><label>तारीख:</label><input type="date" id="farmerJamaDate"></div><div class="input-group" style="margin-bottom: 15px;"><label>नाव:</label><input type="text" id="farmerJamaName" list="farmerList"></div><div class="input-group" style="margin-bottom: 20px;"><label>दिलेली रक्कम:</label><input type="number" id="farmerJamaAmount" placeholder="0"></div><button class="btn-add bg-gradient-blue" onclick="saveFarmerPayment()">✅ जतन</button></div></div></div>
         <div id="detailModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('detailModal')">✕</div><h3 id="detailFarmerName" style="color: var(--primary);">खातेवही</h3><input type="hidden" id="activeFarmerName"><div style="text-align: right; margin-bottom: 10px;"><button class="small-btn bg-gradient-orange" id="farmerHistManageBtn" onclick="toggleFarmerHistMode()">✏️ Edit</button></div><div class="table-container" style="max-height: 60vh; overflow-y:auto;"><table class="styled-table"><thead><tr><th>तारीख</th><th>तपशील</th><th style="text-align:right;">रक्कम</th><th>⚙️</th></tr></thead><tbody id="detailBody"></tbody></table></div></div></div>
         <div id="advModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('advModal')">✕</div><h3 style="color: var(--danger);">💰 Advance (उचल)</h3><div class="section-box" style="background:#fef2f2;"><div class="input-group" style="margin-bottom: 10px;"><label>Date:</label><input type="date" id="advDate"></div><div class="input-group" style="margin-bottom: 10px;"><label>Name:</label><input type="text" id="advFarmerName" list="farmerList"></div><div class="input-group" style="margin-bottom: 15px;"><label>Amount (₹):</label><input type="number" id="advAmount"></div><div style="display:flex; gap:10px;"><button class="btn-add bg-gradient-red" style="flex:1;" onclick="saveAdvance('GIVE')">दिली (+)</button><button class="btn-add bg-gradient-green" style="flex:1;" onclick="saveAdvance('TAKE')">जमा (-)</button></div></div><button class="btn-add" style="background:#1c1c1e;" onclick="openModal('advListModal', renderAdvList)">📜 List</button></div></div>
-        <div id="advListModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('advListModal')">✕</div><h3 style="color: var(--danger);">📜 Advance List</h3><div class="list-header-bar"><span id="totalAdvDisplay" style="font-weight:600; color:var(--danger); flex:1;">Total: 0</span><button class="small-btn" style="background:#8e8e93;" id="manageAdvListBtn" onclick="toggleAdvEditMode()">⚙️ Manage</button></div><div class="table-container" style="max-height: 55vh;"><table class="styled-table"><thead><tr><th>Date</th><th>Name</th><th>Type</th><th>Amt</th><th>⚙️</th></tr></thead><tbody id="advListBody"></tbody></table></div></div></div>
+        
+        <div id="advListModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('advListModal')">✕</div><h3 style="color: var(--danger);">📜 Advance List</h3><div class="list-header-bar"><span id="totalAdvDisplay" style="font-weight:600; color:var(--danger); flex:1;">Total: 0</span><button class="small-btn" style="background:#8e8e93;" id="manageAdvListBtn" onclick="toggleAdvEditMode()">⚙️ Manage</button></div><div class="table-container" style="max-height: 55vh; overflow-y: auto;"><table class="styled-table"><thead><tr><th>Date</th><th>Name</th><th>Type</th><th>Amt</th><th>⚙️</th></tr></thead><tbody id="advListBody"></tbody></table></div></div></div>
     </div> 
 </div>
 
@@ -327,7 +328,6 @@
         updateAlertBadge();
     }
 
-    // 🌟 अलर्ट लॉजिक 🌟
     function checkRateDiscrepancies() {
         let data = getData().filter(e => e && e.type === 'crop');
         let discrepancies = [];
@@ -462,17 +462,14 @@
         if(document.getElementById("merchantListModal").classList.contains("show")) renderMerList();
     }
 
-    // 🌟 CUSTOM WHATSAPP BILL LOGIC 🌟
     function sendWhatsAppBill(areaId) {
         let type = val("billType");
         
-        // 🌟 फक्त व्यापाऱ्यासाठी (Merchant) WhatsApp फॉरमॅट 🌟
         if(type === 'MERCHANT' && areaId === 'mainBillPrintableArea' && window.currentMerchantWaText) {
             window.open(`https://wa.me/?text=${encodeURIComponent(window.currentMerchantWaText)}`, '_blank');
             return;
         }
         
-        // 🌟 शेतकरी आणि पोती यांसाठी जुनाच फॉरमॅट 🌟
         let printArea = document.getElementById(areaId); if(!printArea) return;
         let rN = document.getElementById(areaId === 'mainBillPrintableArea' ? "billHeaderName" : "bagBillHeaderName").innerText;
         let rD = document.getElementById(areaId === 'mainBillPrintableArea' ? "billMonthDisplay" : "bagBillDateDisplay").innerText;
@@ -573,21 +570,10 @@
     }
 
     function toggleBillDateMode() { let mode = document.querySelector('input[name="billDateMode"]:checked').value; if(mode === 'month') { document.getElementById("monthlyBillDiv").style.display = 'block'; document.getElementById("customBillDiv").style.display = 'none'; } else { document.getElementById("monthlyBillDiv").style.display = 'none'; document.getElementById("customBillDiv").style.display = 'flex'; } }
-    function initFarmerBill() { 
-        document.getElementById("searchName").value = ""; // प्रत्येक वेळी नाव रिकामे करण्यासाठी
-        document.getElementById("billType").value = 'FARMER'; 
-        document.getElementById("billTitle").innerText = "📜 Farmer Bill"; 
-        let dl = document.getElementById("billNameSuggestions"); dl.innerHTML = ""; 
-        getMergedFarmers().forEach(f => { let op=document.createElement("option"); op.value=f; dl.appendChild(op); }); 
-    }
     
-    function initMerBill() { 
-        document.getElementById("searchName").value = ""; // प्रत्येक वेळी नाव रिकामे करण्यासाठी
-        document.getElementById("billType").value = 'MERCHANT'; 
-        document.getElementById("billTitle").innerText = "📜 Merchant Bill"; 
-        let dl = document.getElementById("billNameSuggestions"); dl.innerHTML = ""; 
-        getMergedMerchants().forEach(m => { let op=document.createElement("option"); op.value=m; dl.appendChild(op); }); 
-    }
+    function initFarmerBill() { document.getElementById("searchName").value = ""; document.getElementById("billType").value='FARMER'; document.getElementById("billTitle").innerText="📜 Farmer Bill"; let dl = document.getElementById("billNameSuggestions"); dl.innerHTML = ""; getMergedFarmers().forEach(f => { let op=document.createElement("option"); op.value=f; dl.appendChild(op); }); }
+    function initMerBill() { document.getElementById("searchName").value = ""; document.getElementById("billType").value='MERCHANT'; document.getElementById("billTitle").innerText="📜 Merchant Bill"; let dl = document.getElementById("billNameSuggestions"); dl.innerHTML = ""; getMergedMerchants().forEach(m => { let op=document.createElement("option"); op.value=m; dl.appendChild(op); }); }
+
     function generateFinalBill() {
         let type=val("billType"); let n=val("searchName"); if(!n) return;
         let mode = document.querySelector('input[name="billDateMode"]:checked').value; let startFilter = "", endFilter = "", displayDate = "", openingBalDateFilter = "";
@@ -636,7 +622,6 @@
             let openingBal = 0; let filteredData = [];
             d.forEach(e => { if(e && e.name === n) { if (e.date < openingBalDateFilter) { if(e.type !== 'payment') openingBal += (Number(e.total)||0); else openingBal -= (Number(e.amount)||0); } else if (e.date >= startFilter && e.date <= endFilter) { filteredData.push(e); } } });
             
-            // 🌟 1. UI HTML Generation (No changes here) 🌟
             let html = `<table style="width:100%; max-width:700px; margin:0 auto; border-collapse:collapse; font-family:'Poppins',sans-serif; color:#0f172a;"><thead><tr><th style="padding:15px 10px; border-bottom:2px solid #cbd5e1; text-align:left; width:25%; font-size:13px; color:#64748b; text-transform:uppercase; white-space:nowrap;">तारीख</th><th style="padding:15px 10px; border-bottom:2px solid #cbd5e1; text-align:center; width:50%; font-size:13px; color:#64748b; text-transform:uppercase; white-space:nowrap;">तपशील</th><th style="padding:15px 10px; border-bottom:2px solid #cbd5e1; text-align:right; width:25%; font-size:13px; color:#64748b; text-transform:uppercase; white-space:nowrap;">रक्कम (₹)</th></tr></thead><tbody style="font-size:15px;">`;
             
             let runningBal = 0; let lastBillDate = ""; 
@@ -664,7 +649,6 @@
             } else { html += `<tr><td colspan="3" style="text-align:center; padding: 30px; color: #8e8e93; font-weight:500;">No Data Found</td></tr>`; }
             list.innerHTML = html + "</tbody></table>";
 
-            // 🌟 2. NEW CUSTOM WHATSAPP TEXT GENERATION FOR MERCHANTS 🌟
             let waText = `🧾 *हिशोब पत्रक*\n➖➖➖➖➖➖➖➖\n👤 *नाव:* ${n}\n📅 *कालावधी:* ${displayDate.replace('📅 ', '')}\n➖➖➖➖➖➖➖➖\n`;
             let cropEntries = filteredData.filter(e => e.type !== 'payment');
             let payEntries = filteredData.filter(e => e.type === 'payment');
@@ -672,7 +656,7 @@
 
             if(cropEntries.length > 0 || payEntries.length > 0 || openingBal !== 0) {
                 cropEntries.forEach(e => {
-                    let dStr = (e.date !== lastWaDate) ? formatDate(e.date) : "          "; // 10 spaces to align with date
+                    let dStr = (e.date !== lastWaDate) ? formatDate(e.date) : "          "; 
                     lastWaDate = e.date;
                     billTotal += e.total;
                     let tPrefix = e.merType ? e.merType : "";
@@ -701,7 +685,7 @@
             } else {
                 waText += `माहिती उपलब्ध नाही.\n➖➖➖➖➖➖➖➖\n🙏 *धन्यवाद*`;
             }
-            window.currentMerchantWaText = waText; // Store for WhatsApp button
+            window.currentMerchantWaText = waText;
         }
     }
 
@@ -726,8 +710,32 @@
         let data = getData().filter(e => !selectedIds.includes(e.id)); saveData(data); renderPreview(); generateFarmerStatus(); 
     }
 
-    function editEntry(id) { if(currentUserRole !== 'admin') { alert("❌ हे फक्त मालक करू शकतात."); return; } let data=getData(); let idx=data.findIndex(e=>e && e.id===id); if(idx===-1)return; let e=data[idx]; if(e.type==='crop'){ let w=prompt("Weight:",e.weight); let r=prompt("Rate:",e.rate); if(w&&r){e.weight=parseFloat(w);e.rate=parseFloat(r);e.total=Math.floor((e.weight*e.rate)/5)*5; saveData(data); }} else { let a = prompt("Amount:", Math.abs(e.amount)); if(a){e.amount = parseFloat(a)*(e.amount<0?-1:1); saveData(data); } } renderPreview(); generateFarmerStatus(); }
-    function delEntry(id) { if(currentUserRole !== 'admin') { alert("❌ प्रवेश नाकारला!"); return; } if(prompt("Enter PIN:")===ADMIN_PIN){ let data=getData(); saveData(data.filter(e=>e && e.id!==id)); if(document.getElementById("detailModal").classList.contains("show")) renderDetail(val("activeFarmerName")); if(document.getElementById("listModal").classList.contains("show")) generateFarmerStatus(); if(document.getElementById("previewModal").classList.contains("show")) renderPreview(); if(document.getElementById("advListModal").classList.contains("show")) renderAdvList(); } }
+    function editEntry(id) { 
+        if(currentUserRole !== 'admin') { alert("❌ हे फक्त मालक करू शकतात."); return; } 
+        let data=getData(); let idx=data.findIndex(e=>e && e.id===id); if(idx===-1)return; let e=data[idx]; 
+        if(e.type==='crop'){ 
+            let w=prompt("Weight:",e.weight); let r=prompt("Rate:",e.rate); 
+            if(w&&r){e.weight=parseFloat(w);e.rate=parseFloat(r);e.total=Math.floor((e.weight*e.rate)/5)*5; saveData(data); }
+        } else { 
+            let a = prompt("Amount:", Math.abs(e.amount)); 
+            if(a){e.amount = parseFloat(a)*(e.amount<0?-1:1); saveData(data); } 
+        } 
+        if(document.getElementById("previewModal").classList.contains("show")) renderPreview(); 
+        if(document.getElementById("listModal").classList.contains("show")) generateFarmerStatus(); 
+        if(document.getElementById("detailModal").classList.contains("show")) renderDetail(val("activeFarmerName")); 
+        if(document.getElementById("advListModal").classList.contains("show")) renderAdvList(); 
+    }
+    
+    function delEntry(id) { 
+        if(currentUserRole !== 'admin') { alert("❌ प्रवेश नाकारला!"); return; } 
+        if(prompt("Enter PIN:")===ADMIN_PIN){ 
+            let data=getData(); saveData(data.filter(e=>e && e.id!==id)); 
+            if(document.getElementById("detailModal").classList.contains("show")) renderDetail(val("activeFarmerName")); 
+            if(document.getElementById("listModal").classList.contains("show")) generateFarmerStatus(); 
+            if(document.getElementById("previewModal").classList.contains("show")) renderPreview(); 
+            if(document.getElementById("advListModal").classList.contains("show")) renderAdvList(); 
+        } 
+    }
 
     function renderMerPreview() { 
         let date = val("merDate"); let data = getMerchantDB().filter(e => e && e.date === date && (!e.type || e.type === 'bill')); 
@@ -744,7 +752,7 @@
         if(currentUserRole !== 'admin') { alert("❌ फक्त मालक करू शकतात."); return; } 
         let selectedIds = Array.from(document.querySelectorAll(".mer-chk:checked")).map(chk => parseInt(chk.value));
         if(selectedIds.length === 0) { alert("डिलीट करण्यासाठी आधी चेकबॉक्स निवडा!"); return; }
-        if(prompt("निवडलेल्या नोंदी डिलीट करण्यासाठी PIN टाका:") !== ADMIN_PIN) return; 
+        if(prompt("निवडलेल्या नोंदी डिली্যু करण्यासाठी PIN टाका:") !== ADMIN_PIN) return; 
         let data = getMerchantDB().filter(e => !selectedIds.includes(e.id)); saveMerchantDB(data); renderMerPreview(); renderMerList();
     }
     
@@ -902,6 +910,7 @@
 
     function openDetailModal(name) { openModal("detailModal"); document.getElementById("activeFarmerName").value = name; document.getElementById("detailFarmerName").innerText = name; renderDetail(name); }
     let isFarmerHistMode = false; function toggleFarmerHistMode() { if(currentUserRole !== 'admin') return; isFarmerHistMode = !isFarmerHistMode; document.getElementById("farmerHistManageBtn").innerHTML = isFarmerHistMode ? "❌ Done" : "✏️ Edit"; renderDetail(val("activeFarmerName")); }
+    
     function renderDetail(name) { 
         let data = getData().filter(e => e && e.name === name); 
         data.sort((a,b) => new Date(a.date) - new Date(b.date)); 
@@ -913,7 +922,6 @@
         let lastDate = ""; 
         let filteredData = [];
 
-        // जर महिना निवडला असेल, तर फक्त त्याच महिन्याची माहिती घेईल (मागील बाकी घेणार नाही)
         if (selMonth) {
             filteredData = data.filter(e => e.date && e.date.startsWith(selMonth));
         } else {
@@ -948,6 +956,7 @@
         }
         tbody.innerHTML = html; 
     }
+    
     function initFarmerJama() { document.getElementById("farmerJamaDate").value = val("dateInput"); }
     function saveFarmerPayment() { let d=val("farmerJamaDate"); let n=val("farmerJamaName").trim(); let a=parseFloat(val("farmerJamaAmount")); if(!d||!n||!a) return; let mArr = safeArray(farmers); if(!mArr.includes(n)) { mArr.push(n); database.ref('farmers').set(mArr); } let data=getData(); data.push({id:Date.now(), date:d, name:n, type:'payment', amount:a}); saveData(data); document.getElementById("farmerJamaAmount").value=""; closeModal('farmerPaymentModal'); if(document.getElementById("listModal").classList.contains("show")) generateFarmerStatus(); }
     
@@ -956,3 +965,5 @@
     let isAdvEditMode = false; function toggleAdvEditMode() { if(currentUserRole !== 'admin') return; isAdvEditMode = !isAdvEditMode; document.getElementById("manageAdvListBtn").innerHTML = isAdvEditMode ? "❌ Done" : "⚙️ Manage"; renderAdvList(); }
     function renderAdvList() { let data = getData().filter(e => e && e.type === 'advance'); data.sort((a,b) => new Date(b.date) - new Date(a.date)); let tbody = document.getElementById("advListBody"); let html = ""; let tot = 0; data.forEach(e => { let isGive = e.amount > 0; let col = isGive ? "#ea580c" : "#10b981"; let lbl = isGive ? "दिली" : "जमा"; let sign = isGive ? "" : "+ "; tot += e.amount; let btns = isAdvEditMode ? `<button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button>` : ""; html += `<tr><td style="font-weight:600; color:#8e8e93;">${formatDate(e.date)}</td><td style="font-weight:600;">${e.name}</td><td style="color:${col}; font-weight:600;">${lbl}</td><td style="font-weight:700; color:${col};">${sign}${Math.abs(e.amount)}</td><td style="text-align:center;">${btns}</td></tr>`; }); document.getElementById("totalAdvDisplay").innerText = `Total: ₹ ${tot}`; tbody.innerHTML = html; }
 </script>
+</body>
+</html>
