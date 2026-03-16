@@ -35,7 +35,7 @@
         button:active{transform:scale(0.95);}
         .btn-add{background:linear-gradient(135deg,#4f46e5,#3730a3);color:#fff;padding:14px;width:100%;font-size:14px;border-radius:var(--radius-lg);box-shadow:0 8px 15px var(--primary-glow);text-transform:uppercase;letter-spacing:1px;}
         .action-buttons{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-top:15px;}
-        .action-btn{padding:12px 5px;font-size:12px;color:#fff;border-radius:var(--radius-lg);flex-direction:column;box-shadow:0 6px 12px rgba(0,0,0,0.1);border:1px solid rgba(255,255,255,0.2);}
+        .action-btn{padding:12px 5px;font-size:12px;color:#fff;border-radius:var(--radius-lg);flex-direction:column;box-shadow:0 6px 12px rgba(0,0,0,0.1);border:1px solid rgba(255,255,255,0.2); position:relative;}
         .action-btn i{font-size:18px;margin-bottom:4px;font-style:normal;}
         .bg-gradient-purple{background:linear-gradient(135deg,#a855f7,#7e22ce);}.bg-gradient-orange{background:linear-gradient(135deg,#f59e0b,#d97706);}.bg-gradient-blue{background:linear-gradient(135deg,#3b82f6,#1d4ed8);}.bg-gradient-green{background:linear-gradient(135deg,#10b981,#047857);}.bg-gradient-red{background:linear-gradient(135deg,#f43f5e,#be123c);}.bg-gradient-merchant{background:linear-gradient(135deg,#f97316,#c2410c);}.bg-gradient-bag{background:linear-gradient(135deg,#db2777,#9d174d);}.bg-gradient-whatsapp{background:linear-gradient(135deg,#25D366,#128C7E);}.bg-gradient-ai{background:linear-gradient(135deg,#0f172a,#334155);}
         
@@ -135,6 +135,10 @@
             </div>
 
             <div class="action-buttons">
+                <button class="action-btn bg-gradient-red" onclick="openModal('alertModal'); renderAlerts();">
+                    <i>⚠️</i> भाव चुका
+                    <span id="alertBadge" style="position:absolute; top:-5px; right:-5px; background:#fff; color:red; border-radius:50%; width:22px; height:22px; font-size:12px; font-weight:900; display:none; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.3); border:2px solid red;">0</span>
+                </button>
                 <button class="action-btn bg-gradient-purple" onclick="openModal('previewModal'); renderPreview();"><i>👁️</i> Preview</button>
                 <button class="action-btn bg-gradient-orange" onclick="openModal('advModal'); initAdv();"><i>💰</i> Advance</button>
                 <button class="action-btn bg-gradient-blue" onclick="openModal('billModal'); initFarmerBill();"><i>📜</i> Farmer Bill</button>
@@ -143,7 +147,21 @@
                 <button class="action-btn bg-gradient-bag" onclick="openModal('bagModal');"><i>🎒</i> Bags</button>
                 <button class="action-btn bg-gradient-blue" onclick="openModal('monthlyReportModal'); initMonthlyReport();"><i>📊</i> मासिक रिपोर्ट</button>
                 <button class="action-btn bg-gradient-ai" onclick="openModal('aiModal'); generateAIReport();"><i>🤖</i> AI ॲडव्हायझर</button>
-                <button class="action-btn bg-gradient-orange" onclick="openModal('ocrModal'); initOcr();" style="grid-column: span 3;"><i>📸</i> <b>वही स्कॅन (AI)</b></button>
+                <button class="action-btn bg-gradient-orange" onclick="openModal('ocrModal'); initOcr();" style="grid-column: span 2;"><i>📸</i> <b>वही स्कॅन (AI)</b></button>
+            </div>
+        </div>
+
+        <div id="alertModal" class="modal no-print">
+            <div class="modal-content">
+                <div class="close-icon" onclick="closeModal('alertModal')">✕</div>
+                <h3 style="color: var(--danger);">⚠️ चुकीचे भाव (Rate Alerts)</h3>
+                <p style="font-size: 12px; color: #64748b; text-align: center; margin-bottom: 15px;">इतर शेतकऱ्यांपेक्षा वेगळा भाव लागलेल्या नोंदी खालीलप्रमाणे आहेत.</p>
+                <div class="table-container" style="max-height: 55vh; overflow-y: auto;">
+                    <table class="styled-table">
+                        <thead><tr><th>तारीख</th><th>नाव</th><th>चुकीचा भाव</th><th>बरोबर भाव</th><th>⚙️</th></tr></thead>
+                        <tbody id="alertBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -227,7 +245,7 @@
 
     function marathiToEnglish(t) { if(!t) return ""; const m = { 'क':'k','ख':'kh','ग':'g','घ':'gh','च':'ch','छ':'chh','ज':'j','झ':'jh','ञ':'tr','ट':'t','ठ':'th','ड':'d','ढ':'dh','ण':'n','त':'t','थ':'th','द':'d','ध':'dh','न':'n','प':'p','फ':'ph','ब':'b','भ':'bh','म':'m','य':'y','र':'r','ल':'l','व':'v','श':'sh','ष':'sh','स':'s','ह':'h','ळ':'l','क्ष':'ksh','ज्ञ':'dny', 'ा':'a','ि':'i','ी':'ee','ु':'u','ू':'oo','े':'e','ै':'ai','ो':'o','ौ':'au','ं':'m','ः':'h', 'अ':'a','आ':'a','इ':'i','ई':'ee','उ':'u','ऊ':'oo','ए':'e','ऐ':'ai','ओ':'o','औ':'au', '्':'' }; let e = ""; for(let c of t){ e += m[c] || c; } return e; }
     function verifyPin() { let p = val("loginPin"); if (p === ADMIN_PIN) { sessionStorage.setItem("isLoggedIn", "true"); sessionStorage.setItem("userRole", "admin"); currentUserRole = "admin"; unlockApp(); } else if (p === STAFF_PIN) { sessionStorage.setItem("isLoggedIn", "true"); sessionStorage.setItem("userRole", "staff"); currentUserRole = "staff"; unlockApp(); } else { alert("❌ चुकीचा पिन!"); document.getElementById("loginPin").value = ""; } }
-    function unlockApp() { document.getElementById("loginScreen").style.display = "none"; document.getElementById("appContent").style.display = "block"; document.getElementById("syncStatus").style.display = "block"; if(currentUserRole === "staff") { document.getElementById("mainDashboard").style.display = "none"; document.getElementById("mainAppTitle").innerText = "✨ Smart Billing (Staff Mode)"; document.getElementById("syncStatus").innerText = "🟡 Staff Active"; } else { document.getElementById("mainDashboard").style.display = "grid"; document.getElementById("mainAppTitle").innerText = "✨ Smart Billing Hub"; } }
+    function unlockApp() { document.getElementById("loginScreen").style.display = "none"; document.getElementById("appContent").style.display = "block"; document.getElementById("syncStatus").style.display = "block"; if(currentUserRole === "staff") { document.getElementById("mainDashboard").style.display = "none"; document.getElementById("mainAppTitle").innerText = "✨ Smart Billing (Staff Mode)"; document.getElementById("syncStatus").innerText = "🟡 Staff Active"; } else { document.getElementById("mainDashboard").style.display = "grid"; document.getElementById("mainAppTitle").innerText = "✨ Smart Billing Hub"; } updateAlertBadge(); }
 
     document.addEventListener("DOMContentLoaded", () => { 
         if (sessionStorage.getItem("isLoggedIn") === "true") { currentUserRole = sessionStorage.getItem("userRole") || "staff"; unlockApp(); } 
@@ -306,6 +324,52 @@
         let tS = 0, pV = 0, tMw = 0; let mD = getMerchantDB();
         mD.forEach(e => { if(!e) return; if(e.type === 'payment') pV -= (Number(e.amount)||0); else { if(e.date === sel) { tS += (Number(e.total)||0); if(!e.merType || e.merType === 'नि') tMw += (Number(e.weight)||0); } pV += (Number(e.total)||0); } });
         document.getElementById("dashPurchase").innerText = `₹ ${tP.toLocaleString('en-IN')}`; document.getElementById("dashSales").innerText = `₹ ${tS.toLocaleString('en-IN')}`; document.getElementById("dashPending").innerText = `₹ ${pV.toLocaleString('en-IN')}`; document.getElementById("dashAdvance").innerText = `₹ ${tA.toLocaleString('en-IN')}`; document.getElementById("dashFarmerWt").innerText = `${tFw} Kg`; document.getElementById("dashMerchantWt").innerText = `${tMw} Kg`;
+        updateAlertBadge();
+    }
+
+    // 🌟 अलर्ट लॉजिक 🌟
+    function checkRateDiscrepancies() {
+        let data = getData().filter(e => e && e.type === 'crop');
+        let discrepancies = [];
+        let cacheCommonRate = {};
+        
+        data.forEach(e => {
+            if(!cacheCommonRate[e.date]) { cacheCommonRate[e.date] = getCommonRateForDate(e.date); }
+            let cR = cacheCommonRate[e.date];
+            if(cR > 0 && e.rate !== cR) { discrepancies.push({...e, commonRate: cR}); }
+        });
+        discrepancies.sort((a, b) => new Date(b.date) - new Date(a.date));
+        return discrepancies;
+    }
+
+    function updateAlertBadge() {
+        let disc = checkRateDiscrepancies();
+        let badge = document.getElementById("alertBadge");
+        if(badge) {
+            if(disc.length > 0) { badge.innerText = disc.length; badge.style.display = "flex"; } 
+            else { badge.style.display = "none"; }
+        }
+    }
+
+    function renderAlerts() {
+        let disc = checkRateDiscrepancies(); let tbody = document.getElementById("alertBody"); let html = "";
+        disc.forEach(e => {
+            html += `<tr><td style="font-weight:600; font-size:12px;">${formatDate(e.date)}</td><td style="font-weight:600; font-size:12px;">${e.name}</td><td style="color:var(--danger); font-weight:700;">${e.rate}</td><td style="color:var(--success); font-weight:700;">${e.commonRate}</td><td style="text-align:center;"><button class="small-btn btn-edit" onclick="fixRate(${e.id}, ${e.commonRate})" style="padding:4px 8px;">Fix</button></td></tr>`;
+        });
+        if(disc.length === 0) { html = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#8e8e93; font-weight:600;">कोणतीही चूक सापडली नाही. सर्व भाव बरोबर आहेत! 🎉</td></tr>`; }
+        tbody.innerHTML = html;
+    }
+
+    function fixRate(id, correctRate) {
+        if(currentUserRole !== 'admin') { alert("❌ हे फक्त मालक करू शकतात."); return; }
+        let data = getData(); let idx = data.findIndex(e => e && e.id === id);
+        if(idx !== -1) {
+            data[idx].rate = correctRate; data[idx].total = Math.floor((data[idx].weight * correctRate) / 5) * 5;
+            saveData(data); renderAlerts();
+            if(document.getElementById("previewModal").classList.contains("show")) renderPreview();
+            if(document.getElementById("listModal").classList.contains("show")) generateFarmerStatus();
+            alert("✅ भाव दुरुस्त झाला!");
+        }
     }
 
     function loadFarmerList() { let dl=document.getElementById("farmerList"); if(!dl) return; dl.innerHTML=""; let h=""; getMergedFarmers().forEach(f => { h += `<option value="${f}">${marathiToEnglish(f)}</option>`; }); dl.innerHTML=h; }
@@ -323,7 +387,6 @@
         document.getElementById("weight").value=""; document.getElementById("farmerName").value=""; let btn = document.getElementById("mainBtn"); btn.innerText = "✅ Saved!"; setTimeout(() => { btn.innerHTML = "✅ Save Entry"; document.getElementById("farmerName").focus(); }, 1000);
     }
 
-    // 🌟 TRADER/MERCHANT FUNCTIONS START 🌟
     function saveMerchantEntry() {
         let d = val("merDate"); let n = val("merName").trim(); let w = parseFloat(val("merWeight")); let r = parseFloat(val("merRate")); let tSel = val("merTypeSel");
         if(!d || !n || !w || !r) { alert("माहिती भरा!"); return; }
@@ -398,9 +461,18 @@
         if(document.getElementById("merDetailModal").classList.contains("show")) renderMerHistory(val("activeMerchantName"));
         if(document.getElementById("merchantListModal").classList.contains("show")) renderMerList();
     }
-    // 🌟 TRADER/MERCHANT FUNCTIONS END 🌟
 
+    // 🌟 CUSTOM WHATSAPP BILL LOGIC 🌟
     function sendWhatsAppBill(areaId) {
+        let type = val("billType");
+        
+        // 🌟 फक्त व्यापाऱ्यासाठी (Merchant) WhatsApp फॉरमॅट 🌟
+        if(type === 'MERCHANT' && areaId === 'mainBillPrintableArea' && window.currentMerchantWaText) {
+            window.open(`https://wa.me/?text=${encodeURIComponent(window.currentMerchantWaText)}`, '_blank');
+            return;
+        }
+        
+        // 🌟 शेतकरी आणि पोती यांसाठी जुनाच फॉरमॅट 🌟
         let printArea = document.getElementById(areaId); if(!printArea) return;
         let rN = document.getElementById(areaId === 'mainBillPrintableArea' ? "billHeaderName" : "bagBillHeaderName").innerText;
         let rD = document.getElementById(areaId === 'mainBillPrintableArea' ? "billMonthDisplay" : "bagBillDateDisplay").innerText;
@@ -552,10 +624,10 @@
             let openingBal = 0; let filteredData = [];
             d.forEach(e => { if(e && e.name === n) { if (e.date < openingBalDateFilter) { if(e.type !== 'payment') openingBal += (Number(e.total)||0); else openingBal -= (Number(e.amount)||0); } else if (e.date >= startFilter && e.date <= endFilter) { filteredData.push(e); } } });
             
+            // 🌟 1. UI HTML Generation (No changes here) 🌟
             let html = `<table style="width:100%; max-width:700px; margin:0 auto; border-collapse:collapse; font-family:'Poppins',sans-serif; color:#0f172a;"><thead><tr><th style="padding:15px 10px; border-bottom:2px solid #cbd5e1; text-align:left; width:25%; font-size:13px; color:#64748b; text-transform:uppercase; white-space:nowrap;">तारीख</th><th style="padding:15px 10px; border-bottom:2px solid #cbd5e1; text-align:center; width:50%; font-size:13px; color:#64748b; text-transform:uppercase; white-space:nowrap;">तपशील</th><th style="padding:15px 10px; border-bottom:2px solid #cbd5e1; text-align:right; width:25%; font-size:13px; color:#64748b; text-transform:uppercase; white-space:nowrap;">रक्कम (₹)</th></tr></thead><tbody style="font-size:15px;">`;
             
             let runningBal = 0; let lastBillDate = ""; 
-            
             if(openingBal !== 0 || filteredData.length > 0) {
                 filteredData.forEach(e => {
                     if (e.type !== 'payment') { 
@@ -569,18 +641,55 @@
                         lastBillDate = ""; 
                     }
                 });
-
                 if (openingBal !== 0) {
                     html += `<tr><td colspan="3" style="border-top:2px solid #cbd5e1; margin-top:5px;"></td></tr>`;
                     html += `<tr style="background:#f8fafc;"><td colspan="2" style="padding:12px 10px; text-align:right; font-weight:600; font-size:15px; color:#1e293b;">या महिन्याची बाकी :</td><td style="padding:12px 10px; text-align:right; font-weight:700; font-size:17px; color:#1e293b; white-space:nowrap;">${runningBal}</td></tr>`;
                     let obPrefix = openingBal < 0 ? "मागील जास्त जमा :" : "मागील बाकी (+):"; let obColor = openingBal < 0 ? "#059669" : "#d97706";
                     html += `<tr style="background:#fffbeb;"><td colspan="2" style="padding:12px 10px; text-align:right; font-weight:700; color:${obColor}; font-size:15px;">${obPrefix}</td><td style="padding:12px 10px; text-align:right; font-weight:800; color:${obColor}; font-size:17px; white-space:nowrap;">${Math.abs(openingBal)}</td></tr>`;
                 }
-
                 let finalBal = runningBal + openingBal; let finalPrefix = finalBal < 0 ? "जास्त जमा :" : "सध्याची एकूण बाकी :";
                 html += `<tr style="background:#e0f2fe; border:2px solid #3b82f6;"><td colspan="2" style="padding:16px 12px; text-align:right; font-weight:700; font-size:16px; color:#1d4ed8;">${finalPrefix}</td><td style="padding:16px 12px; text-align:right; white-space:nowrap;"><span style="color:#fff; background:#2563eb; padding:6px 14px; border-radius:8px; font-weight:800; font-size:20px; box-shadow:0 4px 6px rgba(37,99,235,0.2);">₹ ${Math.abs(finalBal)} /-</span></td></tr>`;
             } else { html += `<tr><td colspan="3" style="text-align:center; padding: 30px; color: #8e8e93; font-weight:500;">No Data Found</td></tr>`; }
             list.innerHTML = html + "</tbody></table>";
+
+            // 🌟 2. NEW CUSTOM WHATSAPP TEXT GENERATION FOR MERCHANTS 🌟
+            let waText = `🧾 *हिशोब पत्रक*\n➖➖➖➖➖➖➖➖\n👤 *नाव:* ${n}\n📅 *कालावधी:* ${displayDate.replace('📅 ', '')}\n➖➖➖➖➖➖➖➖\n`;
+            let cropEntries = filteredData.filter(e => e.type !== 'payment');
+            let payEntries = filteredData.filter(e => e.type === 'payment');
+            let billTotal = 0; let lastWaDate = "";
+
+            if(cropEntries.length > 0 || payEntries.length > 0 || openingBal !== 0) {
+                cropEntries.forEach(e => {
+                    let dStr = (e.date !== lastWaDate) ? formatDate(e.date) : "          "; // 10 spaces to align with date
+                    lastWaDate = e.date;
+                    billTotal += e.total;
+                    let tPrefix = e.merType ? e.merType : "";
+                    waText += `🔸 ${dStr}  ${tPrefix} ${e.weight} x ${e.rate} = ${e.total}\n`;
+                });
+
+                waText += `----------------------------\n🔹                     *एकूण : ${billTotal}*\n`;
+
+                let totalWithOb = billTotal;
+                if (openingBal !== 0) {
+                    let obPrefix = openingBal < 0 ? "मागील जास्त जमा (-):" : "मागील बाकी (+):";
+                    waText += `🔴       *${obPrefix} ${Math.abs(openingBal)}*\n—————————————————\n`;
+                    totalWithOb = billTotal + openingBal;
+                    waText += `                               *एकूण : ${totalWithOb}*\n`;
+                }
+
+                payEntries.forEach(e => {
+                    let pDate = formatDate(e.date);
+                    let hint = e.hint ? `(${e.hint})` : "";
+                    waText += `🟩 *${pDate} जमा${hint} : ${e.amount}*\n`;
+                });
+
+                let finalBalText = billTotal + openingBal - payEntries.reduce((sum, curr) => sum + curr.amount, 0);
+                let obLabel = finalBalText < 0 ? "जास्त जमा" : "सध्याची एकूण बाकी";
+                waText += `——————————————————-\n🔴 *${obLabel} : ₹ ${Math.abs(finalBalText)} /-*\n➖➖➖➖➖➖➖➖\n\n            🙏 *धन्यवाद*`;
+            } else {
+                waText += `माहिती उपलब्ध नाही.\n➖➖➖➖➖➖➖➖\n🙏 *धन्यवाद*`;
+            }
+            window.currentMerchantWaText = waText; // Store for WhatsApp button
         }
     }
 
@@ -791,5 +900,3 @@
     let isAdvEditMode = false; function toggleAdvEditMode() { if(currentUserRole !== 'admin') return; isAdvEditMode = !isAdvEditMode; document.getElementById("manageAdvListBtn").innerHTML = isAdvEditMode ? "❌ Done" : "⚙️ Manage"; renderAdvList(); }
     function renderAdvList() { let data = getData().filter(e => e && e.type === 'advance'); data.sort((a,b) => new Date(b.date) - new Date(a.date)); let tbody = document.getElementById("advListBody"); let html = ""; let tot = 0; data.forEach(e => { let isGive = e.amount > 0; let col = isGive ? "#ea580c" : "#10b981"; let lbl = isGive ? "दिली" : "जमा"; let sign = isGive ? "" : "+ "; tot += e.amount; let btns = isAdvEditMode ? `<button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button>` : ""; html += `<tr><td style="font-weight:600; color:#8e8e93;">${formatDate(e.date)}</td><td style="font-weight:600;">${e.name}</td><td style="color:${col}; font-weight:600;">${lbl}</td><td style="font-weight:700; color:${col};">${sign}${Math.abs(e.amount)}</td><td style="text-align:center;">${btns}</td></tr>`; }); document.getElementById("totalAdvDisplay").innerText = `Total: ₹ ${tot}`; tbody.innerHTML = html; }
 </script>
-</body>
-</html>
