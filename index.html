@@ -497,49 +497,47 @@
         let opt = { margin: [5,5,5,5], filename: `${safeName}_${type}_Bill.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, windowWidth: 800 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }; html2pdf().set(opt).from(element).save();
     }
 
-    function normalizeMarathi(str) { return str.replace(/[^a-zA-Zअ-ज्ञ0-9]/g, '').toLowerCase(); }
+   function normalizeMarathi(str) { return str.replace(/[^a-zA-Zअ-ज्ञ0-9]/g, '').toLowerCase(); }
+    
+    // 🌟 नवीन सुपर स्मार्ट मॅचिंग सिस्टीम (आकडे कायम ठेवण्यासाठी) 🌟
     function findBestFarmerMatch(ocrName) {
-        let fArr = getMergedFarmers();
-        if (!ocrName) return ""; let normOcr = normalizeMarathi(ocrName); if (normOcr.length < 2) return ocrName;
-        let match = fArr.find(f => normalizeMarathi(f) === normOcr); if(match) return match;
-        match = fArr.find(f => { let normF = normalizeMarathi(f).replace(/[0-9]/g, ''), cleanO = normOcr.replace(/[0-9]/g, ''); return normF.length > 2 && normF === cleanO; }); if(match) return match;
-        match = fArr.find(f => { let normF = normalizeMarathi(f); return normF.length > 2 && (normOcr.includes(normF) || normF.includes(normOcr)); }); if(match) return match;
-        return ocrName;
+        let fArr = getMergedFarmers(); // ही तुमची ओरिजिनल लिस्ट आहे (उदा. "1. सौदी")
+        if (!ocrName) return ""; 
+        
+        // 1. तंतोतंत मॅच होत असेल तर
+        let exactMatch = fArr.find(f => f.trim() === ocrName.trim());
+        if (exactMatch) return exactMatch;
+
+        // 2. फक्त नावावरून (अक्षरांवरून) ओरिजिनल नाव (आकड्यासकट) शोधणे
+        let cleanOcr = ocrName.replace(/[^a-zA-Zअ-ज्ञ]/g, ''); 
+        if (cleanOcr.length >= 2) {
+            let alphaMatch = fArr.find(f => { 
+                let cleanF = f.replace(/[^a-zA-Zअ-ज्ञ]/g, ''); 
+                return cleanF.length >= 2 && (cleanF === cleanOcr || cleanOcr.includes(cleanF) || cleanF.includes(cleanOcr)); 
+            });
+            if (alphaMatch) return alphaMatch; // जर नाव मॅच झाले, तर लिस्ट मधील '1. सौदी' असे पूर्ण नाव देईल
+        }
+        
+        // 3. जर AI ने चुकून फक्त आकडा वाचला (उदा. '1' किंवा '1.'), तरीही नाव शोधणे
+        let ocrNumMatch = ocrName.match(/^(\d+)/);
+        if (ocrNumMatch) {
+            let numMatch = fArr.find(f => f.startsWith(ocrNumMatch[0] + ".") || f.startsWith(ocrNumMatch[0] + " "));
+            if (numMatch) return numMatch;
+        }
+
+        return ocrName; // जर नवीनच शेतकरी असेल, तर AI ने जे वाचलेय तेच देईल
     }
 
     function initOcr() { document.getElementById("ocrDateInput").value = val("dateInput"); document.getElementById("ocrResultSection").style.display = 'none'; document.getElementById("ocrPreview").style.display = 'none'; document.getElementById("ocrStatus").innerText = ''; document.getElementById("ocrResultBody").innerHTML = ''; let savedKey = localStorage.getItem("geminiApiKey"); if(savedKey) { document.getElementById("geminiApiKey").value = savedKey; document.getElementById("apiKeySection").style.display = "none"; } else { document.getElementById("apiKeySection").style.display = "block"; } }
     function saveApiKey() { const key = val("geminiApiKey"); if(key) localStorage.setItem("geminiApiKey", key); }
     
     let currentBase64Image = "";
-    
     function previewOcrImage(event) {
         const file = event.target.files[0];
-        if (file) { 
-            const reader = new FileReader(); 
-            reader.onload = function(e) { 
-                const img = new Image(); 
-                img.onload = function() { 
-                    const canvas = document.createElement('canvas'); 
-                    const MAX_WIDTH = 800; // ⚡ स्पीडसाठी साईझ 1000 वरून 800 केली
-                    let width = img.width, height = img.height; 
-                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } 
-                    canvas.width = width; canvas.height = height; 
-                    const ctx = canvas.getContext('2d'); 
-                    ctx.drawImage(img, 0, 0, width, height); 
-                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.5); // ⚡ अपलोड फास्ट होण्यासाठी क्वालिटी 0.5 केली
-                    const previewEl = document.getElementById("ocrPreview"); 
-                    previewEl.src = compressedDataUrl; 
-                    currentBase64Image = compressedDataUrl.split(',')[1]; 
-                    previewEl.style.display = 'block'; 
-                    document.getElementById("ocrStatus").innerText = '✅ फोटो लोड झाला.'; 
-                }; 
-                img.src = e.target.result; 
-            }; 
-            reader.readAsDataURL(file); 
-        }
+        if (file) { const reader = new FileReader(); reader.onload = function(e) { const img = new Image(); img.onload = function() { const canvas = document.createElement('canvas'); const MAX_WIDTH = 1000; let width = img.width, height = img.height; if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height); const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7); const previewEl = document.getElementById("ocrPreview"); previewEl.src = compressedDataUrl; currentBase64Image = compressedDataUrl.split(',')[1]; previewEl.style.display = 'block'; document.getElementById("ocrStatus").innerText = '✅ फोटो लोड झाला.'; }; img.src = e.target.result; }; reader.readAsDataURL(file); }
     }
     
-   async function processVisionAI() {
+    async function processVisionAI() {
         let rawKey = val("geminiApiKey") || localStorage.getItem('geminiApiKey') || ""; 
         const apiKey = rawKey.trim(); 
         const rate = parseFloat(val("ocrCommonRate"));
@@ -552,23 +550,21 @@
         const btn = document.getElementById("ocrProcessBtn"); 
         btn.disabled = true; 
         btn.style.opacity = '0.5'; 
-        statusLabel.innerHTML = '⚡ स्कॅन सुरू आहे... (AI मॉडेल शोधत आहे)';
+        statusLabel.innerHTML = '⚡ स्कॅन सुरू आहे...';
 
-        const promptText = `Act as an expert Marathi data entry operator. Your task is to extract EVERY SINGLE row from the handwritten notebook image. DO NOT SKIP ANY NAME OR NUMBER.
-        
+        const promptText = `Act as an expert Marathi data entry operator. 
 Known Names List: [${getMergedFarmers().join(', ')}]
 
 CRITICAL RULES:
-1. Extract ALL names line by line. Do not skip any row. 
-2. If a name from the image matches a name in the "Known Names List", output the exact known name. If it's a NEW name, just read it in Marathi and output it.
-3. Read numbers extremely carefully (don't confuse 1 and 9, 8 and 5).
-4. Fractions: 1 line (/,|,\\) = .25, 2 lines (//,||) = .50, 3 lines (///,|||) = .75. (Example: '6///' = 6.75).
-5. If the exact same name appears multiple times in the image, SUM their weights together into one final total for that name.
-6. Return ONLY a valid JSON array format. No other text. Example: [{"name": "1. तानाजी", "weight": 45.75}, {"name": "नवीन शेतकरी", "weight": 10.50}]`;
+1. Extract names and weights from the image EXACTLY line by line.
+2. The names in the Known Names List have numbers in front of them (e.g., "1. सौदी"). Whenever you see a name in the image that matches a name in the list, YOU MUST output the FULL name from the list WITH THE NUMBER. 
+3. DO NOT SUM OR COMBINE ANYTHING. Output exactly what is written, row by row.
+4. Read numbers extremely carefully (don't confuse 1 and 9, 8 and 5).
+5. Fractions: 1 line (/,|,\\) = .25, 2 lines (//,||) = .50, 3 lines (///,|||) = .75.
+6. Return ONLY a valid JSON array format. Example: [{"name": "1. सौदी", "weight": 45.75}, {"name": "2. पोपट", "weight": 10.50}]`;
 
         const payload = { contents: [{ parts: [ { text: promptText }, { inlineData: { mimeType: "image/jpeg", data: currentBase64Image } } ] }] };
         
-        // 🌟 गुगलचे उपलब्ध मॉडेल्स एक-एक करून तपासण्याची सिस्टीम (Fallback Logic) 🌟
         const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash-latest"];
         let response = null;
         let successfulModel = "";
@@ -578,22 +574,13 @@ CRITICAL RULES:
             let url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
             try { 
                 response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }); 
-                if (response.ok) { 
-                    successfulModel = model; 
-                    break; // मॉडेल चालले तर लूप थांबेल
-                } else { 
-                    let errData = await response.json(); 
-                    lastErrorMsg = errData.error?.message || "Error"; 
-                } 
-            } catch (e) { 
-                lastErrorMsg = e.message; 
-            }
+                if (response.ok) { successfulModel = model; break; } 
+                else { let errData = await response.json(); lastErrorMsg = errData.error?.message || "Error"; } 
+            } catch (e) { lastErrorMsg = e.message; }
         }
 
         try {
-            if (!response || !response.ok) {
-                throw new Error(lastErrorMsg || "तुमच्या API Key साठी कोणतेही मॉडेल उपलब्ध नाही.");
-            }
+            if (!response || !response.ok) throw new Error(lastErrorMsg || "API Error");
             
             const result = await response.json(); 
             let aiText = result.candidates[0].content.parts[0].text;
@@ -601,20 +588,25 @@ CRITICAL RULES:
             
             if (jsonMatch) { 
                 const extractedData = JSON.parse(jsonMatch[0]); 
-                renderAiResult(extractedData, rate); 
-                statusLabel.innerHTML = `✅ स्कॅनिंग पूर्ण! (${extractedData.length} नावे सापडली) <br><span style="font-size:10px; color:gray;">(वापरलेले AI: ${successfulModel})</span>`; 
+                
+                // इथे आपली नवीन मॅचिंग सिस्टीम वापरली जाईल
+                let finalDataArray = extractedData.map(item => {
+                    return {
+                        name: findBestFarmerMatch(item.name), 
+                        weight: parseFloat(item.weight) || 0
+                    };
+                });
+
+                renderAiResult(finalDataArray, rate); 
+                statusLabel.innerHTML = `✅ स्कॅनिंग पूर्ण! (${finalDataArray.length} नोंदी सापडल्या) <br><span style="font-size:10px; color:gray;">(वापरलेले AI: ${successfulModel})</span>`; 
                 document.getElementById("ocrResultSection").style.display = 'block'; 
                 document.getElementById("apiKeySection").style.display = "none"; 
-            } else {
-                throw new Error("No JSON found in response");
-            }
+            } else { throw new Error("No JSON found in response"); }
         } catch (error) {
             console.error("Vision AI Error: ", error);
             statusLabel.innerHTML = `<span style="color:red; font-weight:700;">❌ Error: ${error.message}</span>`; 
             document.getElementById("apiKeySection").style.display = "block"; 
-        } finally { 
-            btn.disabled = false; btn.style.opacity = '1'; 
-        }
+        } finally { btn.disabled = false; btn.style.opacity = '1'; }
     }
     function renderAiResult(dataArray, rate) {
         const tbody = document.getElementById("ocrResultBody"); tbody.innerHTML = ''; let idCounter = 0;
