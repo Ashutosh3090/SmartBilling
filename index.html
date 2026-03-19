@@ -148,6 +148,7 @@
                 <button class="action-btn bg-gradient-blue" onclick="openModal('monthlyReportModal'); initMonthlyReport();"><i>📊</i> मासिक रिपोर्ट</button>
                 <button class="action-btn bg-gradient-ai" onclick="openModal('aiModal'); generateAIReport();"><i>🤖</i> AI ॲडव्हायझर</button>
                 <button class="action-btn bg-gradient-orange" onclick="openModal('ocrModal'); initOcr();" style="grid-column: span 2;"><i>📸</i> <b>वही स्कॅन (AI)</b></button>
+           <button class="action-btn" style="background:linear-gradient(135deg,#0ea5e9,#0369a1);" onclick="openModal('notesModal'); initNotes();"><i>📝</i> रोजच्या नोंदी</button>
             </div>
         </div>
 
@@ -237,7 +238,39 @@
         <div id="advListModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('advListModal')">✕</div><h3 style="color: var(--danger);">📜 Advance List</h3><div class="list-header-bar"><span id="totalAdvDisplay" style="font-weight:600; color:var(--danger); flex:1;">Total: 0</span><button class="small-btn" style="background:#8e8e93;" id="manageAdvListBtn" onclick="toggleAdvEditMode()">⚙️ Manage</button></div><div class="table-container" style="max-height: 55vh; overflow-y: auto;"><table class="styled-table"><thead><tr><th>Date</th><th>Name</th><th>Type</th><th>Amt</th><th>⚙️</th></tr></thead><tbody id="advListBody"></tbody></table></div></div></div>
     </div> 
 </div>
+<div id="notesModal" class="modal no-print">
+    <div class="modal-content">
+        <div class="close-icon" onclick="closeModal('notesModal')">✕</div>
+        <h3 style="color: #0ea5e9;">📝 महत्त्वाच्या नोंदी</h3>
+        <div class="section-box" style="background:#f0f9ff; border-color:#bae6fd;">
+            <div class="input-row">
+                <div class="input-group">
+                    <label>तारीख (Date):</label>
+                    <input type="date" id="noteDate">
+                </div>
+            </div>
+            <div class="input-group" style="margin-bottom: 15px;">
+                <label>नोंद (Note):</label>
+                <textarea id="noteText" placeholder="येथे महत्त्वाची माहिती लिहा..." style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-family: inherit; font-size: 14px; min-height: 80px; resize: vertical;"></textarea>
+            </div>
+            <button class="btn-add" style="background:linear-gradient(135deg,#0ea5e9,#0369a1); margin-bottom: 10px;" onclick="saveNote()">✅ नोंद सेव्ह करा</button>
+        </div>
+        <button class="btn-add" style="background:#1c1c1e;" onclick="openModal('notesListModal'); renderNotes();">📜 List</button>
+    </div>
+</div>
 
+<div id="notesListModal" class="modal no-print">
+    <div class="modal-content">
+        <div class="close-icon" onclick="closeModal('notesListModal')">✕</div>
+        <h3 style="color: #0ea5e9;">📜 नोंदींची यादी</h3>
+        <div class="table-container" style="max-height: 55vh; overflow-y: auto;">
+            <table class="styled-table">
+                <thead><tr><th style="width:25%;">तारीख</th><th>तपशील</th><th style="width:15%; text-align:center;">⚙️</th></tr></thead>
+                <tbody id="notesListBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
 <script>
     const val = id => document.getElementById(id) ? document.getElementById(id).value : "";
     const ADMIN_PIN = "1504"; const STAFF_PIN = "2000"; let currentUserRole = "staff"; 
@@ -297,6 +330,13 @@
     database.ref('merchantData').on('value', s => { merchantDB = sanitizeData(s.val()); updateDashboard(); syncRates(); loadMerchantList(); if(document.getElementById("merchantListModal").classList.contains("show")) renderMerList(); });
     database.ref('bagData').on('value', s => { bagDB = sanitizeData(s.val()); loadBagPersonList(); if(document.getElementById("bagPersonListModal").classList.contains("show")) renderBagPersonList(); });
 
+let notesDB = [];
+database.ref('notesData').on('value', s => { 
+    notesDB = sanitizeData(s.val()); 
+    if(document.getElementById("notesListModal").classList.contains("show")) renderNotes(); 
+});
+function getNotesDB() { return notesDB || []; } 
+function saveNotesDB(d) { notesDB = sanitizeData(d); database.ref('notesData').set(notesDB); }
     function getData() { return cropDataDB || []; } function saveData(d) { cropDataDB = sanitizeData(d); database.ref('cropData').set(cropDataDB); updateDashboard(); }
     function getMerchantDB() { return merchantDB || []; } function saveMerchantDB(d) { merchantDB = sanitizeData(d); database.ref('merchantData').set(merchantDB); updateDashboard(); }
     function getBagDB() { return bagDB || []; } function saveBagDB(d) { bagDB = sanitizeData(d); database.ref('bagData').set(bagDB); }
@@ -1127,7 +1167,59 @@ CRITICAL RULES:
     function saveAdvance(mode) { let d=val("advDate"); let n=val("advFarmerName").trim(); let a=parseFloat(val("advAmount")); if(!d||!n||!a) return; let mArr = safeArray(farmers); if(!mArr.includes(n)) { mArr.push(n); database.ref('farmers').set(mArr); } let finalAmt = mode === 'GIVE' ? a : -a; let data = getData(); data.push({id:Date.now(), date:d, name:n, type:'advance', amount:finalAmt}); saveData(data); document.getElementById("advAmount").value=""; document.getElementById("advFarmerName").value=""; alert("✅ उचल नोंदवली!"); if(document.getElementById("advListModal").classList.contains("show")) renderAdvList(); }
     let isAdvEditMode = false; function toggleAdvEditMode() { if(currentUserRole !== 'admin') return; isAdvEditMode = !isAdvEditMode; document.getElementById("manageAdvListBtn").innerHTML = isAdvEditMode ? "❌ Done" : "⚙️ Manage"; renderAdvList(); }
     function renderAdvList() { let data = getData().filter(e => e && e.type === 'advance'); data.sort((a,b) => new Date(b.date) - new Date(a.date)); let tbody = document.getElementById("advListBody"); let html = ""; let tot = 0; data.forEach(e => { let isGive = e.amount > 0; let col = isGive ? "#ea580c" : "#10b981"; let lbl = isGive ? "दिली" : "जमा"; let sign = isGive ? "" : "+ "; tot += e.amount; let btns = isAdvEditMode ? `<button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button>` : ""; html += `<tr><td style="font-weight:600; color:#8e8e93;">${formatDate(e.date)}</td><td style="font-weight:600;">${e.name}</td><td style="color:${col}; font-weight:600;">${lbl}</td><td style="font-weight:700; color:${col};">${sign}${Math.abs(e.amount)}</td><td style="text-align:center;">${btns}</td></tr>`; }); document.getElementById("totalAdvDisplay").innerText = `Total: ₹ ${tot}`; tbody.innerHTML = html; }
-
+// 🌟 Daily Notes Logic 🌟
+    function initNotes() { 
+        document.getElementById("noteDate").value = val("dateInput") || new Date().toISOString().slice(0, 10); 
+        document.getElementById("noteText").value = "";
+    }
+    
+    function saveNote() {
+        let d = val("noteDate"); let t = val("noteText").trim();
+        if(!d || !t) { alert("कृपया तारीख आणि नोंद टाका!"); return; }
+        let data = getNotesDB();
+        data.push({ id: Date.now(), date: d, text: t });
+        saveNotesDB(data);
+        document.getElementById("noteText").value = "";
+        alert("✅ नोंद सेव्ह झाली!");
+    }
+    
+    function renderNotes() {
+        let data = getNotesDB();
+        
+        // तारखेनुसार अचूक सॉर्टिंग (नवीन नोंद सर्वात वर)
+        data.sort((a, b) => new Date(b.date) - new Date(a.date) || b.id - a.id); 
+        
+        let tbody = document.getElementById("notesListBody");
+        let html = "";
+        let lastDate = "";
+        
+        data.forEach(e => {
+            let displayDate = (e.date !== lastDate) ? formatDate(e.date) : "";
+            lastDate = e.date;
+            
+            let btns = (currentUserRole === 'admin') ? `<button class="small-btn btn-del" style="margin:0 auto;" onclick="deleteNote(${e.id})">🗑</button>` : "";
+            
+            html += `<tr>
+                <td style="font-weight:800; color:var(--primary); font-size:12px; vertical-align:top; padding-top:12px;">${displayDate}</td>
+                <td style="font-weight:500; font-size:13px; white-space:pre-wrap; vertical-align:top; padding-top:12px; color:#1e293b;">${e.text}</td>
+                <td style="text-align:center; vertical-align:top; padding-top:12px;">${btns}</td>
+            </tr>`;
+        });
+        
+        if(data.length === 0) {
+            html = `<tr><td colspan="3" style="text-align:center; padding:20px; color:#8e8e93; font-weight:600;">कोणतीही नोंद उपलब्ध नाही.</td></tr>`;
+        }
+        tbody.innerHTML = html;
+    }
+    
+    function deleteNote(id) {
+        if(currentUserRole !== 'admin') { alert("❌ प्रवेश नाकारला!"); return; }
+        if(prompt("ही नोंद डिलीट करण्यासाठी PIN टाका:") === ADMIN_PIN) {
+            let data = getNotesDB().filter(e => e && e.id !== id);
+            saveNotesDB(data);
+            renderNotes();
+        }
+    }
 </script>
 </body>
 </html>
