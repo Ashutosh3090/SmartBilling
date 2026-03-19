@@ -160,17 +160,79 @@
         }
         .close-icon:hover { background: #e2e8f0; color: var(--danger); transform: rotate(90deg); }
 
-        /* Clean Tables */
-        .table-container { border: 1px solid var(--border-light); border-radius: var(--radius-md); overflow-x: auto; -webkit-overflow-scrolling: touch; background: #fff; box-shadow: var(--shadow-sm); }
-        .styled-table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: left; }
-        .styled-table th { background: #f8fafc; color: var(--text-muted); padding: 14px 12px; font-weight: 600; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid var(--border-light); position: sticky; top: 0; z-index: 5; letter-spacing: 0.5px; }
-        .styled-table td { padding: 12px 12px; border-bottom: 1px solid #f1f5f9; color: var(--text-main); font-weight: 500; }
-        .styled-table tbody tr:hover { background: #f8fafc; }
+        /* 🌟 ULTRA PREMIUM TABLES, DATES & NAMES 🌟 */
+        .table-container { 
+            border: 1px solid rgba(226, 232, 240, 0.6); 
+            border-radius: var(--radius-lg); 
+            overflow-x: auto; 
+            background: rgba(255, 255, 255, 0.5); 
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.8), 0 10px 25px -5px rgba(15, 23, 42, 0.05); 
+            padding: 6px;
+        }
+        
+        .styled-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; font-size: 14px; text-align: left; }
+        
+        /* Premium Header */
+        .styled-table th { 
+            background: transparent; color: #64748b; padding: 12px 14px; 
+            font-weight: 700; font-size: 11.5px; text-transform: uppercase; 
+            letter-spacing: 1px; border-bottom: 2px solid #e2e8f0; 
+        }
+        
+        /* Floating Card Style for Rows */
+        .styled-table tbody tr {
+            background: #ffffff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .styled-table tbody tr:hover {
+            transform: scale(1.01) translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.08);
+            z-index: 10; position: relative;
+        }
 
-        .premium-list-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
-        .premium-row { background: #fff; box-shadow: var(--shadow-sm); border-radius: var(--radius-md); border: 1px solid var(--border-light); transition: 0.2s; }
-        .premium-row:hover { transform: translateX(4px); box-shadow: var(--shadow-md); border-color: #cbd5e1; }
-        .premium-row td { padding: 16px 14px; vertical-align: middle; }
+        .styled-table td { padding: 14px; border-bottom: none; color: #1e293b; }
+        .styled-table td:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+        .styled-table td:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+
+        /* 🔥 Premium Date Column (तारीख) 🔥 */
+        .styled-table td:nth-child(1), .premium-row td:nth-child(1) {
+            font-weight: 800;
+            color: #2563eb; /* Royal Blue */
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        
+        /* 🔥 Premium Name Column (नाव) 🔥 */
+        .styled-table td:nth-child(2), .premium-row td:nth-child(2) {
+            font-weight: 800;
+            color: #0f172a; /* Deep Dark Slate */
+            font-size: 15px;
+            letter-spacing: -0.3px;
+        }
+
+        /* Value/Total Column Styling */
+        .styled-table td:nth-last-child(2), .styled-table td:nth-last-child(1) { font-weight: 700; }
+
+        /* Large Premium Lists */
+        .premium-list-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+        .premium-row { 
+            background: #ffffff; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03), 0 2px 4px -1px rgba(0,0,0,0.03); 
+            border-radius: var(--radius-lg); 
+            border: 1px solid #f1f5f9; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        .premium-row:hover { 
+            transform: translateY(-3px) scale(1.015); 
+            box-shadow: 0 15px 25px -5px rgba(15,23,42,0.1); 
+            border-color: #cbd5e1; 
+        }
+        .premium-row td { padding: 16px 14px; vertical-align: middle; border-bottom: none; }
         
         /* Pills & Badges */
         .badge-green { background: #d1fae5; color: #047857; padding: 6px 12px; border-radius: var(--radius-full); font-weight: 700; font-size: 12px; }
@@ -213,6 +275,132 @@
             .no-print-in-bill, .close-icon { display: none !important; }
             .bill-area-printable { padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important;}
             table tr { page-break-inside: avoid; }
+        }
+        /* 🔥 Ultra Premium Date Picker (तारीख निवडण्याचा डबा) 🔥 */
+        input[type="date"], input[type="month"] {
+            background: linear-gradient(145deg, #ffffff, #f1f5f9);
+            color: #1e3a8a; /* Premium Dark Blue */
+            font-weight: 800;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02), 0 4px 10px rgba(67, 56, 202, 0.06);
+            border: 1.5px solid #cbd5e1;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding-right: 12px;
+        }
+
+        input[type="date"]:hover, input[type="month"]:hover {
+            border-color: #94a3b8;
+            box-shadow: 0 6px 15px rgba(67, 56, 202, 0.1);
+        }
+
+        input[type="date"]:focus, input[type="month"]:focus {
+            background: #ffffff;
+            color: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow), 0 10px 25px -5px rgba(67, 56, 202, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* 📅 कॅलेंडर आयकॉन (Calendar Icon) चे भारी डिझाईन */
+        ::-webkit-calendar-picker-indicator {
+            background-color: #e0e7ff; /* Soft Blue Background */
+            padding: 7px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        ::-webkit-calendar-picker-indicator:hover {
+            background-color: var(--primary);
+            filter: invert(1); /* Hover केल्यावर आयकॉन पांढरा होईल */
+            transform: scale(1.1);
+        }
+        /* 🔥 Ultra Premium Name Input & Dropdown (नाव आणि सिलेक्ट बॉक्स) 🔥 */
+        input[list], input[type="text"], select {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            color: #0f172a; /* Premium Deep Dark Slate */
+            font-weight: 800; /* Extra Bold */
+            font-size: 15px;
+            letter-spacing: 0.3px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: var(--radius-md);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.01), 0 4px 10px rgba(15, 23, 42, 0.04);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* डब्यावर क्लिक केल्यावर येणारा फोकस (Glow Effect) */
+        input[list]:focus, input[type="text"]:focus, select:focus {
+            background: #ffffff;
+            color: var(--primary); /* Typing करताना निळा रंग */
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow), 0 10px 25px -5px rgba(67, 56, 202, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* डब्याच्या आतले 'नाव टाका...' हे अक्षर (Placeholder) */
+        input::placeholder {
+            color: #94a3b8;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* 🔽 Dropdown Arrow (सिलेक्ट बॉक्सचा भारी निळा बाण) */
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 16px;
+            padding-right: 40px;
+            cursor: pointer;
+        }
+        
+        select:hover {
+            border-color: #94a3b8;
+            box-shadow: 0 6px 15px rgba(15, 23, 42, 0.08);
+        }
+        /* 🔥 ॲपमधील सर्वच्या सर्व डबे (Date, Name, Number, Textarea) Ultra Premium 🔥 */
+        
+        input, select, textarea {
+            background: linear-gradient(145deg, #ffffff, #f8fafc) !important;
+            color: #0f172a !important; /* Premium Dark Text */
+            font-weight: 800 !important; /* Extra Bold Typing */
+            font-size: 15px !important;
+            border: 2px solid #e2e8f0 !important;
+            border-radius: var(--radius-md) !important;
+            padding: 14px 16px !important;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.02), 0 4px 10px rgba(15, 23, 42, 0.04) !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            width: 100% !important;
+            backdrop-filter: blur(10px) !important;
+        }
+
+        /* 🌟 जेव्हा तुम्ही डब्याला टच (Touch/Focus) कराल 🌟 */
+        input:focus, select:focus, textarea:focus {
+            background: #ffffff !important;
+            border-color: var(--primary) !important; /* Premium Blue Border */
+            box-shadow: 0 0 0 4px var(--primary-glow), 0 12px 25px -5px rgba(79, 70, 229, 0.25) !important;
+            transform: translateY(-2px) !important; /* 3D Floating Effect */
+            outline: none !important;
+        }
+
+        /* 🌟 आतले प्लेसहोल्डर (उदा. 'नाव टाका...') 🌟 */
+        input::placeholder, textarea::placeholder {
+            color: #94a3b8 !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.5px !important;
+        }
+
+        /* 🌟 सिलेक्ट बॉक्सच्या आतील ऑप्शन्ससाठी (मोबाईलला सपोर्ट असेल तेवढे) 🌟 */
+        option {
+            font-weight: 700 !important;
+            color: #1e293b !important;
+            background: #ffffff !important;
+            padding: 10px !important;
         }
     </style>
 </head>
