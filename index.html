@@ -104,17 +104,7 @@
 <div id="appContent">
     <div class="container">
         <div class="no-print">
-            <h3 class="app-title" id="mainAppTitle">✨ Smart Billing Hub</h3>
-            
-            <div class="dashboard-grid" id="mainDashboard">
-                <div class="dash-card"><span class="dash-title">आजची खरेदी</span><span class="dash-value text-blue" id="dashPurchase">₹ 0</span></div>
-                <div class="dash-card"><span class="dash-title">आजची विक्री</span><span class="dash-value text-orange" id="dashSales">₹ 0</span></div>
-                <div class="dash-card"><span class="dash-title">वजन (शेतकरी)</span><span class="dash-value text-blue" id="dashFarmerWt">0 Kg</span></div>
-                <div class="dash-card"><span class="dash-title">वजन (व्यापारी)</span><span class="dash-value text-orange" id="dashMerchantWt">0 Kg</span></div>
-                <div class="dash-card"><span class="dash-title">येणे बाकी ⚠️</span><span class="dash-value text-red" id="dashPending">₹ 0</span></div>
-                <div class="dash-card"><span class="dash-title">एकूण उचल</span><span class="dash-value text-green" id="dashAdvance">₹ 0</span></div>
-            </div>
-
+            <h3 class="app-title" id="mainAppTitle"> Nikam Flowers </h3>
             <div class="section-box">
                 <div class="input-row">
                     <div class="input-group" style="flex: 1; min-width: 120px;"><label>📅 Date:</label><input type="date" id="dateInput" onchange="onDateChange()"></div>
@@ -149,6 +139,7 @@
                 <button class="action-btn bg-gradient-ai" onclick="openModal('aiModal'); generateAIReport();"><i>🤖</i> AI ॲडव्हायझर</button>
                 <button class="action-btn bg-gradient-orange" onclick="openModal('ocrModal'); initOcr();" style="grid-column: span 2;"><i>📸</i> <b>वही स्कॅन (AI)</b></button>
            <button class="action-btn" style="background:linear-gradient(135deg,#0ea5e9,#0369a1);" onclick="openModal('notesModal'); initNotes();"><i>📝</i> रोजच्या नोंदी</button>
+           <button class="action-btn" style="background:linear-gradient(135deg,#6366f1,#4338ca);" onclick="openModal('todaySummaryModal'); updateDashboard();"><i>📈</i> आजचा अहवाल</button>
             </div>
         </div>
 
@@ -271,6 +262,22 @@
         </div>
     </div>
 </div>
+<div id="todaySummaryModal" class="modal no-print">
+    <div class="modal-content">
+        <div class="close-icon" onclick="closeModal('todaySummaryModal')">✕</div>
+        <h3 style="color: var(--primary);">📈 आजचा अहवाल</h3>
+        <p style="text-align:center; font-size:12px; color:#64748b; margin-bottom:15px;">आजचे तुमचे सर्व मुख्य व्यवहार खालीलप्रमाणे आहेत.</p>
+        
+        <div class="dashboard-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:0;">
+            <div class="dash-card" style="border: 1px solid #3b82f6;"><span class="dash-title" style="color:#3b82f6;">आजची खरेदी</span><span class="dash-value text-blue" id="sumPurchase">₹ 0</span></div>
+            <div class="dash-card" style="border: 1px solid #f59e0b;"><span class="dash-title" style="color:#f59e0b;">आजची विक्री</span><span class="dash-value text-orange" id="sumSales">₹ 0</span></div>
+            <div class="dash-card"><span class="dash-title">वजन (शेतकरी)</span><span class="dash-value text-blue" id="sumFarmerWt">0 Kg</span></div>
+            <div class="dash-card"><span class="dash-title">वजन (व्यापारी)</span><span class="dash-value text-orange" id="sumMerchantWt">0 Kg</span></div>
+            <div class="dash-card" style="border: 1px solid #10b981;"><span class="dash-title" style="color:#10b981;">एकूण उचल</span><span class="dash-value text-green" id="sumAdvance">₹ 0</span></div>
+            <div class="dash-card" style="border: 1px solid #ef4444; background:#fef2f2;"><span class="dash-title" style="color:#ef4444;">एकूण येणे बाकी ⚠️</span><span class="dash-value text-red" id="sumPending">₹ 0</span></div>
+        </div>
+    </div>
+</div>
 <script>
     const val = id => document.getElementById(id) ? document.getElementById(id).value : "";
     const ADMIN_PIN = "1504"; const STAFF_PIN = "2000"; let currentUserRole = "staff"; 
@@ -280,8 +287,19 @@
 
     function marathiToEnglish(t) { if(!t) return ""; const m = { 'क':'k','ख':'kh','ग':'g','घ':'gh','च':'ch','छ':'chh','ज':'j','झ':'jh','ञ':'tr','ट':'t','ठ':'th','ड':'d','ढ':'dh','ण':'n','त':'t','थ':'th','द':'d','ध':'dh','न':'n','प':'p','फ':'ph','ब':'b','भ':'bh','म':'m','य':'y','र':'r','ल':'l','व':'v','श':'sh','ष':'sh','स':'s','ह':'h','ळ':'l','क्ष':'ksh','ज्ञ':'dny', 'ा':'a','ि':'i','ी':'ee','ु':'u','ू':'oo','े':'e','ै':'ai','ो':'o','ौ':'au','ं':'m','ः':'h', 'अ':'a','आ':'a','इ':'i','ई':'ee','उ':'u','ऊ':'oo','ए':'e','ऐ':'ai','ओ':'o','औ':'au', '्':'' }; let e = ""; for(let c of t){ e += m[c] || c; } return e; }
     function verifyPin() { let p = val("loginPin"); if (p === ADMIN_PIN) { sessionStorage.setItem("isLoggedIn", "true"); sessionStorage.setItem("userRole", "admin"); currentUserRole = "admin"; unlockApp(); } else if (p === STAFF_PIN) { sessionStorage.setItem("isLoggedIn", "true"); sessionStorage.setItem("userRole", "staff"); currentUserRole = "staff"; unlockApp(); } else { alert("❌ चुकीचा पिन!"); document.getElementById("loginPin").value = ""; } }
-    function unlockApp() { document.getElementById("loginScreen").style.display = "none"; document.getElementById("appContent").style.display = "block"; document.getElementById("syncStatus").style.display = "block"; if(currentUserRole === "staff") { document.getElementById("mainDashboard").style.display = "none"; document.getElementById("mainAppTitle").innerText = "✨ Smart Billing (Staff Mode)"; document.getElementById("syncStatus").innerText = "🟡 Staff Active"; } else { document.getElementById("mainDashboard").style.display = "grid"; document.getElementById("mainAppTitle").innerText = "✨ Smart Billing Hub"; } updateAlertBadge(); }
-
+  function unlockApp() { 
+        document.getElementById("loginScreen").style.display = "none"; 
+        document.getElementById("appContent").style.display = "block"; 
+        document.getElementById("syncStatus").style.display = "block"; 
+        
+        if(currentUserRole === "staff") { 
+            document.getElementById("mainAppTitle").innerText = "✨ Smart Billing (Staff Mode)"; 
+            document.getElementById("syncStatus").innerText = "🟡 Staff Active"; 
+        } else { 
+            document.getElementById("mainAppTitle").innerText = "✨ Smart Billing Hub"; 
+        } 
+        updateAlertBadge(); 
+    }
     document.addEventListener("DOMContentLoaded", () => { 
         if (sessionStorage.getItem("isLoggedIn") === "true") { currentUserRole = sessionStorage.getItem("userRole") || "staff"; unlockApp(); } 
         let today = new Date().toISOString().slice(0, 10); document.getElementById("dateInput").value = today; document.getElementById("reportMonthPicker").value = new Date().toISOString().slice(0, 7); 
@@ -359,13 +377,35 @@ function saveNotesDB(d) { notesDB = sanitizeData(d); database.ref('notesData').s
         document.getElementById("modalMonthFarmerTotal").innerText = `₹ ${fTot.toLocaleString('en-IN')}`; document.getElementById("modalMonthMerchantTotal").innerText = `₹ ${mTot.toLocaleString('en-IN')}`;
     }
 
-    function updateDashboard() {
+   function updateDashboard() {
         let sel = document.getElementById("dateInput").value; if(!sel) return; 
+        
         let tP = 0, tA = 0, tFw = 0; let cD = getData();
-        cD.forEach(e => { if(!e) return; if(e.type === 'advance') tA += (Number(e.amount)||0); else if(e.type === 'crop' && e.date === sel) { tP += (Number(e.total)||0); tFw += (Number(e.weight)||0); } });
+        cD.forEach(e => { 
+            if(!e) return; 
+            if(e.type === 'advance') tA += (Number(e.amount)||0); 
+            else if(e.type === 'crop' && e.date === sel) { tP += (Number(e.total)||0); tFw += (Number(e.weight)||0); } 
+        });
+        
         let tS = 0, pV = 0, tMw = 0; let mD = getMerchantDB();
-        mD.forEach(e => { if(!e) return; if(e.type === 'payment') pV -= (Number(e.amount)||0); else { if(e.date === sel) { tS += (Number(e.total)||0); if(!e.merType || e.merType === 'नि') tMw += (Number(e.weight)||0); } pV += (Number(e.total)||0); } });
-        document.getElementById("dashPurchase").innerText = `₹ ${tP.toLocaleString('en-IN')}`; document.getElementById("dashSales").innerText = `₹ ${tS.toLocaleString('en-IN')}`; document.getElementById("dashPending").innerText = `₹ ${pV.toLocaleString('en-IN')}`; document.getElementById("dashAdvance").innerText = `₹ ${tA.toLocaleString('en-IN')}`; document.getElementById("dashFarmerWt").innerText = `${tFw} Kg`; document.getElementById("dashMerchantWt").innerText = `${tMw} Kg`;
+        mD.forEach(e => { 
+            if(!e) return; 
+            if(e.type === 'payment') pV -= (Number(e.amount)||0); 
+            else { 
+                if(e.date === sel) { tS += (Number(e.total)||0); if(!e.merType || e.merType === 'नि') tMw += (Number(e.weight)||0); } 
+                pV += (Number(e.total)||0); 
+            } 
+        });
+
+        // आता फक्त नवीन 'आजचा अहवाल' बॉक्समध्येच आकडे अपडेट होतील
+        if(document.getElementById("sumPurchase")) {
+            document.getElementById("sumPurchase").innerText = `₹ ${tP.toLocaleString('en-IN')}`;
+            document.getElementById("sumSales").innerText = `₹ ${tS.toLocaleString('en-IN')}`;
+            document.getElementById("sumPending").innerText = `₹ ${pV.toLocaleString('en-IN')}`;
+            document.getElementById("sumAdvance").innerText = `₹ ${tA.toLocaleString('en-IN')}`;
+            document.getElementById("sumFarmerWt").innerText = `${tFw} Kg`;
+            document.getElementById("sumMerchantWt").innerText = `${tMw} Kg`;
+        }
         updateAlertBadge();
     }
 
