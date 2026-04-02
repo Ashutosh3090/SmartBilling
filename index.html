@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -776,7 +777,7 @@ function generateFinalBill() {
             document.getElementById("billAdvBox").innerText=""; let d=[...getData()].sort((a,b)=>new Date(a.date)-new Date(b.date)); let filteredData = []; let totalAdvInPeriod = 0;
             d.forEach(e => { if(e && e.name === n && e.date >= startFilter && e.date <= endFilter) { filteredData.push(e); if(e.type === 'advance') totalAdvInPeriod += (Number(e.amount)||0); } });
             
-            let html = `<table style="width:100%; max-width:320px; margin:0 auto; border-collapse:collapse; font-family:sans-serif; color:#000;"><thead><tr><th style="padding:2px 0; border-bottom:2px solid #000; text-align:left; width:33%; font-size:12px; color:#000;">तारीख</th><th style="padding:2px 0; border-bottom:2px solid #000; text-align:center; width:34%; font-size:12px; color:#000;">तपशील</th><th style="padding:2px 0; border-bottom:2px solid #000; text-align:right; width:33%; font-size:12px; color:#000;">रक्कम (₹)</th></tr></thead><tbody style="font-size:13px;">`;
+            let html = `<table style="width:100%; max-width:320px; margin:0 auto; border-collapse:collapse; font-family:sans-serif; color:#000;"><thead><tr><th style="padding:4px 0; border-bottom:2px solid #000; text-align:left; width:33%; font-size:12px; color:#000;">तारीख</th><th style="padding:4px 0; border-bottom:2px solid #000; text-align:center; width:34%; font-size:12px; color:#000;">तपशील</th><th style="padding:4px 0; border-bottom:2px solid #000; text-align:right; width:33%; font-size:12px; color:#000;">रक्कम (₹)</th></tr></thead><tbody style="font-size:13px;">`;
             let runningBal = 0; let totalCropAmount = 0; let totalBhade = 0; let totalAdv = 0; let totalPay = 0;
             
             if(filteredData.length > 0) {
@@ -790,31 +791,26 @@ function generateFinalBill() {
                         if (e.type === 'crop') {
                             totalCropAmount += e.total;
                             let cR = getCommonRateForDate(dStr); let rateDisplay = (e.rate !== cR && cR > 0) ? `<span style="color:#ef4444; font-weight:900;">${e.rate}⚠️</span>` : e.rate;
-                            html += `<tr><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; font-weight:800;">${fDate}</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700;">नि ${e.weight}x${rateDisplay}</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800;">${e.total}</td></tr>`;
+                            html += `<tr><td style="padding:4px 0; border-bottom:1px solid #e2e8f0; font-weight:800;">${fDate}</td><td style="padding:4px 0; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700;">नि ${e.weight}x${rateDisplay}</td><td style="padding:4px 0; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800;">${e.total}</td></tr>`;
                         } else if (e.type === 'bhade') {
                             totalBhade += e.amount;
-                            html += `<tr><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; font-weight:800;">${fDate}</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700; color:#dc2626;">गाडी भाडे</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800; color:#dc2626;">- ${e.amount}</td></tr>`;
+                            html += `<tr><td style="padding:4px 0; border-bottom:1px solid #e2e8f0; font-weight:800;">${fDate}</td><td style="padding:4px 0; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700; color:#dc2626;">गाडी भाडे</td><td style="padding:4px 0; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800; color:#dc2626;">- ${e.amount}</td></tr>`;
                         } else if (e.type === 'advance') {
                             totalAdv += e.amount;
                             let lbl = e.amount > 0 ? "उचल (दिली)" : "उचल (जमा)"; let col = e.amount > 0 ? "#ea580c" : "#10b981";
-                            html += `<tr style="background:#fff7ed;"><td style="padding:2px 4px; font-weight:800;">${fDate}</td><td style="padding:2px 4px; text-align:center; font-weight:600; color:${col};">${lbl}</td><td style="padding:2px 4px; text-align:right; font-weight:800; color:${col};">${e.amount > 0 ? "- " : "+ "}${Math.abs(e.amount)}</td></tr>`;
+                            html += `<tr style="background:#fff7ed;"><td style="padding:4px 4px; font-weight:800;">${fDate}</td><td style="padding:4px 4px; text-align:center; font-weight:600; color:${col};">${lbl}</td><td style="padding:4px 4px; text-align:right; font-weight:800; color:${col};">${e.amount > 0 ? "- " : "+ "}${Math.abs(e.amount)}</td></tr>`;
                         } else if (e.type === 'payment') {
                             totalPay += e.amount;
-                            html += `<tr style="background:#ecfdf5;"><td style="padding:2px 4px; font-weight:800;">${fDate}</td><td style="padding:2px 4px; text-align:center; font-weight:600; color:#059669;">पैसे जमा</td><td style="padding:2px 4px; text-align:right; font-weight:800; color:#059669;">- ${e.amount}</td></tr>`;
+                            html += `<tr style="background:#ecfdf5;"><td style="padding:4px 4px; font-weight:800;">${fDate}</td><td style="padding:4px 4px; text-align:center; font-weight:600; color:#059669;">पैसे जमा</td><td style="padding:4px 4px; text-align:right; font-weight:800; color:#059669;">- ${e.amount}</td></tr>`;
                         }
                     });
                     currD.setDate(currD.getDate() + 1);
                 }
 
                 runningBal = totalCropAmount;
-                html += `<tr style="border-top:2px solid #000;"><td colspan="2" style="padding:6px 4px; text-align:right; font-weight:800; font-size:14px;">एकूण माल :</td><td style="padding:6px 0; text-align:right; font-weight:800; font-size:15px;">${totalCropAmount}</td></tr>`;
+                html += `<tr style="border-top:2px solid #000;"><td colspan="2" style="padding:8px 4px; text-align:right; font-weight:800; font-size:14px;">एकूण माल :</td><td style="padding:8px 0; text-align:right; font-weight:800; font-size:15px;">${totalCropAmount}</td></tr>`;
 
-                // 🌟 जुनी १०% कपात तशीच ठेवली आहे 🌟
-                if (totalCropAmount > 0) {
-                    let commission = Math.round((totalCropAmount * 0.10) / 5) * 5;
-                    runningBal -= commission;
-                    html += `<tr><td colspan="2" style="padding:4px 4px; text-align:right; font-weight:700; color:#ea580c;">10% कपात (आडत) :</td><td style="padding:4px 0; text-align:right; font-weight:800; color:#ea580c;">- ${commission}</td></tr>`;
-                }
+                // 🌟 १०% कपात काढून टाकली 🌟
                 if (totalBhade > 0) {
                     runningBal -= totalBhade;
                     html += `<tr><td colspan="2" style="padding:4px 4px; text-align:right; font-weight:700; color:#dc2626;">गाडी भाडे :</td><td style="padding:4px 0; text-align:right; font-weight:800; color:#dc2626;">- ${totalBhade}</td></tr>`;
@@ -825,10 +821,9 @@ function generateFinalBill() {
                 }
 
                 let finalPrefix = runningBal < 0 ? "जास्त दिले :" : "सध्याची बाकी :"; let finalColor = runningBal < 0 ? "#ef4444" : "#1e3a8a"; let finalBg = runningBal < 0 ? "#fef2f2" : "#e0eafc";
-                html += `<tr style="background:${finalBg}; border:2px solid ${finalColor};"><td colspan="2" style="padding:8px 4px; text-align:right; font-weight:800; color:${finalColor}; font-size:15px;">${finalPrefix}</td><td style="padding:8px 0; text-align:right; white-space:nowrap;"><span style="color:#fff; background:${finalColor}; padding:4px 8px; border-radius:6px; font-weight:800; font-size:18px;">₹ ${Math.abs(runningBal)} /-</span></td></tr>`; 
+                html += `<tr style="background:${finalBg}; border:2px solid ${finalColor};"><td colspan="2" style="padding:10px 4px; text-align:right; font-weight:800; color:${finalColor}; font-size:15px;">${finalPrefix}</td><td style="padding:10px 0; text-align:right; white-space:nowrap;"><span style="color:#fff; background:${finalColor}; padding:6px 10px; border-radius:6px; font-weight:800; font-size:18px;">₹ ${Math.abs(runningBal)} /-</span></td></tr>`; 
             } else { html += `<tr><td colspan="3" style="text-align:center; padding: 20px; color: #8e8e93; font-weight:600;">No Data Found</td></tr>`; }
             
-            // 🌟 A4 PDF चे लाल रंगाचे बटन 🌟
             let printBtnHtml = filteredData.length > 0 ? `<div class="no-print" style="text-align:center; margin-top:20px; padding-bottom:10px;">
                 <button type="button" onclick="downloadFarmerA4PDF('${n}', '${displayDate}')" style="background:linear-gradient(135deg, #dc2626, #991b1b); color:white; padding:10px 20px; border:none; border-radius:6px; font-weight:bold; font-size:15px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.1);">📄 A4 PDF डाऊनलोड</button>
             </div>` : "";
@@ -837,7 +832,7 @@ function generateFinalBill() {
             
             if(totalAdvInPeriod !== 0) { document.getElementById("billAdvBox").innerText = `⚠️ या कालावधीत नेलेली एकूण उचल : ₹ ${totalAdvInPeriod} (बिलातून वजा केलेली नाही)`; } else { document.getElementById("billAdvBox").innerText = ""; }
         } else {
-            // MERCHANT BILL (व्यापाऱ्याचे जुने बिल जसेच्या तसे)
+            // MERCHANT BILL
             document.getElementById("billAdvBox").innerText=""; let d=[...getMerchantDB()].sort((a,b)=>new Date(a.date)-new Date(b.date)); let openingBal = 0; let filteredData = [];
             d.forEach(e => { if(e && e.name === n) { if (e.date < openingBalDateFilter) { if(e.type !== 'payment') openingBal += (Number(e.total)||0); else openingBal -= (Number(e.amount)||0); } else if (e.date >= startFilter && e.date <= endFilter) { filteredData.push(e); } } });
             let html = `<table style="width:100%; max-width:700px; margin:0 auto; border-collapse:collapse; font-family:'Poppins',sans-serif; color:#0f172a;"><thead><tr><th style="padding:15px 10px; border-bottom:2px solid #cbd5e1; text-align:left; width:25%; font-size:13px; color:#64748b; text-transform:uppercase; white-space:nowrap;">तारीख</th><th style="padding:15px 10px; border-bottom:2px solid #cbd5e1; text-align:center; width:50%; font-size:13px; color:#64748b; text-transform:uppercase; white-space:nowrap;">तपशील</th><th style="padding:15px 10px; border-bottom:2px solid #cbd5e1; text-align:right; width:25%; font-size:13px; color:#64748b; text-transform:uppercase; white-space:nowrap;">रक्कम (₹)</th></tr></thead><tbody style="font-size:15px;">`;
@@ -1149,75 +1144,48 @@ function generateFinalBill() {
 
     function openDetailModal(name) { openModal("detailModal"); document.getElementById("activeFarmerName").value = name; document.getElementById("detailFarmerName").innerText = name; renderDetail(name); }
     let isFarmerHistMode = false; function toggleFarmerHistMode() { if(currentUserRole !== 'admin') return; isFarmerHistMode = !isFarmerHistMode; document.getElementById("farmerHistManageBtn").innerHTML = isFarmerHistMode ? "❌ Done" : "✏️ Edit"; renderDetail(val("activeFarmerName")); }
-    
     function renderDetail(name) { 
-        let data = getData().filter(e => e && e.name === name); 
-        data.sort((a,b) => new Date(a.date) - new Date(b.date)); 
-        
+        let data = getData().filter(e => e && e.name === name); data.sort((a,b) => new Date(a.date) - new Date(b.date)); 
         let selMonth = document.getElementById("farmerListMonth") ? document.getElementById("farmerListMonth").value : "";
-        let tbody = document.getElementById("detailBody"); 
-        let html = ""; 
-        let runningBal = 0; 
-        
-        // महिना निवडला असेल तर फक्त महिन्याची एंट्री घेईल, नाहीतर सर्व एंट्रीज घेईल
+        let tbody = document.getElementById("detailBody"); let html = "";
         let filteredData = selMonth ? data.filter(e => e.date && e.date.startsWith(selMonth)) : data;
 
-        if (filteredData.length === 0) { 
-            tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:20px; color:#8e8e93; font-weight:600;'>कोणतीही नोंद नाही</td></tr>"; 
-            return; 
-        }
+        if (filteredData.length === 0) { tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:20px; color:#8e8e93; font-weight:600;'>कोणतीही नोंद नाही</td></tr>"; return; }
 
-        // पहिल्या एंट्रीच्या तारखेपासून शेवटच्या एंट्रीच्या तारखेपर्यंत कॅलेंडरप्रमाणे लूप फिरवणे
-        let startD = new Date(filteredData[0].date + "T00:00:00");
-        let endD = new Date(filteredData[filteredData.length - 1].date + "T00:00:00");
-        let currD = new Date(startD);
+        let monthsData = {};
+        filteredData.forEach(e => {
+            let m = e.date.slice(0, 7); if(!monthsData[m]) monthsData[m] = []; monthsData[m].push(e);
+        });
 
-        while (currD <= endD) {
-            let yyyy = currD.getFullYear();
-            let mm = String(currD.getMonth() + 1).padStart(2, '0');
-            let dd = String(currD.getDate()).padStart(2, '0');
-            let dStr = `${yyyy}-${mm}-${dd}`;
+        for (let m in monthsData) {
+            let monthEntries = monthsData[m];
+            let mYear = parseInt(m.split('-')[0]); let mMonth = parseInt(m.split('-')[1]);
+            html += `<tr style="background:#e2e8f0;"><td colspan="4" style="text-align:center; font-weight:800; font-size:13px; padding:6px;">📅 ${marathiMonths[mMonth-1]} ${mYear}</td></tr>`;
 
-            let dailyEntries = filteredData.filter(e => e.date === dStr);
-            let cropEnt = dailyEntries.filter(e => e.type === 'crop');
-            let payEnt = dailyEntries.filter(e => e.type === 'payment');
-            let advEnt = dailyEntries.filter(e => e.type === 'advance');
+            let mTotalCrop = 0; let mTotalBhade = 0; let mTotalPay = 0;
 
-            // जर त्या दिवशी खरेदीची (माल) कोणतीही नोंद नसेल, तर "माल नाही" दाखवा
-            if (cropEnt.length === 0) {
-                html += `<tr><td style="font-weight:600; color:#8e8e93;">${formatDate(dStr)}</td><td style="text-align:center; font-weight:600; color:#ef4444;">माल नाही</td><td style="text-align:right; font-weight:700; color:#94a3b8;">-</td><td></td></tr>`;
-            } else {
-                cropEnt.forEach(e => {
-                    runningBal += e.total;
-                    let btns = isFarmerHistMode ? `<button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button>` : "";
-                    html += `<tr><td style="font-weight:600; color:#8e8e93;">${formatDate(dStr)}</td><td style="font-weight:500;">${e.weight}x${e.rate}</td><td style="font-weight:700; text-align:right;">${e.total}</td><td style="text-align:center;">${btns}</td></tr>`;
-                });
-            }
-
-            // उचल दाखवणे
-            advEnt.forEach(e => {
-                let isGive = e.amount > 0; let col = isGive ? "#ea580c" : "#10b981"; let lbl = isGive ? "उचल (दिली)" : "उचल (जमा)"; let sign = isGive ? "" : "+ ";
-                let btns = isFarmerHistMode ? `<button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button>` : "";
-                html += `<tr><td style="font-weight:600; color:#8e8e93;">${formatDate(dStr)}</td><td style="text-align:center; font-weight:600; color:${col};">${lbl}:</td><td style="font-weight:700; color:${col}; text-align:right;">${sign}${Math.abs(e.amount)}</td><td style="text-align:center;">${btns}</td></tr>`;
+            monthEntries.forEach(e => {
+                let dStr = formatDate(e.date);
+                if (e.type === 'crop') {
+                    mTotalCrop += e.total; html += `<tr><td style="font-weight:600; color:#8e8e93;">${dStr}</td><td style="font-weight:500;">${e.weight}x${e.rate}</td><td style="font-weight:700; text-align:right;">${e.total}</td><td></td></tr>`;
+                } else if (e.type === 'bhade') {
+                    mTotalBhade += e.amount; html += `<tr><td style="font-weight:600; color:#8e8e93;">${dStr}</td><td style="text-align:center; font-weight:600; color:#dc2626;">गाडी भाडे:</td><td style="font-weight:700; color:#dc2626; text-align:right;">- ${e.amount}</td><td></td></tr>`;
+                } else if (e.type === 'advance') {
+                    let lbl = e.amount > 0 ? "उचल (दिली)" : "उचल (जमा)"; let col = e.amount > 0 ? "#ea580c" : "#10b981";
+                    html += `<tr><td style="font-weight:600; color:#8e8e93;">${dStr}</td><td style="text-align:center; font-weight:600; color:${col};">${lbl}:</td><td style="font-weight:700; color:${col}; text-align:right;">${e.amount > 0 ? "- " : "+ "}${Math.abs(e.amount)}</td><td></td></tr>`;
+                } else if (e.type === 'payment') {
+                    mTotalPay += e.amount; html += `<tr><td style="font-weight:600; color:#8e8e93;">${dStr}</td><td style="text-align:center; font-weight:600; color:#10b981;">पैसे जमा:</td><td style="font-weight:700; color:#10b981; text-align:right;">- ${e.amount}</td><td></td></tr>`;
+                }
             });
 
-            // जमा (पेमेंट) दाखवणे
-            payEnt.forEach(e => {
-                html += `<tr><td></td><td style="text-align:right; font-weight:600;">Total:</td><td style="font-weight:700; text-align:right;">${runningBal}</td><td></td></tr>`;
-                runningBal -= e.amount;
-                let btns = isFarmerHistMode ? `<button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button>` : "";
-                html += `<tr><td style="font-weight:600; color:#8e8e93;">${formatDate(dStr)}</td><td style="text-align:right; font-weight:600; color:#10b981;">पैसे दिले:</td><td style="font-weight:700; color:#10b981; text-align:right;">- ${e.amount}</td><td style="text-align:center;">${btns}</td></tr>`;
-            });
-
-            // लूपची तारीख एकने पुढे नेणे
-            currD.setDate(currD.getDate() + 1);
+            // 🌟 १०% कपात काढून टाकली 🌟
+            let mRunningBal = mTotalCrop;
+            html += `<tr style="border-top:1px solid #ddd;"><td colspan="2" style="text-align:right; font-weight:700; font-size:12px;">एकूण माल:</td><td style="font-weight:800; text-align:right;">${mTotalCrop}</td><td></td></tr>`;
+            
+            if (mTotalBhade > 0) { mRunningBal -= mTotalBhade; html += `<tr><td colspan="2" style="text-align:right; font-weight:700; color:#dc2626; font-size:12px;">गाडी भाडे:</td><td style="font-weight:800; text-align:right; color:#dc2626;">- ${mTotalBhade}</td><td></td></tr>`; }
+            if (mTotalPay > 0) { mRunningBal -= mTotalPay; html += `<tr><td colspan="2" style="text-align:right; font-weight:700; color:#10b981; font-size:12px;">पैसे जमा:</td><td style="font-weight:800; text-align:right; color:#10b981;">- ${mTotalPay}</td><td></td></tr>`; }
+            html += `<tr style="background:#f1f5f9;"><td colspan="2" style="text-align:right; font-weight:700; color:var(--primary); font-size:13px;">बाकी:</td><td style="font-weight:800; text-align:right; color:var(--primary); font-size:14px;">₹${mRunningBal}</td><td></td></tr>`;
         }
-
-        // शेवटी सध्याची बाकी दाखवणे
-        if (filteredData.length > 0 && filteredData[filteredData.length-1].type !== 'payment') {
-            html += `<tr style="background:#e0eafc;"><td></td><td style="text-align:right; font-weight:700; color:var(--primary);">सध्याची बाकी:</td><td style="font-weight:700; text-align:right; color:var(--primary); font-size:16px;">₹ ${runningBal}</td><td></td></tr>`;
-        }
-
         tbody.innerHTML = html; 
     }
     
@@ -1281,58 +1249,68 @@ function generateFinalBill() {
             renderNotes();
         }
     }
-    // 🌟 शेतकऱ्याचे बिल A4 साईझमध्ये PDF करण्यासाठी 🌟
+  // 🌟 A4 PDF मध्ये आकडे आणि रुंदी सुटसुटीत करणारे फंक्शन 🌟
     function downloadFarmerA4PDF(name, dateStr) {
         let tableWrapper = document.getElementById("billTableWrapper");
         if(!tableWrapper) return;
 
-        // मूळ टेबलची कॉपी तयार करणे
         let clone = tableWrapper.cloneNode(true);
-        
-        // त्यातून 'PDF डाऊनलोड' चे बटन काढून टाकणे
         let buttons = clone.querySelectorAll('.no-print, button');
         buttons.forEach(b => b.remove());
 
-        // मोबाईलची ३२०px साईझ काढून १००% (A4 साईझ) करणे
+        // 🌟 A4 च्या हिशोबाने टेबलची रुंदी आणि जागा सेट करणे 🌟
         let table = clone.querySelector('table');
         if(table) {
             table.style.maxWidth = '100%';
             table.style.width = '100%';
-            table.style.fontSize = '15px'; // PDF मध्ये अक्षरे मोठी आणि स्पष्ट दिसण्यासाठी
+            table.style.margin = '0 auto';
         }
 
-        let advBoxText = document.getElementById("billAdvBox").innerText;
-        let advHtml = advBoxText ? `<p style="color:#ea580c; font-weight:bold; font-size:14px; margin-top:10px;">${advBoxText}</p>` : "";
+        // 🌟 अक्षरे मोठी (Font Size) आणि ओळींमध्ये जास्त जागा (Padding) 🌟
+        let allCells = clone.querySelectorAll('th, td');
+        allCells.forEach(cell => {
+            cell.style.fontSize = '18px';  // मूळ आकडे मोठे केले
+            cell.style.padding = '12px 10px'; // ओळींमध्ये जास्त जागा दिली
+        });
 
-        // वरती A4 हेडिंग टाकणे
+        // 🌟 ज्या ओळींमध्ये 'एकूण' किंवा 'बाकी' आहे त्याचे आकडे आणखी मोठे केले 🌟
+        let bigSpans = clone.querySelectorAll('span');
+        bigSpans.forEach(span => {
+            if(span.style.fontSize && parseInt(span.style.fontSize) > 10) {
+                span.style.fontSize = '24px';
+            }
+        });
+
+        let advBoxText = document.getElementById("billAdvBox").innerText;
+        let advHtml = advBoxText ? `<p style="color:#ea580c; font-weight:bold; font-size:18px; margin-top:15px;">${advBoxText}</p>` : "";
+
         let container = document.createElement('div');
-        container.style.padding = "20px";
+        // A4 पेजवर व्यवस्थित दिसण्यासाठी साईडने मार्जिन (Padding) दिले आहे
+        container.style.padding = "40px"; 
         container.style.fontFamily = "sans-serif";
         container.style.color = "#000";
         container.style.backgroundColor = "#fff";
         container.innerHTML = `
-            <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">
-                <h1 style="margin: 0; font-size: 26px;">हिशोब पत्रक</h1>
-                <p style="margin: 5px 0 0 0; font-size: 16px; font-weight: bold;">शेतकऱ्याचे नाव: ${name}</p>
-                <p style="margin: 5px 0 0 0; font-size: 15px;">कालावधी: ${dateStr.replace('📅 ', '')}</p>
+            <div style="text-align: center; border-bottom: 3px solid #000; padding-bottom: 15px; margin-bottom: 30px;">
+                <h1 style="margin: 0; font-size: 32px; color: #000;">हिशोब पत्रक</h1>
+                <p style="margin: 10px 0 0 0; font-size: 20px; font-weight: bold; color: #000;">शेतकऱ्याचे नाव: ${name}</p>
+                <p style="margin: 5px 0 0 0; font-size: 18px; color: #000;">कालावधी: ${dateStr.replace('📅 ', '')}</p>
             </div>
         `;
         
         container.appendChild(clone);
         if(advHtml) container.innerHTML += advHtml;
 
-        // html2pdf लायब्ररी वापरून A4 PDF बनवणे
         if (typeof html2pdf !== 'undefined') {
             let opt = {
-                margin:       10, // A4 मार्जिन
+                margin:       10, 
                 filename:     `${name}_हिशोब.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
+                image:        { type: 'jpeg', quality: 1.0 },
                 html2canvas:  { scale: 2 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
             html2pdf().set(opt).from(container).save();
         } else {
-            // जर html2pdf नसेल, तर ब्राउझरच्या सिस्टीममधून PDF 'Save as PDF' करता येईल
             let printWindow = window.open('', '_blank');
             if(!printWindow) { alert("तुमच्या ब्राउझरने पॉप-अप ब्लॉक केले आहे. कृपया Allow करा."); return; }
             printWindow.document.write('<html><head><title>PDF - '+name+'</title></head><body>');
