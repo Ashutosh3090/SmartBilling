@@ -773,188 +773,131 @@ function generateFinalBill() {
         
         if(type==='FARMER'){
             document.getElementById("billAdvBox").innerText=""; let d=[...getData()].sort((a,b)=>new Date(a.date)-new Date(b.date)); let filteredData = []; let totalAdvInPeriod = 0;
-            
-            d.forEach(e => { 
-                if(e && e.name === n && e.date >= startFilter && e.date <= endFilter) { 
-                    filteredData.push(e); 
-                    if(e.type === 'advance') totalAdvInPeriod += (Number(e.amount)||0); 
-                } 
-            });
+            d.forEach(e => { if(e && e.name === n && e.date >= startFilter && e.date <= endFilter) { filteredData.push(e); if(e.type === 'advance') totalAdvInPeriod += (Number(e.amount)||0); } });
             
             let html = `<table style="width:100%; max-width:320px; margin:0 auto; border-collapse:collapse; font-family:sans-serif; color:#000;"><thead><tr><th style="padding:2px 0; border-bottom:2px solid #000; text-align:left; width:33%; font-size:12px; color:#000;">तारीख</th><th style="padding:2px 0; border-bottom:2px solid #000; text-align:center; width:34%; font-size:12px; color:#000;">तपशील</th><th style="padding:2px 0; border-bottom:2px solid #000; text-align:right; width:33%; font-size:12px; color:#000;">रक्कम (₹)</th></tr></thead><tbody style="font-size:13px;">`;
-            let runningBal = 0;
+            let runningBal = 0; let totalCropAmount = 0; let totalBhade = 0; let totalAdv = 0; let totalPay = 0;
             
             if(filteredData.length > 0) {
                 let currD = new Date(startFilter + "T00:00:00"); let endD = new Date(endFilter + "T00:00:00");
                 while(currD <= endD) {
                     let yyyy = currD.getFullYear(); let mm = String(currD.getMonth() + 1).padStart(2, '0'); let dd = String(currD.getDate()).padStart(2, '0'); let dStr = `${yyyy}-${mm}-${dd}`;
                     let dailyEntries = filteredData.filter(e => e.date === dStr);
-                    let cropEnt = dailyEntries.filter(e => e.type === 'crop'); let advEnt = dailyEntries.filter(e => e.type === 'advance'); let payEnt = dailyEntries.filter(e => e.type === 'payment');
-
-                    if (cropEnt.length > 0) {
-                        cropEnt.forEach(e => { 
-                            runningBal += e.total; 
+                    
+                    dailyEntries.forEach(e => {
+                        let fDate = formatDate(dStr);
+                        if (e.type === 'crop') {
+                            totalCropAmount += e.total;
                             let cR = getCommonRateForDate(dStr); let rateDisplay = (e.rate !== cR && cR > 0) ? `<span style="color:#ef4444; font-weight:900;">${e.rate}⚠️</span>` : e.rate;
-                            html += `<tr><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; font-size:13px; color:#000; font-weight:800; white-space:nowrap;">${formatDate(dStr)}</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:center; font-size:14px; font-weight:700; color:#333;">नि ${e.weight}x${rateDisplay}</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:right; font-size:16px; font-weight:800; color:#000; white-space:nowrap;">${e.total}</td></tr>`; 
-                        });
-                    } else { html += `<tr><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; font-size:13px; color:#000; font-weight:800; white-space:nowrap;">${formatDate(dStr)}</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:center; font-size:13px; font-weight:600; color:#ef4444;">माल नाही</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:right; font-size:16px; font-weight:800; color:#94a3b8; white-space:nowrap;">-</td></tr>`; }
-
-                    advEnt.forEach(e => { let isGive = e.amount > 0; let lbl = isGive ? "उचल (दिली):" : "उचल (जमा):"; let col = isGive ? "#ea580c" : "#10b981"; let bgCol = isGive ? "#fff7ed" : "#ecfdf5"; let sign = isGive ? "" : "+ "; html += `<tr style="background:${bgCol};"><td style="padding:2px 4px; font-size:13px; color:#000; font-weight:800; white-space:nowrap;">${formatDate(dStr)}</td><td style="padding:2px 4px; text-align:center; font-weight:600; color:${col}; font-size:13px;">${lbl}</td><td style="padding:2px 4px; text-align:right; font-weight:800; color:${col}; font-size:15px; white-space:nowrap;">${sign}${Math.abs(e.amount)}</td></tr>`; });
-                    
-                    payEnt.forEach(e => { 
-                        html += `<tr style="background:#f1f5f9;"><td colspan="2" style="padding:3px 5px; text-align:right; font-weight:700; font-size:13px; color:#000;">एकूण :</td><td style="padding:3px 0; text-align:right; font-weight:800; font-size:16px; color:#000; white-space:nowrap;">${runningBal}</td></tr>`; 
-                        runningBal -= e.amount; 
-                        html += `<tr style="background:#ecfdf5;"><td style="padding:3px 5px; color:#000; font-weight:800; font-size:13px; white-space:nowrap;">${formatDate(dStr)}</td><td style="padding:3px 5px; text-align:center; font-weight:600; color:#059669; font-size:13px;">पैसे दिले :</td><td style="padding:3px 0; text-align:right; font-weight:800; font-size:16px; color:#059669; white-space:nowrap;">- ${e.amount}</td></tr>`;
-                        html += `<tr><td colspan="3" style="padding:2px 0; text-align:right; border-bottom:1px solid #cbd5e1;"><span style="font-weight:700; font-size:11px; color:#1d4ed8;">बाकी: ${runningBal} /-</span></td></tr>`; 
+                            html += `<tr><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; font-weight:800;">${fDate}</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700;">नि ${e.weight}x${rateDisplay}</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800;">${e.total}</td></tr>`;
+                        } else if (e.type === 'bhade') {
+                            totalBhade += e.amount;
+                            html += `<tr><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; font-weight:800;">${fDate}</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700; color:#dc2626;">गाडी भाडे</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800; color:#dc2626;">- ${e.amount}</td></tr>`;
+                        } else if (e.type === 'advance') {
+                            totalAdv += e.amount;
+                            let lbl = e.amount > 0 ? "उचल (दिली)" : "उचल (जमा)"; let col = e.amount > 0 ? "#ea580c" : "#10b981";
+                            html += `<tr style="background:#fff7ed;"><td style="padding:2px 4px; font-weight:800;">${fDate}</td><td style="padding:2px 4px; text-align:center; font-weight:600; color:${col};">${lbl}</td><td style="padding:2px 4px; text-align:right; font-weight:800; color:${col};">${e.amount > 0 ? "- " : "+ "}${Math.abs(e.amount)}</td></tr>`;
+                        } else if (e.type === 'payment') {
+                            totalPay += e.amount;
+                            html += `<tr style="background:#ecfdf5;"><td style="padding:2px 4px; font-weight:800;">${fDate}</td><td style="padding:2px 4px; text-align:center; font-weight:600; color:#059669;">पैसे जमा</td><td style="padding:2px 4px; text-align:right; font-weight:800; color:#059669;">- ${e.amount}</td></tr>`;
+                        }
                     });
-                    
                     currD.setDate(currD.getDate() + 1);
                 }
+
+                runningBal = totalCropAmount;
+                html += `<tr style="border-top:2px solid #000;"><td colspan="2" style="padding:6px 4px; text-align:right; font-weight:800; font-size:14px;">एकूण माल :</td><td style="padding:6px 0; text-align:right; font-weight:800; font-size:15px;">${totalCropAmount}</td></tr>`;
+
+                if (totalCropAmount > 0) {
+                    let commission = Math.round((totalCropAmount * 0.10) / 5) * 5;
+                    runningBal -= commission;
+                    html += `<tr><td colspan="2" style="padding:4px 4px; text-align:right; font-weight:700; color:#ea580c;">10% कपात (आडत) :</td><td style="padding:4px 0; text-align:right; font-weight:800; color:#ea580c;">- ${commission}</td></tr>`;
+                }
+                if (totalBhade > 0) {
+                    runningBal -= totalBhade;
+                    html += `<tr><td colspan="2" style="padding:4px 4px; text-align:right; font-weight:700; color:#dc2626;">गाडी भाडे :</td><td style="padding:4px 0; text-align:right; font-weight:800; color:#dc2626;">- ${totalBhade}</td></tr>`;
+                }
+                if (totalPay > 0) {
+                    runningBal -= totalPay;
+                    html += `<tr><td colspan="2" style="padding:4px 4px; text-align:right; font-weight:700; color:#059669;">पैसे जमा :</td><td style="padding:4px 0; text-align:right; font-weight:800; color:#059669;">- ${totalPay}</td></tr>`;
+                }
+
                 let finalPrefix = runningBal < 0 ? "जास्त दिले :" : "सध्याची बाकी :"; let finalColor = runningBal < 0 ? "#ef4444" : "#1e3a8a"; let finalBg = runningBal < 0 ? "#fef2f2" : "#e0eafc";
-                html += `<tr style="background:${finalBg}; border:2px solid ${finalColor};"><td colspan="2" style="padding:8px 4px; text-align:right; font-weight:700; color:${finalColor}; font-size:14px;">${finalPrefix}</td><td style="padding:8px 0; text-align:right; white-space:nowrap;"><span style="color:#fff; background:${finalColor}; padding:2px 8px; border-radius:6px; font-weight:800; font-size:18px;">₹ ${Math.abs(runningBal)} /-</span></td></tr>`; 
+                html += `<tr style="background:${finalBg}; border:2px solid ${finalColor};"><td colspan="2" style="padding:8px 4px; text-align:right; font-weight:800; color:${finalColor}; font-size:15px;">${finalPrefix}</td><td style="padding:8px 0; text-align:right; white-space:nowrap;"><span style="color:#fff; background:${finalColor}; padding:4px 8px; border-radius:6px; font-weight:800; font-size:18px;">₹ ${Math.abs(runningBal)} /-</span></td></tr>`; 
             } else { html += `<tr><td colspan="3" style="text-align:center; padding: 20px; color: #8e8e93; font-weight:600;">No Data Found</td></tr>`; }
-            list.innerHTML = html + "</tbody></table>"; 
-            if(totalAdvInPeriod !== 0) { document.getElementById("billAdvBox").innerText = `⚠️ या कालावधीत नेलेली एकूण उचल : ₹ ${totalAdvInPeriod}`; } else { document.getElementById("billAdvBox").innerText = ""; }
+            
+            // 🌟 येथे A4 प्रिंटचे बटन टाकले आहे 🌟
+            let printBtnHtml = filteredData.length > 0 ? `<div style="text-align:center; margin-top:20px; padding-bottom:10px;"><button onclick="printFarmerBillA4('${n}', '${displayDate}')" style="background:linear-gradient(135deg, #2563eb, #1e40af); color:white; padding:10px 20px; border:none; border-radius:6px; font-weight:bold; font-size:15px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.1);">🖨️ A4 Print काढा</button></div>` : "";
+            
+            list.innerHTML = html + "</tbody></table>" + printBtnHtml; 
+            
+            if(totalAdvInPeriod !== 0) { document.getElementById("billAdvBox").innerText = `⚠️ या कालावधीत नेलेली एकूण उचल : ₹ ${totalAdvInPeriod} (बिलातून वजा केलेली नाही)`; } else { document.getElementById("billAdvBox").innerText = ""; }
         } else {
-            // MERCHANT BILL 
-            document.getElementById("billAdvBox").innerText=""; 
-            let d=[...getMerchantDB()].sort((a,b)=>new Date(a.date)-new Date(b.date)); 
-            let openingBal = 0; let filteredData = [];
+            // ... व्यापारी बिलाचा जुना कोड खाली तसाच ठेवा
+            document.getElementById("billAdvBox").innerText=""; let d=[...getMerchantDB()].sort((a,b)=>new Date(a.date)-new Date(b.date)); let openingBal = 0; let filteredData = [];
             d.forEach(e => { if(e && e.name === n) { if (e.date < openingBalDateFilter) { if(e.type !== 'payment') openingBal += (Number(e.total)||0); else openingBal -= (Number(e.amount)||0); } else if (e.date >= startFilter && e.date <= endFilter) { filteredData.push(e); } } });
-            
             let html = `<table style="width:100%; max-width:700px; margin:0 auto; border-collapse:collapse; font-family:'Poppins',sans-serif; color:#0f172a;"><thead><tr><th style="padding:15px 10px; border-bottom:2px solid #cbd5e1; text-align:left; width:25%; font-size:13px; color:#64748b; text-transform:uppercase; white-space:nowrap;">तारीख</th><th style="padding:15px 10px; border-bottom:2px solid #cbd5e1; text-align:center; width:50%; font-size:13px; color:#64748b; text-transform:uppercase; white-space:nowrap;">तपशील</th><th style="padding:15px 10px; border-bottom:2px solid #cbd5e1; text-align:right; width:25%; font-size:13px; color:#64748b; text-transform:uppercase; white-space:nowrap;">रक्कम (₹)</th></tr></thead><tbody style="font-size:15px;">`;
-            
-            let billTotalSoFar = 0;
-            let runningTotal = 0;
-            let hasAddedPrevBal = false;
-            let lastBillDate = "";
-
-            if(openingBal === 0 && filteredData.length === 0) {
-                html += `<tr><td colspan="3" style="text-align:center; padding: 30px; color: #8e8e93; font-weight:500;">No Data Found</td></tr>`; 
-            } else {
+            let billTotalSoFar = 0; let runningTotal = 0; let hasAddedPrevBal = false; let lastBillDate = "";
+            if(openingBal === 0 && filteredData.length === 0) { html += `<tr><td colspan="3" style="text-align:center; padding: 30px; color: #8e8e93; font-weight:500;">No Data Found</td></tr>`; } else {
                 filteredData.forEach(e => {
-                    let displayDate = (e.date !== lastBillDate) ? formatDate(e.date) : ""; 
-                    lastBillDate = e.date;
-
+                    let displayDate = (e.date !== lastBillDate) ? formatDate(e.date) : ""; lastBillDate = e.date;
                     if (e.type === 'payment') {
-                        // 🌟 प्रत्येक जमा वेळी आधी 'एकूण' दाखवणे 🌟
                         if (!hasAddedPrevBal) {
-                            if (billTotalSoFar > 0) {
-                                html += `<tr style="background:#f8fafc;"><td colspan="2" style="padding:12px 10px; text-align:right; font-weight:600; font-size:15px; color:#1e293b;">एकूण :</td><td style="padding:12px 10px; text-align:right; font-weight:700; font-size:17px; color:#1e293b; white-space:nowrap;">${billTotalSoFar}</td></tr>`;
-                            }
+                            if (billTotalSoFar > 0) { html += `<tr style="background:#f8fafc;"><td colspan="2" style="padding:12px 10px; text-align:right; font-weight:600; font-size:15px; color:#1e293b;">एकूण :</td><td style="padding:12px 10px; text-align:right; font-weight:700; font-size:17px; color:#1e293b; white-space:nowrap;">${billTotalSoFar}</td></tr>`; }
                             runningTotal = billTotalSoFar;
                             if (openingBal !== 0) {
-                                let obPrefix = openingBal < 0 ? "मागील जास्त जमा (-):" : "मागील बाकी (+):"; 
-                                let obColor = openingBal < 0 ? "#059669" : "#d97706";
+                                let obPrefix = openingBal < 0 ? "मागील जास्त जमा (-):" : "मागील बाकी (+):"; let obColor = openingBal < 0 ? "#059669" : "#d97706";
                                 html += `<tr style="background:#fffbeb;"><td colspan="2" style="padding:12px 10px; text-align:right; font-weight:700; color:${obColor}; font-size:15px;">${obPrefix}</td><td style="padding:12px 10px; text-align:right; font-weight:800; color:${obColor}; font-size:17px; white-space:nowrap;">${Math.abs(openingBal)}</td></tr>`;
-                                runningTotal += openingBal;
-                                html += `<tr style="background:#e2e8f0;"><td colspan="2" style="padding:12px 10px; text-align:right; font-weight:700; font-size:15px; color:#0f172a;">एकूण येणे :</td><td style="padding:12px 10px; text-align:right; font-weight:800; font-size:17px; color:#0f172a; white-space:nowrap;">${runningTotal}</td></tr>`;
+                                runningTotal += openingBal; html += `<tr style="background:#e2e8f0;"><td colspan="2" style="padding:12px 10px; text-align:right; font-weight:700; font-size:15px; color:#0f172a;">एकूण येणे :</td><td style="padding:12px 10px; text-align:right; font-weight:800; font-size:17px; color:#0f172a; white-space:nowrap;">${runningTotal}</td></tr>`;
                             }
                             hasAddedPrevBal = true;
-                        } else {
-                            // जर मागील बाकी आधीच ॲड झाली असेल, तरीही जमा च्या आधी 'एकूण' दिसेल
-                            html += `<tr style="background:#f8fafc;"><td colspan="2" style="padding:12px 10px; text-align:right; font-weight:600; font-size:15px; color:#1e293b;">एकूण :</td><td style="padding:12px 10px; text-align:right; font-weight:700; font-size:17px; color:#1e293b; white-space:nowrap;">${runningTotal}</td></tr>`;
-                        }
-
-                        // जमा रक्कम मायनस करणे
-                        runningTotal -= e.amount;
-                        let hintStr = e.hint ? ` <span style="font-size:11px; color:#64748b;">(${e.hint})</span>` : ""; 
+                        } else { html += `<tr style="background:#f8fafc;"><td colspan="2" style="padding:12px 10px; text-align:right; font-weight:600; font-size:15px; color:#1e293b;">एकूण :</td><td style="padding:12px 10px; text-align:right; font-weight:700; font-size:17px; color:#1e293b; white-space:nowrap;">${runningTotal}</td></tr>`; }
+                        runningTotal -= e.amount; let hintStr = e.hint ? ` <span style="font-size:11px; color:#64748b;">(${e.hint})</span>` : ""; 
                         html += `<tr style="background:#ecfdf5;"><td style="padding:12px 10px; color:#059669; font-weight:600; font-size:14px; white-space:nowrap; border-bottom:1px dashed #cbd5e1;">${displayDate ? displayDate : formatDate(e.date)}</td><td style="padding:12px 10px; text-align:center; font-weight:600; color:#059669; white-space:nowrap; border-bottom:1px dashed #cbd5e1;">जमा${hintStr} :</td><td style="padding:12px 10px; text-align:right; font-weight:700; font-size:17px; color:#059669; white-space:nowrap; border-bottom:1px dashed #cbd5e1;">- ${e.amount}</td></tr>`; 
-                        
-                        // जमा झाल्यानंतरची 'बाकी'
-                        html += `<tr><td colspan="3" style="text-align:right; padding:4px 10px; border-bottom:2px solid #cbd5e1;"><span style="font-weight:700; font-size:12px; color:#1d4ed8;">बाकी: ${runningTotal} /-</span></td></tr>`;
-                        
-                        lastBillDate = ""; // तारीख रीसेट
-
+                        html += `<tr><td colspan="3" style="text-align:right; padding:4px 10px; border-bottom:2px solid #cbd5e1;"><span style="font-weight:700; font-size:12px; color:#1d4ed8;">बाकी: ${runningTotal} /-</span></td></tr>`; lastBillDate = ""; 
                     } else { 
-                        // खरेदीची नोंद 
-                        if (!hasAddedPrevBal) {
-                            billTotalSoFar += e.total;
-                        } else {
-                            runningTotal += e.total;
-                        }
+                        if (!hasAddedPrevBal) { billTotalSoFar += e.total; } else { runningTotal += e.total; }
                         let tPrefix = e.merType ? `<span style="background:#e2e8f0; color:#1e293b; padding:3px 8px; border-radius:6px; font-size:11px; margin-right:8px; font-weight:700;">${e.merType}</span>` : ""; 
                         html += `<tr><td style="padding:12px 10px; border-bottom:1px dashed #e2e8f0; color:#475569; font-weight:600; font-size:14px; white-space:nowrap;">${displayDate}</td><td style="padding:12px 10px; border-bottom:1px dashed #e2e8f0; text-align:center; font-weight:600; color:#334155; white-space:nowrap;">${tPrefix}${e.weight} x ${e.rate}</td><td style="padding:12px 10px; border-bottom:1px dashed #e2e8f0; text-align:right; font-weight:700; font-size:17px; color:#0f172a; white-space:nowrap;">${e.total}</td></tr>`; 
                     }
                 });
-
-                // जर महिनाभरात कोणतीही जमा झाली नसेल, तर शेवटी मागील बाकी दाखवणे
                 if (!hasAddedPrevBal) {
-                    if (billTotalSoFar > 0) {
-                        html += `<tr style="background:#f8fafc;"><td colspan="2" style="padding:12px 10px; text-align:right; font-weight:600; font-size:15px; color:#1e293b;">एकूण :</td><td style="padding:12px 10px; text-align:right; font-weight:700; font-size:17px; color:#1e293b; white-space:nowrap;">${billTotalSoFar}</td></tr>`;
-                    }
+                    if (billTotalSoFar > 0) { html += `<tr style="background:#f8fafc;"><td colspan="2" style="padding:12px 10px; text-align:right; font-weight:600; font-size:15px; color:#1e293b;">एकूण :</td><td style="padding:12px 10px; text-align:right; font-weight:700; font-size:17px; color:#1e293b; white-space:nowrap;">${billTotalSoFar}</td></tr>`; }
                     runningTotal = billTotalSoFar;
                     if (openingBal !== 0) {
-                        let obPrefix = openingBal < 0 ? "मागील जास्त जमा (-):" : "मागील बाकी (+):"; 
-                        let obColor = openingBal < 0 ? "#059669" : "#d97706";
+                        let obPrefix = openingBal < 0 ? "मागील जास्त जमा (-):" : "मागील बाकी (+):"; let obColor = openingBal < 0 ? "#059669" : "#d97706";
                         html += `<tr style="background:#fffbeb;"><td colspan="2" style="padding:12px 10px; text-align:right; font-weight:700; color:${obColor}; font-size:15px;">${obPrefix}</td><td style="padding:12px 10px; text-align:right; font-weight:800; color:${obColor}; font-size:17px; white-space:nowrap;">${Math.abs(openingBal)}</td></tr>`;
-                        runningTotal += openingBal;
-                        html += `<tr style="background:#e2e8f0;"><td colspan="2" style="padding:12px 10px; text-align:right; font-weight:700; font-size:15px; color:#0f172a;">एकूण येणे :</td><td style="padding:12px 10px; text-align:right; font-weight:800; font-size:17px; color:#0f172a; white-space:nowrap;">${runningTotal}</td></tr>`;
+                        runningTotal += openingBal; html += `<tr style="background:#e2e8f0;"><td colspan="2" style="padding:12px 10px; text-align:right; font-weight:700; font-size:15px; color:#0f172a;">एकूण येणे :</td><td style="padding:12px 10px; text-align:right; font-weight:800; font-size:17px; color:#0f172a; white-space:nowrap;">${runningTotal}</td></tr>`;
                     }
                 }
-
-                let finalPrefix = runningTotal < 0 ? "जास्त जमा :" : "सध्याची एकूण बाकी :";
-                html += `<tr style="background:#e0f2fe; border:2px solid #3b82f6;"><td colspan="2" style="padding:16px 12px; text-align:right; font-weight:700; font-size:16px; color:#1d4ed8;">${finalPrefix}</td><td style="padding:16px 12px; text-align:right; white-space:nowrap;"><span style="color:#fff; background:#2563eb; padding:6px 14px; border-radius:8px; font-weight:800; font-size:20px; box-shadow:0 4px 6px rgba(37,99,235,0.2);">₹ ${Math.abs(runningTotal)} /-</span></td></tr>`;
+                let finalPrefix = runningTotal < 0 ? "जास्त जमा :" : "सध्याची एकूण बाकी :"; html += `<tr style="background:#e0f2fe; border:2px solid #3b82f6;"><td colspan="2" style="padding:16px 12px; text-align:right; font-weight:700; font-size:16px; color:#1d4ed8;">${finalPrefix}</td><td style="padding:16px 12px; text-align:right; white-space:nowrap;"><span style="color:#fff; background:#2563eb; padding:6px 14px; border-radius:8px; font-weight:800; font-size:20px; box-shadow:0 4px 6px rgba(37,99,235,0.2);">₹ ${Math.abs(runningTotal)} /-</span></td></tr>`;
             }
             list.innerHTML = html + "</tbody></table>";
 
-            // WhatsApp Message (WhatsApp मध्ये पण प्रत्येक जमाच्या आधी एकूण जाईल)
             let waText = `🧾 *हिशोब पत्रक*\n➖➖➖➖➖➖➖➖\n👤 *नाव:* ${n}\n📅 *कालावधी:* ${displayDate.replace('📅 ', '')}\n➖➖➖➖➖➖➖➖\n`;
-            let waBillTotalSoFar = 0;
-            let waRunningTotal = 0;
-            let waHasAddedPrevBal = false;
-            let lastWaDate = "";
-
-            if(openingBal === 0 && filteredData.length === 0) {
-                waText += `माहिती उपलब्ध नाही.\n➖➖➖➖➖➖➖➖\n🙏 *धन्यवाद*`;
-            } else {
+            let waBillTotalSoFar = 0; let waRunningTotal = 0; let waHasAddedPrevBal = false; let lastWaDate = "";
+            if(openingBal === 0 && filteredData.length === 0) { waText += `माहिती उपलब्ध नाही.\n➖➖➖➖➖➖➖➖\n🙏 *धन्यवाद*`; } else {
                 filteredData.forEach(e => {
-                    let dStr = (e.date !== lastWaDate) ? formatDate(e.date) : "          "; 
-                    lastWaDate = e.date; 
-
+                    let dStr = (e.date !== lastWaDate) ? formatDate(e.date) : "          "; lastWaDate = e.date; 
                     if(e.type === 'payment') {
                         if (!waHasAddedPrevBal) {
                             if (waBillTotalSoFar > 0) waText += `----------------------------\n🔹                    *एकूण : ${waBillTotalSoFar}*\n`;
                             waRunningTotal = waBillTotalSoFar;
-                            if (openingBal !== 0) {
-                                let obPrefix = openingBal < 0 ? "मागील जास्त जमा (-):" : "मागील बाकी (+):";
-                                waText += `🔴       *${obPrefix} ${Math.abs(openingBal)}*\n—————————————————\n`;
-                                waRunningTotal += openingBal;
-                                waText += `                               *एकूण : ${waRunningTotal}*\n`;
-                            }
+                            if (openingBal !== 0) { let obPrefix = openingBal < 0 ? "मागील जास्त जमा (-):" : "मागील बाकी (+):"; waText += `🔴       *${obPrefix} ${Math.abs(openingBal)}*\n—————————————————\n`; waRunningTotal += openingBal; waText += `                               *एकूण : ${waRunningTotal}*\n`; }
                             waHasAddedPrevBal = true;
-                        } else {
-                            waText += `----------------------------\n🔹                    *एकूण : ${waRunningTotal}*\n`;
-                        }
-
-                        waRunningTotal -= e.amount;
-                        let hint = e.hint ? `(${e.hint})` : "";
-                        waText += `🟩 *${formatDate(e.date)} जमा${hint} : ${e.amount}*\n`;
-                        waText += `🔹        बाकी : ${waRunningTotal}\n`; 
+                        } else { waText += `----------------------------\n🔹                    *एकूण : ${waRunningTotal}*\n`; }
+                        waRunningTotal -= e.amount; let hint = e.hint ? `(${e.hint})` : ""; waText += `🟩 *${formatDate(e.date)} जमा${hint} : ${e.amount}*\n`; waText += `🔹        बाकी : ${waRunningTotal}\n`; 
                     } else {
-                        if (!waHasAddedPrevBal) {
-                            waBillTotalSoFar += e.total;
-                        } else {
-                            waRunningTotal += e.total;
-                        }
-                        let tPrefix = e.merType ? e.merType : "";
-                        waText += `🔸 ${dStr}  ${tPrefix} ${e.weight} x ${e.rate} = ${e.total}\n`;
+                        if (!waHasAddedPrevBal) { waBillTotalSoFar += e.total; } else { waRunningTotal += e.total; }
+                        let tPrefix = e.merType ? e.merType : ""; waText += `🔸 ${dStr}  ${tPrefix} ${e.weight} x ${e.rate} = ${e.total}\n`;
                     }
                 });
-
                 if (!waHasAddedPrevBal) {
                     if (waBillTotalSoFar > 0) waText += `----------------------------\n🔹                    *एकूण : ${waBillTotalSoFar}*\n`;
                     waRunningTotal = waBillTotalSoFar;
-                    if (openingBal !== 0) {
-                        let obPrefix = openingBal < 0 ? "मागील जास्त जमा (-):" : "मागील बाकी (+):";
-                        waText += `🔴       *${obPrefix} ${Math.abs(openingBal)}*\n—————————————————\n`;
-                        waRunningTotal += openingBal;
-                        waText += `                               *एकूण : ${waRunningTotal}*\n`;
-                    }
+                    if (openingBal !== 0) { let obPrefix = openingBal < 0 ? "मागील जास्त जमा (-):" : "मागील बाकी (+):"; waText += `🔴       *${obPrefix} ${Math.abs(openingBal)}*\n—————————————————\n`; waRunningTotal += openingBal; waText += `                               *एकूण : ${waRunningTotal}*\n`; }
                 }
-
-                let obLabel = waRunningTotal < 0 ? "जास्त जमा" : "सध्याची एकूण बाकी";
-                waText += `——————————————————-\n🔴 *${obLabel} : ₹ ${Math.abs(waRunningTotal)} /-*\n➖➖➖➖➖➖➖➖\n\n            🙏 *धन्यवाद*`;
+                let obLabel = waRunningTotal < 0 ? "जास्त जमा" : "सध्याची एकूण बाकी"; waText += `——————————————————-\n🔴 *${obLabel} : ₹ ${Math.abs(waRunningTotal)} /-*\n➖➖➖➖➖➖➖➖\n\n            🙏 *धन्यवाद*`;
             }
             window.currentMerchantWaText = waText;
         }
