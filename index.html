@@ -660,38 +660,49 @@ CRITICAL RULES:
 
         const payload = { contents: [{ parts: [ { text: promptText }, { inlineData: { mimeType: "image/jpeg", data: currentBase64Image } } ] }] };
         
-        // तुमचे जुने काम करणारे मॉडेल्स
-        const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash-latest"];
-        let response = null;
+        // 🌟 तुमच्या जुन्या कोडमधील सर्व मॉडेल्सची लिस्ट (जे १००% चालतात) 🌟
+        const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash", "gemini-1.5-flash-latest"];
         let successfulModel = "";
-        let lastErrorMsg = "";
+        let limitHit = false;
+        let response = null;
+        let finalErrorMsg = "सर्वरशी संपर्क झाला नाही किंवा API Key चुकीची आहे.";
 
         for (let model of modelsToTry) {
-            let url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+            // iOS आणि PC दोन्हीसाठी कॅशे प्रॉब्लेम येऊ नये म्हणून &t=${Date.now()}
+            let url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}&t=${Date.now()}`;
+            
             try { 
-                response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }); 
+                response = await fetch(url, { 
+                    method: "POST", 
+                    headers: { "Content-Type": "application/json" }, 
+                    body: JSON.stringify(payload),
+                    cache: "no-store"
+                }); 
                 
                 if (response.ok) { 
                     successfulModel = model; 
-                    break; 
-                } else if (response.status === 429) {
-                    // 🌟 इथे खरा लिमिटचा एरर पकडून मराठीत मेसेज दिला 🌟
-                    throw new Error("⏳ लिमिट संपली आहे! कृपया 1 ते 2 मिनिटे थांबा आणि पुन्हा प्रयत्न करा.");
-                } else { 
+                    break; // 🟢 बरोबर मॉडेल सापडलं की थांबेल
+                } else {
                     let errData = await response.json(); 
-                    lastErrorMsg = errData.error?.message || "Error"; 
-                } 
-            } catch (e) { 
-                lastErrorMsg = e.message;
-                // जर लिमिटचा एरर असेल तर पुढचे मॉडेल्स शोधण्यात वेळ वाया घालवू नका
-                if (lastErrorMsg.includes("लिमिट संपली आहे")) {
-                    break; 
+                    if (response.status === 429) {
+                        limitHit = true;
+                        break; // 🔴 लिमिट संपली की लगेच बाहेर पडेल (वेळ वाया घालवणार नाही)
+                    }
+                    finalErrorMsg = errData.error?.message || "Google API Error";
                 }
+            } catch (e) { 
+                finalErrorMsg = e.message;
             }
         }
 
         try {
-            if (!response || !response.ok) throw new Error(lastErrorMsg || "API Error");
+            if (limitHit) {
+                // 🌟 कुठेही न अडकता थेट मेसेज 🌟
+                throw new Error("⏳ गुगलची '१ मिनिटाची' लिमिट संपली आहे! कृपया 60 सेकंद थांबा आणि पुन्हा बटण दाबा.");
+            }
+            if (!successfulModel) {
+                throw new Error(finalErrorMsg); // आता खोटा एरर न येता खरा एरर दिसेल
+            }
             
             const result = await response.json(); 
             let aiText = result.candidates[0].content.parts[0].text;
@@ -703,16 +714,19 @@ CRITICAL RULES:
                     return { name: findBestFarmerMatch(item.name), weight: parseFloat(item.weight) || 0 };
                 });
                 renderAiResult(finalDataArray, rate); 
-                statusLabel.innerHTML = `✅ स्कॅनिंग पूर्ण! (${finalDataArray.length} नोंदी सापडल्या) <br><span style="font-size:10px; color:gray;">(वापरलेले AI: ${successfulModel})</span>`; 
+                statusLabel.innerHTML = `✅ स्कॅनिंग पूर्ण! (${finalDataArray.length} नोंदी) <br><span style="font-size:10px; color:gray;">(AI: ${successfulModel})</span>`; 
                 document.getElementById("ocrResultSection").style.display = 'block'; 
                 document.getElementById("apiKeySection").style.display = "none"; 
-            } else { throw new Error("No JSON found in response"); }
+            } else { throw new Error("डेटा वाचता आला नाही. फोटो क्लिअर काढा."); }
         } catch (error) {
-            statusLabel.innerHTML = `<span style="color:red; font-weight:700;">❌ Error: ${error.message}</span>`; 
-            if(!error.message.includes("लिमिट संपली आहे")) {
+            statusLabel.innerHTML = `<span style="color:red; font-weight:700;">❌ ${error.message}</span>`; 
+            if(error.message.includes("API key not valid")) {
                 document.getElementById("apiKeySection").style.display = "block"; 
             }
-        } finally { btn.disabled = false; btn.style.opacity = '1'; }
+        } finally { 
+            btn.disabled = false; 
+            btn.style.opacity = '1'; 
+        }
     }
     function renderAiResult(dataArray, rate) {
         const tbody = document.getElementById("ocrResultBody"); tbody.innerHTML = ''; let idCounter = 0;
