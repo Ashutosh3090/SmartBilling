@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -473,11 +472,32 @@ function saveNotesDB(d) { notesDB = sanitizeData(d); database.ref('notesData').s
         }
     }
 
-    function loadFarmerList() { let dl=document.getElementById("farmerList"); if(!dl) return; dl.innerHTML=""; let h=""; getMergedFarmers().forEach(f => { h += `<option value="${f}">${marathiToEnglish(f)}</option>`; }); dl.innerHTML=h; }
-    function loadMerchantList() { let dl=document.getElementById("merchantList"); let dl2=document.getElementById("billNameSuggestions"); if(!dl) return; let h=""; getMergedMerchants().forEach(m => { h += `<option value="${m}">${marathiToEnglish(m)}</option>`; }); dl.innerHTML=h; if(dl2) dl2.innerHTML=h; }
-    function loadBagPersonList() { let dl1=document.getElementById("bagPersonList"); let dl2=document.getElementById("bagBillPersonList"); if(!dl1) return; let h=""; safeArray(bagPersons).sort((a,b)=>(parseInt(a)||99999)-(parseInt(b)||99999)).forEach(p => { h += `<option value="${p}">${marathiToEnglish(p)}</option>`; }); dl1.innerHTML=h; if(dl2) dl2.innerHTML=h; }
-    function autoSelectFarmerName() { let v=val("farmerName"); if(!isNaN(v)&&v!==""){let f=getMergedFarmers().find(n=>n.startsWith(v+".")); if(f) document.getElementById("farmerName").value=f;} }
+   function loadFarmerList() { let dl=document.getElementById("farmerList"); if(!dl) return; dl.innerHTML=""; let h=""; getMergedFarmers().forEach(f => { h += `<option value="${f}">${f} | ${marathiToEnglish(f)}</option>`; }); dl.innerHTML=h; }
+    
+    function loadMerchantList() { let dl=document.getElementById("merchantList"); let dl2=document.getElementById("billNameSuggestions"); if(!dl) return; let h=""; getMergedMerchants().forEach(m => { h += `<option value="${m}">${m} | ${marathiToEnglish(m)}</option>`; }); dl.innerHTML=h; if(dl2) dl2.innerHTML=h; }
+    
+    function loadBagPersonList() { let dl1=document.getElementById("bagPersonList"); let dl2=document.getElementById("bagBillPersonList"); if(!dl1) return; let h=""; safeArray(bagPersons).sort((a,b)=>(parseInt(a)||99999)-(parseInt(b)||99999)).forEach(p => { h += `<option value="${p}">${p} | ${marathiToEnglish(p)}</option>`; }); dl1.innerHTML=h; if(dl2) dl2.innerHTML=h; }
 
+    function autoSelectFarmerName() { 
+        let inputEl = document.getElementById("farmerName");
+        let v = inputEl.value.toLowerCase().trim(); 
+        if(!v) return;
+        
+        let fList = getMergedFarmers();
+        
+        // १. नंबरवरून सर्च (उदा. '1' दाबलं की '1. सौदी' येईल)
+        if(!isNaN(v)){
+            let f=fList.find(n=>n.startsWith(v+".")); 
+            if(f) inputEl.value=f;
+            return;
+        }
+        
+        // २. इंग्लिश स्पेलिंगवरून सर्च (उदा. 'pop' टाईप केल्यावर 'पोपट' सिलेक्ट होईल)
+        if(/[a-z]/i.test(v)) {
+            let matched = fList.find(n => marathiToEnglish(n).toLowerCase().includes(v));
+            if(matched) inputEl.value = matched;
+        }
+    }
     function saveCrop() {
         let d=val("dateInput"); let n=val("farmerName").trim(); let w=parseFloat(val("weight")); let r=parseFloat(val("rate"));
         if(!d||!n||!w||!r) { alert("माहिती भरा!"); return; }
