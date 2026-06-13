@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -790,60 +789,60 @@ function generateFinalBill() {
         closeModal("billModal"); openModal("finalBillModal"); document.getElementById("billMonthDisplay").innerText = displayDate; document.getElementById("billHeaderName").innerText = n; let list=document.getElementById("billTableWrapper"); list.innerHTML=""; 
         
         if(type==='FARMER'){
-       
             document.getElementById("billAdvBox").innerText=""; let d=[...getData()].sort((a,b)=>new Date(a.date)-new Date(b.date)); let filteredData = []; let totalAdvInPeriod = 0;
             d.forEach(e => { if(e && e.name === n && e.date >= startFilter && e.date <= endFilter) { filteredData.push(e); if(e.type === 'advance') totalAdvInPeriod += (Number(e.amount)||0); } });
             
-            let html = `<table style="width:100%; max-width:320px; margin:0 auto; border-collapse:collapse; font-family:sans-serif; color:#000;"><thead><tr><th style="padding:2px 0; border-bottom:2px solid #000; text-align:left; width:33%; font-size:12px; color:#000;">तारीख</th><th style="padding:2px 0; border-bottom:2px solid #000; text-align:center; width:34%; font-size:12px; color:#000;">तपशील</th><th style="padding:2px 0; border-bottom:2px solid #000; text-align:right; width:33%; font-size:12px; color:#000;">रक्कम (₹)</th></tr></thead><tbody style="font-size:13px;">`;
+            // 🌟 A4 साईझसाठी max-width: 100% आणि फॉन्ट साईझ मोठा केला आहे 🌟
+            let html = `<table style="width:100%; max-width:800px; margin:0 auto; border-collapse:collapse; font-family:sans-serif; color:#000;"><thead><tr><th style="padding:12px 8px; border-bottom:2px solid #000; text-align:left; width:33%; font-size:15px; color:#000;">तारीख</th><th style="padding:12px 8px; border-bottom:2px solid #000; text-align:center; width:34%; font-size:15px; color:#000;">तपशील</th><th style="padding:12px 8px; border-bottom:2px solid #000; text-align:right; width:33%; font-size:15px; color:#000;">रक्कम (₹)</th></tr></thead><tbody style="font-size:15px;">`;
             let runningBal = 0; let totalCropAmount = 0; let totalBhade = 0; let totalAdv = 0; let totalPay = 0;
             
-           if(filteredData.length > 0) {
+            if(filteredData.length > 0) {
                 let currD = new Date(startFilter + "T00:00:00"); let endD = new Date(endFilter + "T00:00:00");
                 while(currD <= endD) {
                     let yyyy = currD.getFullYear(); let mm = String(currD.getMonth() + 1).padStart(2, '0'); let dd = String(currD.getDate()).padStart(2, '0'); let dStr = `${yyyy}-${mm}-${dd}`;
                     let dailyEntries = filteredData.filter(e => e.date === dStr);
                     let fDate = formatDate(dStr);
                     
-                    // 🌟 फक्त शेतकरी बिलासाठी: ज्या दिवशी माल नाही, तिथे 'माल नाही' दाखवा 🌟
                     let hasCrop = dailyEntries.some(e => e.type === 'crop');
                     if (!hasCrop) {
-                        html += `<tr><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; font-weight:800; color:#64748b;">${fDate}</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700; color:#94a3b8;">माल नाही</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800; color:#94a3b8;">-</td></tr>`;
+                        html += `<tr><td style="padding:8px 5px; border-bottom:1px solid #e2e8f0; font-weight:800; color:#64748b;">${fDate}</td><td style="padding:8px 5px; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700; color:#94a3b8;">माल नाही</td><td style="padding:8px 5px; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800; color:#94a3b8;">-</td></tr>`;
                     }
                     
                     dailyEntries.forEach(e => {
                         if (e.type === 'crop') {
                             totalCropAmount += e.total;
                             let cR = getCommonRateForDate(dStr); let rateDisplay = (e.rate !== cR && cR > 0) ? `<span style="color:#ef4444; font-weight:900;">${e.rate}⚠️</span>` : e.rate;
-                            html += `<tr><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; font-weight:800;">${fDate}</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700;">नि ${e.weight}x${rateDisplay}</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800;">${e.total}</td></tr>`;
+                            html += `<tr><td style="padding:8px 5px; border-bottom:1px solid #e2e8f0; font-weight:800;">${fDate}</td><td style="padding:8px 5px; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700;">नि ${e.weight}x${rateDisplay}</td><td style="padding:8px 5px; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800;">${e.total}</td></tr>`;
                         } else if (e.type === 'bhade') {
                             totalBhade += e.amount;
-                            html += `<tr><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; font-weight:800;">${fDate}</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700; color:#dc2626;">गाडी भाडे</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800; color:#dc2626;">- ${e.amount}</td></tr>`;
+                            html += `<tr><td style="padding:8px 5px; border-bottom:1px solid #e2e8f0; font-weight:800;">${fDate}</td><td style="padding:8px 5px; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700; color:#dc2626;">गाडी भाडे</td><td style="padding:8px 5px; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800; color:#dc2626;">- ${e.amount}</td></tr>`;
                         } else if (e.type === 'advance') {
                             totalAdv += e.amount;
                             let lbl = e.amount > 0 ? "उचल (दिली)" : "उचल (जमा)"; let col = e.amount > 0 ? "#ea580c" : "#10b981";
-                            html += `<tr style="background:#fff7ed;"><td style="padding:2px 4px; font-weight:800;">${fDate}</td><td style="padding:2px 4px; text-align:center; font-weight:600; color:${col};">${lbl}</td><td style="padding:2px 4px; text-align:right; font-weight:800; color:${col};">${e.amount > 0 ? "- " : "+ "}${Math.abs(e.amount)}</td></tr>`;
+                            html += `<tr style="background:#fff7ed;"><td style="padding:8px 5px; font-weight:800;">${fDate}</td><td style="padding:8px 5px; text-align:center; font-weight:600; color:${col};">${lbl}</td><td style="padding:8px 5px; text-align:right; font-weight:800; color:${col};">${e.amount > 0 ? "- " : "+ "}${Math.abs(e.amount)}</td></tr>`;
                         } else if (e.type === 'payment') {
                             totalPay += e.amount;
-                            html += `<tr style="background:#ecfdf5;"><td style="padding:2px 4px; font-weight:800;">${fDate}</td><td style="padding:2px 4px; text-align:center; font-weight:600; color:#059669;">पैसे जमा</td><td style="padding:2px 4px; text-align:right; font-weight:800; color:#059669;">- ${e.amount}</td></tr>`;
+                            html += `<tr style="background:#ecfdf5;"><td style="padding:8px 5px; font-weight:800;">${fDate}</td><td style="padding:8px 5px; text-align:center; font-weight:600; color:#059669;">पैसे जमा</td><td style="padding:8px 5px; text-align:right; font-weight:800; color:#059669;">- ${e.amount}</td></tr>`;
                         }
                     });
                     currD.setDate(currD.getDate() + 1);
                 }
+
                 runningBal = totalCropAmount;
-                html += `<tr style="border-top:2px solid #000;"><td colspan="2" style="padding:6px 4px; text-align:right; font-weight:800; font-size:14px;">एकूण माल :</td><td style="padding:6px 0; text-align:right; font-weight:800; font-size:15px;">${totalCropAmount}</td></tr>`;
+                html += `<tr style="border-top:2px solid #000;"><td colspan="2" style="padding:12px 5px; text-align:right; font-weight:800; font-size:16px;">एकूण माल :</td><td style="padding:12px 5px; text-align:right; font-weight:800; font-size:17px;">${totalCropAmount}</td></tr>`;
 
                 if (totalBhade > 0) {
                     runningBal -= totalBhade;
-                    html += `<tr><td colspan="2" style="padding:4px 4px; text-align:right; font-weight:700; color:#dc2626;">गाडी भाडे :</td><td style="padding:4px 0; text-align:right; font-weight:800; color:#dc2626;">- ${totalBhade}</td></tr>`;
+                    html += `<tr><td colspan="2" style="padding:8px 5px; text-align:right; font-weight:700; color:#dc2626;">गाडी भाडे :</td><td style="padding:8px 5px; text-align:right; font-weight:800; color:#dc2626;">- ${totalBhade}</td></tr>`;
                 }
                 if (totalPay > 0) {
                     runningBal -= totalPay;
-                    html += `<tr><td colspan="2" style="padding:4px 4px; text-align:right; font-weight:700; color:#059669;">पैसे जमा :</td><td style="padding:4px 0; text-align:right; font-weight:800; color:#059669;">- ${totalPay}</td></tr>`;
+                    html += `<tr><td colspan="2" style="padding:8px 5px; text-align:right; font-weight:700; color:#059669;">पैसे जमा :</td><td style="padding:8px 5px; text-align:right; font-weight:800; color:#059669;">- ${totalPay}</td></tr>`;
                 }
 
                 let finalPrefix = runningBal < 0 ? "जास्त दिले :" : "सध्याची बाकी :"; let finalColor = runningBal < 0 ? "#ef4444" : "#1e3a8a"; let finalBg = runningBal < 0 ? "#fef2f2" : "#e0eafc";
-                html += `<tr style="background:${finalBg}; border:2px solid ${finalColor};"><td colspan="2" style="padding:8px 4px; text-align:right; font-weight:800; color:${finalColor}; font-size:15px;">${finalPrefix}</td><td style="padding:8px 0; text-align:right; white-space:nowrap;"><span style="color:#fff; background:${finalColor}; padding:4px 8px; border-radius:6px; font-weight:800; font-size:18px;">₹ ${Math.abs(runningBal)} /-</span></td></tr>`; 
-            } else { html += `<tr><td colspan="3" style="text-align:center; padding: 20px; color: #8e8e93; font-weight:600;">No Data Found</td></tr>`; }
+                html += `<tr style="background:${finalBg}; border:2px solid ${finalColor};"><td colspan="2" style="padding:14px 5px; text-align:right; font-weight:800; color:${finalColor}; font-size:17px;">${finalPrefix}</td><td style="padding:14px 5px; text-align:right; white-space:nowrap;"><span style="color:#fff; background:${finalColor}; padding:6px 12px; border-radius:6px; font-weight:800; font-size:20px;">₹ ${Math.abs(runningBal)} /-</span></td></tr>`; 
+            } else { html += `<tr><td colspan="3" style="text-align:center; padding: 40px; color: #8e8e93; font-weight:600; font-size:16px;">कोणतीही नोंद सापडली नाही</td></tr>`; }
             
             list.innerHTML = html + "</tbody></table>"; 
             
@@ -890,8 +889,7 @@ function generateFinalBill() {
             }
             list.innerHTML = html + "</tbody></table>";
         }
-    }
-
+}
     function renderPreview() { 
         let date = val("dateInput"); let data = getData().filter(e => e && e.date === date); let cR = getCommonRateForDate(date); 
         let tbody = document.getElementById("previewBody"); tbody.innerHTML = ""; 
