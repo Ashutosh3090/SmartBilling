@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -165,8 +164,25 @@
 
         <div id="ocrModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('ocrModal')">✕</div><h3 style="color: #ea580c;">📸 वही स्कॅन (Smart AI)</h3><div class="section-box" id="apiKeySection" style="background:#fffbeb; border-color:#fde68a;"><label style="color:#d97706;">🔐 Google AI API Key:</label><input type="text" id="geminiApiKey" placeholder="Paste API Key here..." onchange="saveApiKey()" style="margin-bottom: 10px; border-color:#fbbf24; font-size: 13px;"><div style="font-size: 11px; color: #b45309;">Key नसेल तर <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #ef4444; font-weight:600;">येथे मिळवा</a>.</div></div><div class="section-box"><div class="input-group" style="margin-bottom: 10px;"><label>📸 फोटो निवडा (Camera/Gallery):</label><input type="file" id="ocrImageInput" accept="image/*" onchange="previewOcrImage(event)"></div><img id="ocrPreview" style="max-width: 100%; display: none; border-radius: 8px; margin-bottom: 10px; border: 2px solid #cbd5e1;" /><div class="input-row"><div class="input-group"><label>📅 तारीख:</label><input type="date" id="ocrDateInput" onchange="onOcrDateChange()"></div><div class="input-group"><label>भाव (Rate ₹):</label><input type="number" id="ocrCommonRate" placeholder="2000" oninput="updateOcrTotals()"></div></div><button class="btn-add bg-gradient-ai" id="ocrProcessBtn" onclick="processVisionAI()" style="margin-top:10px;">🔍 AI द्वारे स्कॅन करा</button><div id="ocrStatus" style="text-align: center; margin-top: 10px; font-weight: 600; font-size: 13px; color: #ea580c;"></div></div><div id="ocrResultSection" style="display: none;"><div class="table-container" style="max-height: 40vh; overflow-y: auto; margin-bottom: 15px;"><table class="styled-table"><thead><tr><th>नाव (AI)</th><th>वजन</th><th>भाव</th><th>रक्कम</th><th>❌</th></tr></thead><tbody id="ocrResultBody"></tbody></table></div><button class="btn-add bg-gradient-green" onclick="saveOcrEntries()">✅ सर्व सेव्ह करा</button></div></div></div>
 
-        <div id="aiModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('aiModal')">✕</div><h3 style="color: #0f172a;">🤖 AI Business Advisor</h3><div id="aiReportContent" style="margin-top: 15px; font-size: 14px; line-height: 1.6;"><p style="text-align:center; color:gray;">⏳ Scanning Data...</p></div></div></div>
+       <div id="aiModal" class="modal no-print">
+    <div class="modal-content" style="display:flex; flex-direction:column; height:85vh; padding-bottom: 10px;">
+        <div class="close-icon" onclick="closeModal('aiModal')">✕</div>
+        <h3 style="color: #0f172a; margin-bottom: 15px;">🤖 Smart Business AI</h3>
+        
+        <div id="aiChatBox" style="flex:1; overflow-y:auto; background:#f8fafc; border-radius:16px; padding:15px; border:1px solid #e2e8f0; margin-bottom:15px; display:flex; flex-direction:column; gap:12px;">
+            <div style="text-align:left;">
+                <span style="background:#e0e7ff; color:#3730a3; padding:10px 14px; border-radius:16px 16px 16px 0; display:inline-block; font-size:13px; font-weight:500; max-width:85%; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
+                    नमस्ते! मी तुमचा स्मार्ट असिस्टंट. तुम्हाला आजच्या व्यवहारांबद्दल किंवा कोणत्याही हिशोबाबद्दल काय विचारायचे आहे?
+                </span>
+            </div>
+        </div>
 
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="aiChatInput" placeholder="येथे प्रश्न विचारा... (उदा. आजची एकूण खरेदी किती?)" style="flex:1; font-size:14px; border:2px solid #cbd5e1; border-radius:14px; padding:12px; box-shadow:none;" onkeypress="if(event.key === 'Enter') sendAiMessage()">
+            <button class="btn-add bg-gradient-ai" style="width:auto; padding:12px 18px; border-radius:14px;" onclick="sendAiMessage()">📤</button>
+        </div>
+    </div>
+</div>
         <div id="merchantHubModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('merchantHubModal')">✕</div><h3 style="color: var(--merchant-color);">🏢 Vyapari</h3><div class="section-box"><div class="input-row"><div class="input-group"><label>Date:</label><input type="date" id="merDate" onchange="onMerDateOrTypeChange()"></div><div class="input-group" style="flex:2;"><label>Trader Name:</label><input type="text" id="merName" list="merchantList" placeholder="Select Trader..."><datalist id="merchantList"></datalist></div></div><div class="input-row"><div class="input-group"><label>Weight:</label><input type="number" id="merWeight" placeholder="0.00"></div><div class="input-group"><label>Rate:</label><input type="number" id="merRate" placeholder="0.00"></div><div class="input-group"><label>Type:</label><select id="merTypeSel" onchange="onMerDateOrTypeChange()"><option value="नि">नि</option><option value="पि">पि</option><option value="के">के</option><option value="शे">शे</option><option value="रु">रु</option></select></div></div><button class="btn-add bg-gradient-merchant" style="margin-top: 5px;" onclick="saveMerchantEntry()">Save Entry</button></div><div class="list-header-bar" style="background:transparent; padding:0; border:none;"><button class="btn-action-small bg-gradient-purple" onclick="openModal('merPreviewModal'); renderMerPreview();">👁️ Preview</button><button class="btn-action-small bg-gradient-green" onclick="openModal('merJamaModal'); initMerJama();">💸 जमा</button><button class="btn-action-small bg-gradient-orange" onclick="openModal('merchantListModal'); renderMerList();">👥 List</button><button class="btn-action-small bg-gradient-blue" onclick="openModal('billModal'); initMerBill();">📜 Bill</button></div></div></div>
         
         <div id="merJamaModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('merJamaModal')">✕</div><h3 style="color: var(--success);">💸 व्यापारी जमा</h3><div class="section-box" style="border: none; background: #ecfdf5;"><div class="input-group" style="margin-bottom: 15px;"><label>तारीख (Date):</label><input type="date" id="merJamaDateOut"></div><div class="input-group" style="margin-bottom: 15px;"><label>व्यापाऱ्याचे नाव:</label><input type="text" id="merJamaNameOut" list="merchantList" placeholder="नाव निवडा..."></div><div class="input-group" style="margin-bottom: 15px;"><label>जमा रक्कम (₹):</label><input type="number" id="merJamaAmountOut" placeholder="0" style="font-size: 18px; font-weight: bold; color: var(--success);"></div><div class="input-group" style="margin-bottom: 20px;"><label>टीप (Hint):</label><input type="text" id="merJamaHintOut" placeholder="उदा. रोख, PhonePe"></div><button class="btn-add bg-gradient-green" onclick="saveMerJamaOutside()">✅ जमा करा</button></div></div></div>
@@ -774,20 +790,27 @@ function generateFinalBill() {
         closeModal("billModal"); openModal("finalBillModal"); document.getElementById("billMonthDisplay").innerText = displayDate; document.getElementById("billHeaderName").innerText = n; let list=document.getElementById("billTableWrapper"); list.innerHTML=""; 
         
         if(type==='FARMER'){
+       
             document.getElementById("billAdvBox").innerText=""; let d=[...getData()].sort((a,b)=>new Date(a.date)-new Date(b.date)); let filteredData = []; let totalAdvInPeriod = 0;
             d.forEach(e => { if(e && e.name === n && e.date >= startFilter && e.date <= endFilter) { filteredData.push(e); if(e.type === 'advance') totalAdvInPeriod += (Number(e.amount)||0); } });
             
             let html = `<table style="width:100%; max-width:320px; margin:0 auto; border-collapse:collapse; font-family:sans-serif; color:#000;"><thead><tr><th style="padding:2px 0; border-bottom:2px solid #000; text-align:left; width:33%; font-size:12px; color:#000;">तारीख</th><th style="padding:2px 0; border-bottom:2px solid #000; text-align:center; width:34%; font-size:12px; color:#000;">तपशील</th><th style="padding:2px 0; border-bottom:2px solid #000; text-align:right; width:33%; font-size:12px; color:#000;">रक्कम (₹)</th></tr></thead><tbody style="font-size:13px;">`;
             let runningBal = 0; let totalCropAmount = 0; let totalBhade = 0; let totalAdv = 0; let totalPay = 0;
             
-            if(filteredData.length > 0) {
+           if(filteredData.length > 0) {
                 let currD = new Date(startFilter + "T00:00:00"); let endD = new Date(endFilter + "T00:00:00");
                 while(currD <= endD) {
                     let yyyy = currD.getFullYear(); let mm = String(currD.getMonth() + 1).padStart(2, '0'); let dd = String(currD.getDate()).padStart(2, '0'); let dStr = `${yyyy}-${mm}-${dd}`;
                     let dailyEntries = filteredData.filter(e => e.date === dStr);
+                    let fDate = formatDate(dStr);
+                    
+                    // 🌟 फक्त शेतकरी बिलासाठी: ज्या दिवशी माल नाही, तिथे 'माल नाही' दाखवा 🌟
+                    let hasCrop = dailyEntries.some(e => e.type === 'crop');
+                    if (!hasCrop) {
+                        html += `<tr><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; font-weight:800; color:#64748b;">${fDate}</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700; color:#94a3b8;">माल नाही</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800; color:#94a3b8;">-</td></tr>`;
+                    }
                     
                     dailyEntries.forEach(e => {
-                        let fDate = formatDate(dStr);
                         if (e.type === 'crop') {
                             totalCropAmount += e.total;
                             let cR = getCommonRateForDate(dStr); let rateDisplay = (e.rate !== cR && cR > 0) ? `<span style="color:#ef4444; font-weight:900;">${e.rate}⚠️</span>` : e.rate;
@@ -806,7 +829,6 @@ function generateFinalBill() {
                     });
                     currD.setDate(currD.getDate() + 1);
                 }
-
                 runningBal = totalCropAmount;
                 html += `<tr style="border-top:2px solid #000;"><td colspan="2" style="padding:6px 4px; text-align:right; font-weight:800; font-size:14px;">एकूण माल :</td><td style="padding:6px 0; text-align:right; font-weight:800; font-size:15px;">${totalCropAmount}</td></tr>`;
 
@@ -1243,7 +1265,94 @@ function generateFinalBill() {
             renderNotes();
         }
     }
-   
+   // 🤖 Smart AI Chatbot Logic
+async function sendAiMessage() {
+    let inputField = document.getElementById("aiChatInput");
+    let userText = inputField.value.trim();
+    if (!userText) return;
+
+    let chatBox = document.getElementById("aiChatBox");
+    
+    // 1. Show User Message
+    chatBox.innerHTML += `<div style="text-align:right;"><span style="background:linear-gradient(135deg,#3b82f6,#1d4ed8); color:#fff; padding:10px 14px; border-radius:16px 16px 0 16px; display:inline-block; font-size:13px; max-width:85%; font-weight:500; box-shadow:0 4px 6px rgba(0,0,0,0.1);">${userText}</span></div>`;
+    inputField.value = "";
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    // 2. Check API Key
+    let apiKey = document.getElementById("geminiApiKey").value || localStorage.getItem("geminiApiKey");
+    if (!apiKey) {
+        chatBox.innerHTML += `<div style="text-align:left;"><span style="background:#fee2e2; color:#ef4444; padding:10px 14px; border-radius:16px 16px 16px 0; display:inline-block; font-size:13px; max-width:85%; font-weight:600;">⚠️ कृपया 'वही स्कॅन' सेक्शन मध्ये जाऊन आधी API Key टाका.</span></div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+        return;
+    }
+
+    // 3. Show Loading Animation
+    let loadingId = "loading_" + Date.now();
+    chatBox.innerHTML += `<div id="${loadingId}" style="text-align:left;"><span style="background:#e2e8f0; color:#475569; padding:10px 14px; border-radius:16px 16px 16px 0; display:inline-block; font-size:13px; font-weight:500; animation: pulse 1.5s infinite;">⏳ माहिती शोधत आहे...</span></div>`;
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    // 4. Gather Live Software Data for AI Context
+    let selDate = val("dateInput");
+    let cData = getData() || [];
+    let mData = getMerchantDB() || [];
+    let bData = getBagDB() || [];
+    
+    let tKharedi = 0, tVikri = 0, pendingAmt = 0;
+    
+    // Calculate stats
+    cData.forEach(e => { if(e && e.date === selDate && e.type === 'crop') tKharedi += (e.total || 0); });
+    mData.forEach(e => { 
+        if(e) {
+            if(e.type === 'payment') pendingAmt -= (e.amount || 0);
+            else { 
+                pendingAmt += (e.total || 0); 
+                if(e.date === selDate) tVikri += (e.total || 0); 
+            }
+        }
+    });
+
+    let systemPrompt = `You are a helpful and intelligent Marathi AI assistant integrated inside a billing software. 
+    You must answer the user's questions based strictly on the current live data provided below. Keep your answers natural, accurate, and in Marathi.
+    
+    [LIVE SOFTWARE DATA SUMMARY]
+    Selected Date: ${selDate}
+    Today's Farmer Purchase (आजची शेतकरी खरेदी): ₹ ${tKharedi}
+    Today's Merchant Sales (आजची व्यापारी विक्री): ₹ ${tVikri}
+    Total Market Outstanding (एकूण व्यापाऱ्यांकडून येणे बाकी): ₹ ${pendingAmt}
+    
+    If the user asks something outside this data, politely tell them that you currently only have access to basic summary data. Do not make up numbers.`;
+
+    let payload = {
+        contents: [{ parts: [{ text: systemPrompt + "\n\nUser Question: " + userText }] }]
+    };
+
+    // 5. Call Gemini API
+    try {
+        let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+        
+        let result = await response.json();
+        document.getElementById(loadingId).remove();
+
+        if (response.ok && result.candidates) {
+            let aiReply = result.candidates[0].content.parts[0].text;
+            // Convert markdown bold (**) to HTML bold (<b>) for neat display
+            aiReply = aiReply.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+            aiReply = aiReply.replace(/\n/g, '<br>');
+            
+            chatBox.innerHTML += `<div style="text-align:left;"><span style="background:#ffffff; color:#334155; padding:12px 16px; border-radius:16px 16px 16px 0; display:inline-block; font-size:13px; max-width:85%; line-height:1.6; box-shadow:0 4px 6px rgba(0,0,0,0.05); border:1px solid #e2e8f0;">${aiReply}</span></div>`;
+        } else {
+            throw new Error(result.error?.message || "Unknown error");
+        }
+    } catch (e) {
+        if(document.getElementById(loadingId)) document.getElementById(loadingId).remove();
+        chatBox.innerHTML += `<div style="text-align:left;"><span style="background:#fee2e2; color:#ef4444; padding:10px 14px; border-radius:16px 16px 16px 0; display:inline-block; font-size:13px; max-width:85%; font-weight:500;">❌ सर्व्हर एरर: ${e.message}</span></div>`;
+    }
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
 </script>
 </body>
 </html>
