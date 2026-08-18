@@ -1,4 +1,4 @@
-         <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -134,15 +134,14 @@
                     <span id="alertBadge" style="position:absolute; top:-5px; right:-5px; background:#fff; color:red; border-radius:50%; width:22px; height:22px; font-size:12px; font-weight:900; display:none; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.3); border:2px solid red;">0</span>
                 </button>
                 <button class="action-btn bg-gradient-purple" onclick="openModal('previewModal'); renderPreview();"><i>👁️</i> Preview</button>
-                <button class="action-btn bg-gradient-orange" onclick="openModal('advModal'); initAdv();"><i>💰</i> Advance</button>
                 <button class="action-btn bg-gradient-blue" onclick="openModal('billModal'); initFarmerBill();"><i>📜</i> Farmer Bill</button>
                 <button class="action-btn bg-gradient-green" onclick="openModal('listModal'); generateFarmerStatus();"><i>👥</i> Farmers</button>
                 <button class="action-btn bg-gradient-merchant" onclick="openModal('merchantHubModal');"><i>🏢</i> Traders</button>
-                <button class="action-btn bg-gradient-bag" onclick="openModal('bagModal');"><i>🎒</i> Bags</button>
                 <button class="action-btn bg-gradient-blue" onclick="openModal('monthlyReportModal'); initMonthlyReport();"><i>📊</i> मासिक रिपोर्ट</button>
            <button class="action-btn" style="background:linear-gradient(135deg,#0ea5e9,#0369a1);" onclick="openModal('notesModal'); initNotes();"><i>📝</i> रोजच्या नोंदी</button>
            <button class="action-btn" style="background:linear-gradient(135deg,#14b8a6,#0d9488);" onclick="openModal('profitModal'); initProfit();"><i>💸</i> Profit</button>
            <button class="action-btn" style="background:linear-gradient(135deg,#6366f1,#4338ca);" onclick="openModal('todaySummaryModal'); updateDashboard();"><i>📈</i> आजचा अहवाल</button>
+           <button class="action-btn bg-gradient-red" onclick="openModal('advModal');"><i>💰</i> Advance</button>
             </div>
         </div>
 
@@ -238,9 +237,51 @@
         
 
         <div id="detailModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('detailModal')">✕</div><h3 id="detailFarmerName" style="color: var(--primary);">खातेवही</h3><input type="hidden" id="activeFarmerName"><div style="text-align: right; margin-bottom: 10px;"><button class="small-btn bg-gradient-orange" id="farmerHistManageBtn" onclick="toggleFarmerHistMode()">✏️ Edit</button></div><div class="table-container" style="max-height: 60vh; overflow-y:auto;"><table class="styled-table"><thead><tr><th>तारीख</th><th>तपशील</th><th style="text-align:right;">रक्कम</th><th>⚙️</th></tr></thead><tbody id="detailBody"></tbody></table></div></div></div>
-        <div id="advModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('advModal')">✕</div><h3 style="color: var(--danger);">💰 Advance (उचल)</h3><div class="section-box" style="background:#fef2f2;"><div class="input-group" style="margin-bottom: 10px;"><label>Date:</label><input type="date" id="advDate"></div><div class="input-group" style="margin-bottom: 10px;"><label>Name:</label><input type="text" id="advFarmerName" list="farmerList"></div><div class="input-group" style="margin-bottom: 15px;"><label>Amount (₹):</label><input type="number" id="advAmount"></div><div style="display:flex; gap:10px;"><button class="btn-add bg-gradient-red" style="flex:1;" onclick="saveAdvance('GIVE')">दिली (+)</button><button class="btn-add bg-gradient-green" style="flex:1;" onclick="saveAdvance('TAKE')">जमा (-)</button></div></div><button class="btn-add" style="background:#1c1c1e;" onclick="openModal('advListModal', renderAdvList)">📜 List</button></div></div>
+        <div id="advModal" class="modal no-print"><div class="modal-content" style="max-width: 380px; padding: 25px; border: 2px solid #fecaca; box-shadow: 0 20px 40px rgba(220,38,38,0.15);"><div class="close-icon" onclick="closeModal('advModal')">✕</div>
+            <h3 style="color: var(--danger); margin-bottom: 5px;">💰 Advance (उचल)</h3>
+            <p style="text-align: center; color: var(--text-muted); font-size: 12px; margin-bottom: 20px;">कोणाला उचल दिली किंवा जमा केली असेल तर येथे नोंदवा.</p>
+            <div class="section-box" style="background:#fef2f2; border: 1px solid #fecaca; border-radius: var(--radius-lg); padding: 20px;">
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label style="color: #b91c1c; font-weight: 600;">Date:</label>
+                    <input type="date" id="advDate" style="border: 1px solid #fca5a5; background: #fff;">
+                </div>
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label style="color: #b91c1c; font-weight: 600;">Name:</label>
+                    <input type="text" id="advFarmerName" list="farmerList" placeholder="नाव शोधा किंवा लिहा..." style="border: 1px solid #fca5a5; background: #fff;">
+                </div>
+                <div class="input-group" style="margin-bottom: 20px;">
+                    <label style="color: #b91c1c; font-weight: 600;">Amount (₹):</label>
+                    <input type="number" id="advAmount" placeholder="0" style="border: 1px solid #fca5a5; background: #fff; font-size: 18px; font-weight: 700; color: #b91c1c;">
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-add bg-gradient-red" style="flex:1; box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);" onclick="saveAdvance('GIVE')">दिली (+)</button>
+                    <button class="btn-add bg-gradient-green" style="flex:1; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);" onclick="saveAdvance('TAKE')">जमा (-)</button>
+                </div>
+            </div>
+            <button class="btn-add" style="background:#1e293b; margin-top: 15px; box-shadow: 0 4px 6px rgba(30, 41, 59, 0.2);" onclick="openModal('advListModal'); renderAdvList();">📜 History List</button>
+        </div></div>
         
-        <div id="advListModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('advListModal')">✕</div><h3 style="color: var(--danger);">📜 Advance List</h3><div class="list-header-bar"><span id="totalAdvDisplay" style="font-weight:600; color:var(--danger); flex:1;">Total: 0</span><button class="small-btn" style="background:#8e8e93;" id="manageAdvListBtn" onclick="toggleAdvEditMode()">⚙️ Manage</button></div><div class="table-container" style="max-height: 55vh; overflow-y: auto;"><table class="styled-table"><thead><tr><th>Date</th><th>Name</th><th>Type</th><th>Amt</th><th>⚙️</th></tr></thead><tbody id="advListBody"></tbody></table></div></div></div>
+        <div id="advListModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('advListModal')">✕</div><h3 style="color: var(--danger);">📜 Advance List</h3><div class="list-header-bar"><span id="totalAdvDisplay" style="font-weight:600; color:var(--danger); flex:1;">Total: 0</span></div><div class="table-container" style="max-height: 55vh; overflow-y: auto;"><table class="styled-table"><thead><tr><th>Name</th><th style="text-align:right;">Pending Advance</th></tr></thead><tbody id="advListBody"></tbody></table></div></div></div>
+        
+        <div id="advHistoryModal" class="modal no-print">
+            <div class="modal-content">
+                <div class="close-icon" onclick="closeModal('advHistoryModal')">✕</div>
+                <h3 style="color: var(--danger);" id="advHistoryTitle">Advance History</h3>
+                <input type="hidden" id="activeAdvHistoryName">
+                <div style="text-align: right; margin-bottom: 10px;">
+                    <button class="small-btn bg-gradient-orange" id="advHistManageBtn" onclick="toggleAdvHistMode()">✏️ Edit</button>
+                </div>
+                <div class="list-header-bar" style="justify-content:center; background:#fef2f2; border:none; padding:10px; margin-bottom:15px; border-radius:10px;">
+                    <span id="advHistoryTotal" style="font-weight:800; font-size:20px; color:var(--danger);">₹ 0</span>
+                </div>
+                <div class="table-container" style="max-height: 55vh; overflow-y: auto;">
+                    <table class="styled-table">
+                        <thead><tr><th>तारीख</th><th style="text-align:right;">रक्कम</th><th>⚙️</th></tr></thead>
+                        <tbody id="advHistoryBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div> 
 </div>
 <div id="notesModal" class="modal no-print">
@@ -565,7 +606,7 @@
         data.forEach(e => {
             if(!cacheCommonRate[e.date]) { cacheCommonRate[e.date] = getCommonRateForDate(e.date); }
             let cR = cacheCommonRate[e.date];
-            if(cR > 0 && e.rate !== cR) { discrepancies.push({...e, commonRate: cR}); }
+            if(cR > 0 && e.rate !== cR && !e.isRateOk) { discrepancies.push({...e, commonRate: cR}); }
         });
         discrepancies.sort((a, b) => new Date(b.date) - new Date(a.date));
         return discrepancies;
@@ -583,7 +624,7 @@
     function renderAlerts() {
         let disc = checkRateDiscrepancies(); let tbody = document.getElementById("alertBody"); let html = "";
         disc.forEach(e => {
-            html += `<tr><td style="font-weight:600; font-size:12px;">${formatDate(e.date)}</td><td style="font-weight:600; font-size:12px;">${e.name}</td><td style="color:var(--danger); font-weight:700;">${e.rate}</td><td style="color:var(--success); font-weight:700;">${e.commonRate}</td><td style="text-align:center;"><button class="small-btn btn-edit" onclick="fixRate(${e.id}, ${e.commonRate})" style="padding:4px 8px;">Fix</button></td></tr>`;
+            html += `<tr><td style="font-weight:600; font-size:12px;">${formatDate(e.date)}</td><td style="font-weight:600; font-size:12px;">${e.name}</td><td style="color:var(--danger); font-weight:700;">${e.rate}</td><td style="color:var(--success); font-weight:700;">${e.commonRate}</td><td style="text-align:center;"><button class="small-btn btn-edit" onclick="fixRate(${e.id}, ${e.commonRate})" style="padding:4px 8px; margin-right:4px;">Fix</button><button class="small-btn bg-gradient-green" onclick="ignoreRateError(${e.id})" style="padding:4px 8px;">OK</button></td></tr>`;
         });
         if(disc.length === 0) { html = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#8e8e93; font-weight:600;">कोणतीही चूक सापडली नाही. सर्व भाव बरोबर आहेत! 🎉</td></tr>`; }
         tbody.innerHTML = html;
@@ -593,11 +634,20 @@
         if(currentUserRole !== 'admin') { alert("❌ हे फक्त मालक करू शकतात."); return; }
         let data = getData(); let idx = data.findIndex(e => e && e.id === id);
         if(idx !== -1) {
-            data[idx].rate = correctRate; data[idx].total = Math.floor((data[idx].weight * correctRate) / 5) * 5;
-            saveData(data); renderAlerts();
+            data[idx].rate = correctRate; data[idx].total = Math.floor((data[idx].weight * correctRate) / 5) * 5; data[idx].isRateOk = true;
+            saveData(data); updateAlertBadge(); renderAlerts();
             if(document.getElementById("previewModal").classList.contains("show")) renderPreview();
             if(document.getElementById("listModal").classList.contains("show")) generateFarmerStatus();
             alert("✅ भाव दुरुस्त झाला!");
+        }
+    }
+
+    function ignoreRateError(id) {
+        if(currentUserRole !== 'admin') { alert("❌ हे फक्त मालक करू शकतात."); return; }
+        let data = getData(); let idx = data.findIndex(e => e && e.id === id);
+        if(idx !== -1) {
+            data[idx].isRateOk = true;
+            saveData(data); updateAlertBadge(); renderAlerts();
         }
     }
 
@@ -865,8 +915,26 @@ function generateFinalBill() {
             }
             
             if(totalAdvInPeriod !== 0) { document.getElementById("billAdvBox").innerText = `⚠️ या कालावधीत नेलेली एकूण उचल : ₹ ${totalAdvInPeriod} (बिलातून वजा केलेली नाही)`; } else { document.getElementById("billAdvBox").innerText = ""; }
+        } else if(type === 'MERCHANT_JAMA') {
+            // MERCHANT JAMA BILL (Only Payments, no balances)
+            document.getElementById("billAdvBox").innerText=""; let d=[...getMerchantDB()].sort((a,b)=>new Date(a.date)-new Date(b.date)); let filteredData = []; let totalJama = 0;
+            d.forEach(e => { 
+                if(e && e.name === n && e.type === 'payment' && e.date >= startFilter && e.date <= endFilter) { 
+                    filteredData.push(e); totalJama += (Number(e.amount)||0);
+                } 
+            });
+            let html = `<table style="width:100%; max-width:100%; margin:0 auto; border-collapse:collapse; font-family:'Poppins',sans-serif; color:#0f172a;"><thead><tr><th style="padding:10px 5px; border-bottom:2px solid #cbd5e1; text-align:left; width:25%; font-size:14px; color:#64748b; text-transform:uppercase; white-space:nowrap;">तारीख</th><th style="padding:10px 5px; border-bottom:2px solid #cbd5e1; text-align:center; width:50%; font-size:14px; color:#64748b; text-transform:uppercase; white-space:nowrap;">तपशील</th><th style="padding:10px 5px; border-bottom:2px solid #cbd5e1; text-align:right; width:25%; font-size:14px; color:#64748b; text-transform:uppercase; white-space:nowrap;">रक्कम (₹)</th></tr></thead><tbody style="font-size:15px;">`;
+            
+            if(filteredData.length === 0) { html += `<tr><td colspan="3" style="text-align:center; padding: 30px; color: #8e8e93; font-weight:500;">No Deposits Found</td></tr>`; } else {
+                filteredData.forEach(e => {
+                    let hintStr = e.hint ? ` <span style="font-size:11px; color:#64748b;">(${e.hint})</span>` : ""; 
+                    html += `<tr style="background:#ecfdf5;"><td style="padding:12px 10px; color:#059669; font-weight:600; font-size:14px; white-space:nowrap; border-bottom:1px dashed #cbd5e1;">${formatDate(e.date)}</td><td style="padding:12px 10px; text-align:center; font-weight:600; color:#059669; white-space:nowrap; border-bottom:1px dashed #cbd5e1;">जमा${hintStr}</td><td style="padding:12px 10px; text-align:right; font-weight:700; font-size:17px; color:#059669; white-space:nowrap; border-bottom:1px dashed #cbd5e1;">${e.amount}</td></tr>`; 
+                });
+                html += `<tr style="background:#e0f2fe; border:2px solid #3b82f6;"><td colspan="2" style="padding:16px 12px; text-align:right; font-weight:700; font-size:16px; color:#1d4ed8;">एकूण जमा :</td><td style="padding:16px 12px; text-align:right; white-space:nowrap;"><span style="color:#fff; background:#2563eb; padding:6px 14px; border-radius:8px; font-weight:800; font-size:20px; box-shadow:0 4px 6px rgba(37,99,235,0.2);">₹ ${totalJama} /-</span></td></tr>`;
+            }
+            list.innerHTML = html + "</tbody></table>";
         } else {
-            // MERCHANT BILL
+            // MERCHANT BILL (All Data)
             document.getElementById("billAdvBox").innerText=""; let d=[...getMerchantDB()].sort((a,b)=>new Date(a.date)-new Date(b.date)); let openingBal = 0; let filteredData = [];
             d.forEach(e => { if(e && e.name === n) { if (e.date < openingBalDateFilter) { if(e.type !== 'payment') openingBal += (Number(e.total)||0); else openingBal -= (Number(e.amount)||0); } else if (e.date >= startFilter && e.date <= endFilter) { filteredData.push(e); } } });
             let html = `<table style="width:100%; max-width:100%; margin:0 auto; border-collapse:collapse; font-family:'Poppins',sans-serif; color:#0f172a;"><thead><tr><th style="padding:10px 5px; border-bottom:2px solid #cbd5e1; text-align:left; width:25%; font-size:14px; color:#64748b; text-transform:uppercase; white-space:nowrap;">तारीख</th><th style="padding:10px 5px; border-bottom:2px solid #cbd5e1; text-align:center; width:50%; font-size:14px; color:#64748b; text-transform:uppercase; white-space:nowrap;">तपशील</th><th style="padding:10px 5px; border-bottom:2px solid #cbd5e1; text-align:right; width:25%; font-size:14px; color:#64748b; text-transform:uppercase; white-space:nowrap;">रक्कम (₹)</th></tr></thead><tbody style="font-size:15px;">`;
@@ -905,6 +973,7 @@ function generateFinalBill() {
                 }
                 let finalPrefix = runningTotal < 0 ? "जास्त जमा :" : "सध्याची एकूण बाकी :"; html += `<tr style="background:#e0f2fe; border:2px solid #3b82f6;"><td colspan="2" style="padding:16px 12px; text-align:right; font-weight:700; font-size:16px; color:#1d4ed8;">${finalPrefix}</td><td style="padding:16px 12px; text-align:right; white-space:nowrap;"><span style="color:#fff; background:#2563eb; padding:6px 14px; border-radius:8px; font-weight:800; font-size:20px; box-shadow:0 4px 6px rgba(37,99,235,0.2);">₹ ${Math.abs(runningTotal)} /-</span></td></tr>`;
             }
+
             list.innerHTML = html + "</tbody></table>";
         }
     }
@@ -1018,8 +1087,6 @@ function generateFinalBill() {
                         if(selMonth && e.date && e.date.startsWith(selMonth)) hasDataForMonth = true;
                         
                         if(e.type==='crop') cropTotal += (Number(e.total) || 0); 
-                        else if(e.type==='payment') payTotal += (Number(e.amount) || 0); 
-                        else if(e.type==='advance') totalAdv += (Number(e.amount) || 0); 
                     } 
                 }); 
                 let tenPercentDeduction = Math.round((cropTotal * 0.10) / 5) * 5;
@@ -1031,9 +1098,8 @@ function generateFinalBill() {
                 let btns = listMode ? `<div style='float:right'><button class='manage-btn' onclick="editFarmerName('${f}')">✎</button><button class='manage-btn' style='color:#ef4444;' onclick="delFarmerName('${f}')">🗑</button></div>` : ""; 
                 let badgeClass = "badge-green"; let styleStr = ""; let prefix = "₹ "; 
                 if(total < 0) { badgeClass = "badge-red"; prefix = "जास्त दिले: ₹ "; styleStr = "color:var(--danger); border-color:var(--danger);"; total = Math.abs(total); } 
-                let advBadge = totalAdv !== 0 ? `<div style="font-size:11px; color:var(--warning); margin-top:4px; font-weight:600;">उचल: ₹ ${Math.abs(totalAdv).toLocaleString('en-IN')}</div>` : ""; 
                 
-                html += `<tr class='premium-row'><td><div style="display:flex; align-items:center;"><div class="user-avatar">🧑🌾</div><span onclick="openDetailModal('${f}')" style="cursor:pointer; font-weight:600;">${f}</span></div>${btns}</td><td style="text-align:right;"><span style="${showAll ? '' : 'display:none'} ${styleStr}" class="${badgeClass}">${prefix}${total.toLocaleString('en-IN')}</span><div style="${showAll ? '' : 'display:none'}">${advBadge}</div><span style="${showAll ? 'display:none' : ''}" style="color:var(--text-muted); font-weight:600;">****</span></td></tr>`; 
+                html += `<tr class='premium-row'><td><div style="display:flex; align-items:center;"><div class="user-avatar">🧑🌾</div><span onclick="openDetailModal('${f}')" style="cursor:pointer; font-weight:600;">${f}</span></div>${btns}</td><td style="text-align:right;"><span style="${showAll ? '' : 'display:none'} ${styleStr}" class="${badgeClass}">${prefix}${total.toLocaleString('en-IN')}</span><span style="${showAll ? 'display:none' : ''}" style="color:var(--text-muted); font-weight:600;">****</span></td></tr>`; 
             }); 
             
             tbody.innerHTML = html || "<tr><td colspan='2' style='text-align:center; padding:20px; color:#8e8e93; font-weight:600;'>No Data Found</td></tr>"; 
@@ -1202,15 +1268,12 @@ function generateFinalBill() {
 
             monthEntries.forEach(e => {
                 let dStr = formatDate(e.date);
+                let btns = isFarmerHistMode ? `<button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button>` : "";
+                
                 if (e.type === 'crop') {
-                    mTotalCrop += e.total; html += `<tr><td style="font-weight:600; color:#8e8e93;">${dStr}</td><td style="font-weight:500;">${e.weight}x${e.rate}</td><td style="font-weight:700; text-align:right;">${e.total}</td><td></td></tr>`;
+                    mTotalCrop += e.total; html += `<tr><td style="font-weight:600; color:#8e8e93;">${dStr}</td><td style="font-weight:500;">${e.weight}x${e.rate}</td><td style="font-weight:700; text-align:right;">${e.total}</td><td style="text-align:center;">${btns}</td></tr>`;
                 } else if (e.type === 'bhade') {
-                    mTotalBhade += e.amount; html += `<tr><td style="font-weight:600; color:#8e8e93;">${dStr}</td><td style="text-align:center; font-weight:600; color:#dc2626;">गाडी भाडे:</td><td style="font-weight:700; color:#dc2626; text-align:right;">- ${e.amount}</td><td></td></tr>`;
-                } else if (e.type === 'advance') {
-                    let lbl = e.amount > 0 ? "उचल (दिली)" : "उचल (जमा)"; let col = e.amount > 0 ? "#ea580c" : "#10b981";
-                    html += `<tr><td style="font-weight:600; color:#8e8e93;">${dStr}</td><td style="text-align:center; font-weight:600; color:${col};">${lbl}:</td><td style="font-weight:700; color:${col}; text-align:right;">${e.amount > 0 ? "- " : "+ "}${Math.abs(e.amount)}</td><td></td></tr>`;
-                } else if (e.type === 'payment') {
-                    mTotalPay += e.amount; html += `<tr><td style="font-weight:600; color:#8e8e93;">${dStr}</td><td style="text-align:center; font-weight:600; color:#10b981;">पैसे जमा:</td><td style="font-weight:700; color:#10b981; text-align:right;">- ${e.amount}</td><td></td></tr>`;
+                    mTotalBhade += e.amount; html += `<tr><td style="font-weight:600; color:#8e8e93;">${dStr}</td><td style="text-align:center; font-weight:600; color:#dc2626;">गाडी भाडे:</td><td style="font-weight:700; color:#dc2626; text-align:right;">- ${e.amount}</td><td style="text-align:center;">${btns}</td></tr>`;
                 }
             });
 
@@ -1235,8 +1298,81 @@ function generateFinalBill() {
     
     function initAdv() { document.getElementById("advDate").value = val("dateInput"); }
     function saveAdvance(mode) { let d=val("advDate"); let n=val("advFarmerName").trim(); let a=parseFloat(val("advAmount")); if(!d||!n||!a) return; let mArr = safeArray(farmers); if(!mArr.includes(n)) { mArr.push(n); database.ref('farmers').set(mArr); } let finalAmt = mode === 'GIVE' ? a : -a; let data = getData(); data.push({id:Date.now(), date:d, name:n, type:'advance', amount:finalAmt}); saveData(data); document.getElementById("advAmount").value=""; document.getElementById("advFarmerName").value=""; alert("✅ उचल नोंदवली!"); if(document.getElementById("advListModal").classList.contains("show")) renderAdvList(); }
-    let isAdvEditMode = false; function toggleAdvEditMode() { if(currentUserRole !== 'admin') return; isAdvEditMode = !isAdvEditMode; document.getElementById("manageAdvListBtn").innerHTML = isAdvEditMode ? "❌ Done" : "⚙️ Manage"; renderAdvList(); }
-    function renderAdvList() { let data = getData().filter(e => e && e.type === 'advance'); data.sort((a,b) => new Date(b.date) - new Date(a.date)); let tbody = document.getElementById("advListBody"); let html = ""; let tot = 0; data.forEach(e => { let isGive = e.amount > 0; let col = isGive ? "#ea580c" : "#10b981"; let lbl = isGive ? "दिली" : "जमा"; let sign = isGive ? "" : "+ "; tot += e.amount; let btns = isAdvEditMode ? `<button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button>` : ""; html += `<tr><td style="font-weight:600; color:#8e8e93;">${formatDate(e.date)}</td><td style="font-weight:600;">${e.name}</td><td style="color:${col}; font-weight:600;">${lbl}</td><td style="font-weight:700; color:${col};">${sign}${Math.abs(e.amount)}</td><td style="text-align:center;">${btns}</td></tr>`; }); document.getElementById("totalAdvDisplay").innerText = `Total: ₹ ${tot}`; tbody.innerHTML = html; }
+    let isAdvHistMode = false; 
+    function toggleAdvHistMode() { 
+        if(currentUserRole !== 'admin') { alert("❌ फक्त मालक सेटिंग्ज बदलू शकतात."); return; } 
+        isAdvHistMode = !isAdvHistMode; 
+        document.getElementById("advHistManageBtn").innerHTML = isAdvHistMode ? "❌ Done" : "✏️ Edit"; 
+        renderAdvHistory(document.getElementById("activeAdvHistoryName").value); 
+    }
+    
+    function renderAdvList() { 
+        let data = getData().filter(e => e && e.type === 'advance'); 
+        let tbody = document.getElementById("advListBody"); let html = ""; let grandTot = 0; 
+        let grouped = {};
+        data.forEach(e => {
+            if(!grouped[e.name]) grouped[e.name] = 0;
+            grouped[e.name] += e.amount;
+            grandTot += e.amount;
+        });
+
+        let names = Object.keys(grouped).sort((a,b) => grouped[b] - grouped[a]); 
+        
+        names.forEach(name => {
+            let tot = grouped[name];
+            let col = tot > 0 ? "#ea580c" : (tot < 0 ? "#10b981" : "#1e293b");
+            let text = tot < 0 ? "(जमा)" : "";
+            html += `<tr>
+                <td style="font-weight:700; color:#2563eb; cursor:pointer;" onclick="openAdvHistory('${name}')">👤 ${name}</td>
+                <td style="font-weight:800; color:${col}; text-align:right;" onclick="openAdvHistory('${name}')">₹ ${Math.abs(tot)} ${text}</td>
+            </tr>`; 
+        }); 
+        
+        document.getElementById("totalAdvDisplay").innerText = `Total Remaining: ₹ ${grandTot}`; 
+        if(names.length === 0) html = `<tr><td colspan="2" style="text-align:center; color:#8e8e93; font-weight:600;">नोंद नाही (No records)</td></tr>`;
+        tbody.innerHTML = html; 
+    }
+    
+    function openAdvHistory(name) {
+        document.getElementById("activeAdvHistoryName").value = name;
+        document.getElementById("advHistoryTitle").innerText = name + " (उचल)";
+        renderAdvHistory(name);
+        openModal("advHistoryModal");
+    }
+    
+    function renderAdvHistory(name) {
+        let data = getData().filter(e => e && e.type === 'advance' && e.name === name);
+        data.sort((a,b) => new Date(a.date) - new Date(b.date)); 
+        let html = "";
+        let tot = 0; let totalGiven = 0; let totalDeposit = 0;
+        data.forEach(e => {
+            let isGive = e.amount > 0;
+            if(isGive) totalGiven += e.amount; else totalDeposit += Math.abs(e.amount);
+            tot += e.amount;
+            
+            if (isGive) {
+                let btns = isAdvHistMode ? `<button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button>` : "";
+                html += `<tr>
+                    <td style="font-weight:600; color:#8e8e93;">${formatDate(e.date)}</td>
+                    <td style="font-weight:800; color:#1e293b; text-align:right;">${Math.abs(e.amount)}</td>
+                    <td style="text-align:center;">${btns}</td>
+                </tr>`;
+            }
+        });
+        
+        html += `<tr style="background:#fffbeb; border-top:2px solid #cbd5e1;"><td style="text-align:right; font-weight:700; color:#b91c1c; font-size:13px;">एकूण उचल :</td><td style="text-align:right; font-weight:800; color:#b91c1c; font-size:15px;">${totalGiven}</td><td></td></tr>`;
+        if(totalDeposit > 0) {
+            html += `<tr style="background:#ecfdf5;"><td style="text-align:right; font-weight:700; color:#059669; font-size:13px;">एकूण जमा :</td><td style="text-align:right; font-weight:800; color:#059669; font-size:15px;">- ${totalDeposit}</td><td></td></tr>`;
+        }
+        let finalLbl = tot < 0 ? "जास्त जमा :" : "सध्याची बाकी :";
+        html += `<tr style="background:#e0f2fe; border-top:2px solid #3b82f6;"><td style="text-align:right; font-weight:700; color:#1d4ed8; font-size:14px;">${finalLbl}</td><td style="text-align:right; font-weight:800; color:#1d4ed8; font-size:17px;">₹ ${Math.abs(tot)}</td><td></td></tr>`;
+        
+        let totCol = tot > 0 ? "#ea580c" : (tot < 0 ? "#10b981" : "#1e293b");
+        let totPrefix = tot > 0 ? "बाकी: ₹ " : (tot < 0 ? "जास्त जमा: ₹ " : "बाकी: ₹ ");
+        document.getElementById("advHistoryTotal").innerText = `${totPrefix}${Math.abs(tot)}`;
+        document.getElementById("advHistoryTotal").style.color = totCol;
+        document.getElementById("advHistoryBody").innerHTML = html;
+    }
 // 🌟 Daily Notes Logic 🌟
     function initNotes() { 
         document.getElementById("noteDate").value = val("dateInput") || new Date().toISOString().slice(0, 10); 
