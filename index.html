@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+         <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -85,7 +85,9 @@
             .modal-content { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; transform: none !important; max-height: none !important; overflow: visible !important; }
             .no-print-in-bill, .close-icon { display: none !important; }
             .bill-area-printable { padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important;}
-            table tr { page-break-inside: avoid; }
+            table { max-width: 100% !important; width: 100% !important; font-size: 12pt !important; line-height: 1.3 !important; }
+            th, td { font-size: 12pt !important; padding: 4px 6px !important; }
+            table tr { page-break-inside: avoid !important; }
         }
     </style>
 </head>
@@ -138,9 +140,8 @@
                 <button class="action-btn bg-gradient-merchant" onclick="openModal('merchantHubModal');"><i>🏢</i> Traders</button>
                 <button class="action-btn bg-gradient-bag" onclick="openModal('bagModal');"><i>🎒</i> Bags</button>
                 <button class="action-btn bg-gradient-blue" onclick="openModal('monthlyReportModal'); initMonthlyReport();"><i>📊</i> मासिक रिपोर्ट</button>
-                <button class="action-btn bg-gradient-ai" onclick="openModal('aiModal'); generateAIReport();"><i>🤖</i> AI ॲडव्हायझर</button>
-                <button class="action-btn bg-gradient-orange" onclick="openModal('ocrModal'); initOcr();" style="grid-column: span 2;"><i>📸</i> <b>वही स्कॅन (AI)</b></button>
            <button class="action-btn" style="background:linear-gradient(135deg,#0ea5e9,#0369a1);" onclick="openModal('notesModal'); initNotes();"><i>📝</i> रोजच्या नोंदी</button>
+           <button class="action-btn" style="background:linear-gradient(135deg,#14b8a6,#0d9488);" onclick="openModal('profitModal'); initProfit();"><i>💸</i> Profit</button>
            <button class="action-btn" style="background:linear-gradient(135deg,#6366f1,#4338ca);" onclick="openModal('todaySummaryModal'); updateDashboard();"><i>📈</i> आजचा अहवाल</button>
             </div>
         </div>
@@ -159,29 +160,23 @@
             </div>
         </div>
 
-        <div id="monthlyReportModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('monthlyReportModal')">✕</div><h3 style="color: var(--primary);">📊 मासिक रिपोर्ट</h3><div class="section-box" style="background:#eff6ff;"><div class="input-group" style="margin-bottom: 15px;"><label>महिना निवडा:</label><input type="month" id="reportMonthPicker" onchange="generateMonthlyReport()"></div><div class="dashboard-grid" style="margin-bottom: 0;"><div class="dash-card" style="border: 1px solid #3b82f6;"><span class="dash-title" style="color:#3b82f6;">शेतकरी खरेदी (रक्कम)</span><span class="dash-value text-blue" id="modalMonthFarmerTotal">₹ 0</span></div><div class="dash-card" style="border: 1px solid #f59e0b;"><span class="dash-title" style="color:#f59e0b;">व्यापारी विक्री (रक्कम)</span><span class="dash-value text-orange" id="modalMonthMerchantTotal">₹ 0</span></div></div></div></div></div>
+        </div>
 
-        <div id="ocrModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('ocrModal')">✕</div><h3 style="color: #ea580c;">📸 वही स्कॅन (Smart AI)</h3><div class="section-box" id="apiKeySection" style="background:#fffbeb; border-color:#fde68a;"><label style="color:#d97706;">🔐 Google AI API Key:</label><input type="text" id="geminiApiKey" placeholder="Paste API Key here..." onchange="saveApiKey()" style="margin-bottom: 10px; border-color:#fbbf24; font-size: 13px;"><div style="font-size: 11px; color: #b45309;">Key नसेल तर <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #ef4444; font-weight:600;">येथे मिळवा</a>.</div></div><div class="section-box"><div class="input-group" style="margin-bottom: 10px;"><label>📸 फोटो निवडा (Camera/Gallery):</label><input type="file" id="ocrImageInput" accept="image/*" onchange="previewOcrImage(event)"></div><img id="ocrPreview" style="max-width: 100%; display: none; border-radius: 8px; margin-bottom: 10px; border: 2px solid #cbd5e1;" /><div class="input-row"><div class="input-group"><label>📅 तारीख:</label><input type="date" id="ocrDateInput" onchange="onOcrDateChange()"></div><div class="input-group"><label>भाव (Rate ₹):</label><input type="number" id="ocrCommonRate" placeholder="2000" oninput="updateOcrTotals()"></div></div><button class="btn-add bg-gradient-ai" id="ocrProcessBtn" onclick="processVisionAI()" style="margin-top:10px;">🔍 AI द्वारे स्कॅन करा</button><div id="ocrStatus" style="text-align: center; margin-top: 10px; font-weight: 600; font-size: 13px; color: #ea580c;"></div></div><div id="ocrResultSection" style="display: none;"><div class="table-container" style="max-height: 40vh; overflow-y: auto; margin-bottom: 15px;"><table class="styled-table"><thead><tr><th>नाव (AI)</th><th>वजन</th><th>भाव</th><th>रक्कम</th><th>❌</th></tr></thead><tbody id="ocrResultBody"></tbody></table></div><button class="btn-add bg-gradient-green" onclick="saveOcrEntries()">✅ सर्व सेव्ह करा</button></div></div></div>
-
-       <div id="aiModal" class="modal no-print">
-    <div class="modal-content" style="display:flex; flex-direction:column; height:85vh; padding-bottom: 10px;">
-        <div class="close-icon" onclick="closeModal('aiModal')">✕</div>
-        <h3 style="color: #0f172a; margin-bottom: 15px;">🤖 Smart Business AI</h3>
-        
-        <div id="aiChatBox" style="flex:1; overflow-y:auto; background:#f8fafc; border-radius:16px; padding:15px; border:1px solid #e2e8f0; margin-bottom:15px; display:flex; flex-direction:column; gap:12px;">
-            <div style="text-align:left;">
-                <span style="background:#e0e7ff; color:#3730a3; padding:10px 14px; border-radius:16px 16px 16px 0; display:inline-block; font-size:13px; font-weight:500; max-width:85%; box-shadow:0 2px 4px rgba(0,0,0,0.02);">
-                    नमस्ते! मी तुमचा स्मार्ट असिस्टंट. तुम्हाला आजच्या व्यवहारांबद्दल किंवा कोणत्याही हिशोबाबद्दल काय विचारायचे आहे?
-                </span>
+        <div id="profitModal" class="modal no-print">
+            <div class="modal-content">
+                <div class="close-icon" onclick="closeModal('profitModal')">✕</div>
+                <h3 style="color: #0d9488;">💸 कमिशन (Profit)</h3>
+                <div class="section-box" style="background:#f0fdfa; text-align:center;">
+                    <div style="font-size:12px; color:#0f766e; font-weight:600;">एकूण कमिशन (Total Profit)</div>
+                    <div id="profitTotalComm" style="font-size:28px; font-weight:800; color:#0f766e; margin-bottom:10px;">₹ 0</div>
+                </div>
+                <div class="table-container" style="max-height: 50vh; overflow-y: auto;">
+                    <div id="profitMonthList"></div>
+                </div>
             </div>
         </div>
 
-        <div style="display:flex; gap:10px;">
-            <input type="text" id="aiChatInput" placeholder="येथे प्रश्न विचारा... (उदा. आजची एकूण खरेदी किती?)" style="flex:1; font-size:14px; border:2px solid #cbd5e1; border-radius:14px; padding:12px; box-shadow:none;" onkeypress="if(event.key === 'Enter') sendAiMessage()">
-            <button class="btn-add bg-gradient-ai" style="width:auto; padding:12px 18px; border-radius:14px;" onclick="sendAiMessage()">📤</button>
-        </div>
-    </div>
-</div>
+        <div id="monthlyReportModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('monthlyReportModal')">✕</div><h3 style="color: var(--primary);">📊 मासिक रिपोर्ट</h3><div class="section-box" style="background:#eff6ff;"><div class="input-group" style="margin-bottom: 15px;"><label>महिना निवडा:</label><input type="month" id="reportMonthPicker" onchange="generateMonthlyReport()"></div><div class="dashboard-grid" style="margin-bottom: 0;"><div class="dash-card" style="border: 1px solid #3b82f6;"><span class="dash-title" style="color:#3b82f6;">शेतकरी खरेदी (रक्कम)</span><span class="dash-value text-blue" id="modalMonthFarmerTotal">₹ 0</span></div><div class="dash-card" style="border: 1px solid #f59e0b;"><span class="dash-title" style="color:#f59e0b;">व्यापारी विक्री (रक्कम)</span><span class="dash-value text-orange" id="modalMonthMerchantTotal">₹ 0</span></div></div></div></div></div>
         <div id="merchantHubModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('merchantHubModal')">✕</div><h3 style="color: var(--merchant-color);">🏢 Vyapari</h3><div class="section-box"><div class="input-row"><div class="input-group"><label>Date:</label><input type="date" id="merDate" onchange="onMerDateOrTypeChange()"></div><div class="input-group" style="flex:2;"><label>Trader Name:</label><input type="text" id="merName" list="merchantList" placeholder="Select Trader..."><datalist id="merchantList"></datalist></div></div><div class="input-row"><div class="input-group"><label>Weight:</label><input type="number" id="merWeight" placeholder="0.00"></div><div class="input-group"><label>Rate:</label><input type="number" id="merRate" placeholder="0.00"></div><div class="input-group"><label>Type:</label><select id="merTypeSel" onchange="onMerDateOrTypeChange()"><option value="नि">नि</option><option value="पि">पि</option><option value="के">के</option><option value="शे">शे</option><option value="रु">रु</option></select></div></div><button class="btn-add bg-gradient-merchant" style="margin-top: 5px;" onclick="saveMerchantEntry()">Save Entry</button></div><div class="list-header-bar" style="background:transparent; padding:0; border:none;"><button class="btn-action-small bg-gradient-purple" onclick="openModal('merPreviewModal'); renderMerPreview();">👁️ Preview</button><button class="btn-action-small bg-gradient-green" onclick="openModal('merJamaModal'); initMerJama();">💸 जमा</button><button class="btn-action-small bg-gradient-orange" onclick="openModal('merchantListModal'); renderMerList();">👥 List</button><button class="btn-action-small bg-gradient-blue" onclick="openModal('billModal'); initMerBill();">📜 Bill</button></div></div></div>
         
         <div id="merJamaModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('merJamaModal')">✕</div><h3 style="color: var(--success);">💸 व्यापारी जमा</h3><div class="section-box" style="border: none; background: #ecfdf5;"><div class="input-group" style="margin-bottom: 15px;"><label>तारीख (Date):</label><input type="date" id="merJamaDateOut"></div><div class="input-group" style="margin-bottom: 15px;"><label>व्यापाऱ्याचे नाव:</label><input type="text" id="merJamaNameOut" list="merchantList" placeholder="नाव निवडा..."></div><div class="input-group" style="margin-bottom: 15px;"><label>जमा रक्कम (₹):</label><input type="number" id="merJamaAmountOut" placeholder="0" style="font-size: 18px; font-weight: bold; color: var(--success);"></div><div class="input-group" style="margin-bottom: 20px;"><label>टीप (Hint):</label><input type="text" id="merJamaHintOut" placeholder="उदा. रोख, PhonePe"></div><button class="btn-add bg-gradient-green" onclick="saveMerJamaOutside()">✅ जमा करा</button></div></div></div>
@@ -237,11 +232,11 @@
         <div id="listModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('listModal')">✕</div><h3>👥 Farmers</h3>
             <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center;"><input type="month" id="farmerListMonth" onchange="generateFarmerStatus()" style="flex:1; padding:8px; border-radius:8px;"><button class="btn-action-small bg-gradient-blue" style="padding:10px 15px; font-size:13px;" onclick="document.getElementById('farmerListMonth').value=''; generateFarmerStatus();">All Time</button></div>
             <div style="text-align:center; padding:15px; background:linear-gradient(135deg, #1e3a8a, #3b82f6); color:white; border-radius:12px; margin-bottom:15px;"><div style="font-size:12px;">निवडलेल्या महिन्याचे एकूण देणे</div><div id="farmerGrandTotalDisplay" style="font-size:24px; font-weight:700;">₹ 0</div></div>
-            <div class="list-header-bar"><button class="small-btn bg-gradient-green" onclick="addNewFarmerPrompt()">➕ New</button><button class="small-btn bg-gradient-blue" onclick="openModal('farmerPaymentModal', initFarmerJama)">💸 पैसे दिले</button><button class="small-btn bg-gradient-orange" onclick="toggleAllAmounts()">👁️ Hide</button><button class="small-btn" style="background:#8e8e93;" id="manageListBtn" onclick="toggleEditMode()">⚙️ Manage</button></div>
+            <div class="list-header-bar"><button class="small-btn bg-gradient-green" onclick="addNewFarmerPrompt()">➕ New</button><button class="small-btn bg-gradient-orange" onclick="toggleAllAmounts()">👁️ Hide</button><button class="small-btn" style="background:#8e8e93;" id="manageListBtn" onclick="toggleEditMode()">⚙️ Manage</button></div>
             <div style="overflow-x: auto; max-height: 45vh;"><table class="premium-list-table"><tbody id="farmerListBody"></tbody></table></div>
         </div></div>
         
-        <div id="farmerPaymentModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('farmerPaymentModal')">✕</div><h3 style="color: var(--primary);">💸 शेतकरी जमा</h3><div class="section-box" style="background: #eff6ff;"><div class="input-group" style="margin-bottom: 15px;"><label>तारीख:</label><input type="date" id="farmerJamaDate"></div><div class="input-group" style="margin-bottom: 15px;"><label>नाव:</label><input type="text" id="farmerJamaName" list="farmerList"></div><div class="input-group" style="margin-bottom: 20px;"><label>दिलेली रक्कम:</label><input type="number" id="farmerJamaAmount" placeholder="0"></div><button class="btn-add bg-gradient-blue" onclick="saveFarmerPayment()">✅ जतन</button></div></div></div>
+
         <div id="detailModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('detailModal')">✕</div><h3 id="detailFarmerName" style="color: var(--primary);">खातेवही</h3><input type="hidden" id="activeFarmerName"><div style="text-align: right; margin-bottom: 10px;"><button class="small-btn bg-gradient-orange" id="farmerHistManageBtn" onclick="toggleFarmerHistMode()">✏️ Edit</button></div><div class="table-container" style="max-height: 60vh; overflow-y:auto;"><table class="styled-table"><thead><tr><th>तारीख</th><th>तपशील</th><th style="text-align:right;">रक्कम</th><th>⚙️</th></tr></thead><tbody id="detailBody"></tbody></table></div></div></div>
         <div id="advModal" class="modal no-print"><div class="modal-content"><div class="close-icon" onclick="closeModal('advModal')">✕</div><h3 style="color: var(--danger);">💰 Advance (उचल)</h3><div class="section-box" style="background:#fef2f2;"><div class="input-group" style="margin-bottom: 10px;"><label>Date:</label><input type="date" id="advDate"></div><div class="input-group" style="margin-bottom: 10px;"><label>Name:</label><input type="text" id="advFarmerName" list="farmerList"></div><div class="input-group" style="margin-bottom: 15px;"><label>Amount (₹):</label><input type="number" id="advAmount"></div><div style="display:flex; gap:10px;"><button class="btn-add bg-gradient-red" style="flex:1;" onclick="saveAdvance('GIVE')">दिली (+)</button><button class="btn-add bg-gradient-green" style="flex:1;" onclick="saveAdvance('TAKE')">जमा (-)</button></div></div><button class="btn-add" style="background:#1c1c1e;" onclick="openModal('advListModal', renderAdvList)">📜 List</button></div></div>
         
@@ -332,10 +327,111 @@
     function closeModal(id) { let m = document.getElementById(id); m.classList.remove("show"); setTimeout(() => m.style.display = "none", 300); }
 
     const defaultFarmersList = ["1. सौदी", "2. पोपट", "3. बन्ने", "4. तानाजी", "5. आकाश", "6. शिवानंद", "7. हरी"];
-    let farmers = []; let merchants = []; let bagPersons = []; let cropDataDB = []; let merchantDB = []; let bagDB = [];
     
     function sanitizeData(v) { if (!v) return []; let arr = Array.isArray(v) ? v : Object.values(v); return arr.filter(e => e && typeof e === 'object' && e.id); }
     function safeArray(obj) { if(!obj) return []; return (Array.isArray(obj) ? obj : Object.values(obj)).filter(Boolean); }
+
+    // --- 🌟 OFFLINE SYNC MANAGER 🌟 ---
+    function loadLocalBackup(path, fallback) {
+        let raw = localStorage.getItem('local_' + path);
+        return raw ? JSON.parse(raw) : fallback;
+    }
+
+    let farmers = loadLocalBackup('farmers', defaultFarmersList);
+    let merchants = loadLocalBackup('merchants', ["Traders A"]);
+    let bagPersons = loadLocalBackup('bagPersons', []);
+    let cropDataDB = loadLocalBackup('cropData', []);
+    let merchantDB = loadLocalBackup('merchantData', []);
+    let bagDB = loadLocalBackup('bagData', []);
+    let notesDB = loadLocalBackup('notesData', []);
+
+    let isSyncing = false;
+    const originalRef = database.ref.bind(database);
+    
+    database.ref = function(path) {
+        const r = originalRef(path);
+        
+        // 1. Override .set() to save locally and queue sync
+        const originalSet = r.set.bind(r);
+        r.set = function(data) {
+            localStorage.setItem('local_' + path, JSON.stringify(data));
+            localStorage.setItem('dirty_' + path, 'true');
+            updateSyncUI();
+            triggerSync();
+            return Promise.resolve(); // Fast local resolve
+        };
+        
+        // 2. Override .on() to block server overwrites if we have pending changes
+        const originalOn = r.on.bind(r);
+        r.on = function(eventType, callback) {
+            if (eventType === 'value') {
+                return originalOn('value', (snapshot) => {
+                    if (localStorage.getItem('dirty_' + path) === 'true') {
+                        console.log(`[Offline Sync] Ignored server update for ${path} due to pending local changes.`);
+                        return; 
+                    }
+                    callback(snapshot);
+                });
+            }
+            return originalOn(eventType, callback);
+        };
+        
+        return r;
+    };
+
+    function triggerSync() {
+        if (!navigator.onLine || isSyncing) { updateSyncUI(); return; }
+        
+        let paths = ['cropData', 'merchantData', 'bagData', 'notesData', 'farmers', 'merchants', 'bagPersons'];
+        let dirtyPaths = paths.filter(p => localStorage.getItem('dirty_' + p) === 'true');
+        
+        if (dirtyPaths.length === 0) { updateSyncUI(); return; }
+        
+        isSyncing = true;
+        updateSyncUI();
+        
+        let promises = dirtyPaths.map(p => {
+            let localData = JSON.parse(localStorage.getItem('local_' + p));
+            // Use original reference to bypass the overridden .set()
+            return originalRef(p).set(localData).then(() => {
+                localStorage.removeItem('dirty_' + p);
+            }).catch(err => {
+                console.error("[Offline Sync] Failed to sync", p, err);
+            });
+        });
+        
+        Promise.all(promises).then(() => {
+            isSyncing = false;
+            updateSyncUI();
+        });
+    }
+
+    setInterval(triggerSync, 5000);
+    window.addEventListener('online', triggerSync);
+    window.addEventListener('offline', updateSyncUI);
+
+    function updateSyncUI() {
+        let el = document.getElementById("syncStatus");
+        if (!el) return;
+        
+        let paths = ['cropData', 'merchantData', 'bagData', 'notesData', 'farmers', 'merchants', 'bagPersons'];
+        let dirtyCount = paths.filter(p => localStorage.getItem('dirty_' + p) === 'true').length;
+        
+        if (isSyncing) {
+            el.innerHTML = `🔄 Syncing`;
+            el.style.background = "#3b82f6";
+        } else if (dirtyCount > 0) {
+            el.innerHTML = navigator.onLine ? `⏳ ${dirtyCount} Pending` : `📴 Offline (${dirtyCount})`;
+            el.style.background = "#f59e0b";
+        } else {
+            el.innerHTML = navigator.onLine ? `🟢 Online` : `📴 Offline`;
+            el.style.background = navigator.onLine ? "#10b981" : "#64748b";
+        }
+    }
+    // Initial UI Setup
+    setTimeout(updateSyncUI, 1000);
+    // --- 🌟 END OFFLINE SYNC MANAGER 🌟 ---
+
 
     function getMergedFarmers() { 
         let s = new Set(); 
@@ -360,20 +456,20 @@
         return Array.from(s).sort((a,b)=>(parseInt(a)||99999)-(parseInt(b)||99999));
     }
 
-    database.ref('farmers').on('value', s => { if(!s.exists()) { database.ref('farmers').set(defaultFarmersList); } else { farmers = safeArray(s.val()); } loadFarmerList(); if(document.getElementById("listModal").classList.contains("show")) generateFarmerStatus(); });
-    database.ref('merchants').on('value', s => { if(!s.exists()) { database.ref('merchants').set(["Traders A"]); } else { merchants = safeArray(s.val()); } loadMerchantList(); if(document.getElementById("merchantListModal").classList.contains("show")) renderMerList(); });
-    database.ref('bagPersons').on('value', s => { if(!s.exists()) { database.ref('bagPersons').set([]); } else { bagPersons = safeArray(s.val()); } loadBagPersonList(); if(document.getElementById("bagPersonListModal").classList.contains("show")) renderBagPersonList(); });
-    database.ref('cropData').on('value', s => { cropDataDB = sanitizeData(s.val()); updateDashboard(); syncRates(); loadFarmerList(); if(document.getElementById("listModal").classList.contains("show")) generateFarmerStatus(); });
-    database.ref('merchantData').on('value', s => { merchantDB = sanitizeData(s.val()); updateDashboard(); syncRates(); loadMerchantList(); if(document.getElementById("merchantListModal").classList.contains("show")) renderMerList(); });
-    database.ref('bagData').on('value', s => { bagDB = sanitizeData(s.val()); loadBagPersonList(); if(document.getElementById("bagPersonListModal").classList.contains("show")) renderBagPersonList(); });
+    database.ref('farmers').on('value', s => { if(!s.exists()) { database.ref('farmers').set(defaultFarmersList); } else { farmers = safeArray(s.val()); localStorage.setItem('local_farmers', JSON.stringify(farmers)); } loadFarmerList(); if(document.getElementById("listModal").classList.contains("show")) generateFarmerStatus(); });
+    database.ref('merchants').on('value', s => { if(!s.exists()) { database.ref('merchants').set(["Traders A"]); } else { merchants = safeArray(s.val()); localStorage.setItem('local_merchants', JSON.stringify(merchants)); } loadMerchantList(); if(document.getElementById("merchantListModal").classList.contains("show")) renderMerList(); });
+    database.ref('bagPersons').on('value', s => { if(!s.exists()) { database.ref('bagPersons').set([]); } else { bagPersons = safeArray(s.val()); localStorage.setItem('local_bagPersons', JSON.stringify(bagPersons)); } loadBagPersonList(); if(document.getElementById("bagPersonListModal").classList.contains("show")) renderBagPersonList(); });
+    database.ref('cropData').on('value', s => { cropDataDB = sanitizeData(s.val()); localStorage.setItem('local_cropData', JSON.stringify(cropDataDB)); updateDashboard(); syncRates(); loadFarmerList(); if(document.getElementById("listModal").classList.contains("show")) generateFarmerStatus(); });
+    database.ref('merchantData').on('value', s => { merchantDB = sanitizeData(s.val()); localStorage.setItem('local_merchantData', JSON.stringify(merchantDB)); updateDashboard(); syncRates(); loadMerchantList(); if(document.getElementById("merchantListModal").classList.contains("show")) renderMerList(); });
+    database.ref('bagData').on('value', s => { bagDB = sanitizeData(s.val()); localStorage.setItem('local_bagData', JSON.stringify(bagDB)); loadBagPersonList(); if(document.getElementById("bagPersonListModal").classList.contains("show")) renderBagPersonList(); });
 
-let notesDB = [];
-database.ref('notesData').on('value', s => { 
-    notesDB = sanitizeData(s.val()); 
-    if(document.getElementById("notesListModal").classList.contains("show")) renderNotes(); 
-});
-function getNotesDB() { return notesDB || []; } 
-function saveNotesDB(d) { notesDB = sanitizeData(d); database.ref('notesData').set(notesDB); }
+    database.ref('notesData').on('value', s => { 
+        notesDB = sanitizeData(s.val()); localStorage.setItem('local_notesData', JSON.stringify(notesDB));
+        if(document.getElementById("notesListModal").classList.contains("show")) renderNotes(); 
+    });
+
+    function getNotesDB() { return notesDB || []; } 
+    function saveNotesDB(d) { notesDB = sanitizeData(d); database.ref('notesData').set(notesDB); }
     function getData() { return cropDataDB || []; } function saveData(d) { cropDataDB = sanitizeData(d); database.ref('cropData').set(cropDataDB); updateDashboard(); }
     function getMerchantDB() { return merchantDB || []; } function saveMerchantDB(d) { merchantDB = sanitizeData(d); database.ref('merchantData').set(merchantDB); updateDashboard(); }
     function getBagDB() { return bagDB || []; } function saveBagDB(d) { bagDB = sanitizeData(d); database.ref('bagData').set(bagDB); }
@@ -387,6 +483,39 @@ function saveNotesDB(d) { notesDB = sanitizeData(d); database.ref('notesData').s
     function onDateChange() { let d=val("dateInput"); document.getElementById("rate").value = getRateForDate(d); updateDashboard(); }
     function onMerDateOrTypeChange() { let d=val("merDate"); let t=val("merTypeSel"); if(t==='नि') document.getElementById("merRate").value = getRateForDate(d); else document.getElementById("merRate").value = ""; }
     function onOcrDateChange() { let d=val("ocrDateInput"); let r = getRateForDate(d); if(r) { document.getElementById("ocrCommonRate").value=r; updateOcrTotals(); } }
+
+    function initProfit() {
+        let data = getData().filter(e => e && e.type === 'crop' && e.date);
+        let monthTotals = {};
+        
+        data.forEach(e => {
+            let yyyy_mm = e.date.substring(0, 7);
+            if(!monthTotals[yyyy_mm]) monthTotals[yyyy_mm] = 0;
+            monthTotals[yyyy_mm] += (Number(e.total) || 0);
+        });
+
+        let html = `<table class="styled-table"><thead><tr><th>महिना</th><th style="text-align:right;">कमिशन (₹)</th></tr></thead><tbody>`;
+        let totalCommission = 0;
+        let sortedMonths = Object.keys(monthTotals).sort((a,b) => b.localeCompare(a));
+        
+        sortedMonths.forEach(m => {
+            let mTotal = monthTotals[m];
+            let comm = Math.round((mTotal * 0.10) / 5) * 5;
+            totalCommission += comm;
+            let mParts = m.split('-');
+            let mName = marathiMonths[parseInt(mParts[1]) - 1] + " " + mParts[0];
+            html += `<tr><td>${mName}</td><td style="text-align:right; font-weight:700; color:var(--success);">₹ ${comm.toLocaleString('en-IN')}</td></tr>`;
+        });
+        
+        if (sortedMonths.length === 0) {
+            html += `<tr><td colspan="2" style="text-align:center; padding:15px; color:#94a3b8;">कोणतीही नोंद नाही</td></tr>`;
+        }
+        
+        html += `</tbody></table>`;
+        
+        document.getElementById("profitTotalComm").innerText = `₹ ${totalCommission.toLocaleString('en-IN')}`;
+        document.getElementById("profitMonthList").innerHTML = html;
+    }
 
     function initMonthlyReport() { if(!document.getElementById("reportMonthPicker").value) document.getElementById("reportMonthPicker").value = new Date().toISOString().slice(0, 7); generateMonthlyReport(); }
     function generateMonthlyReport() {
@@ -632,171 +761,11 @@ function saveNotesDB(d) { notesDB = sanitizeData(d); database.ref('notesData').s
     
     function downloadBillPDF(areaId, type) {
         let nE = type === 'BAG' ? document.getElementById("bagBillHeaderName") : document.getElementById("billHeaderName"); let safeName = nE && nE.innerText !== "---" ? nE.innerText.trim() : "Billing"; let element = document.getElementById(areaId);
-        let opt = { margin: [5,5,5,5], filename: `${safeName}_${type}_Bill.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, windowWidth: 800 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }; html2pdf().set(opt).from(element).save();
+        let opt = { margin: [10,10,10,10], filename: `${safeName}_${type}_Bill.pdf`, image: { type: 'jpeg', quality: 1 }, html2canvas: { scale: 2, useCORS: true, windowWidth: 800 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, pagebreak: { mode: ['avoid-all', 'css', 'legacy'] } }; html2pdf().set(opt).from(element).save();
     }
 
    function normalizeMarathi(str) { return str.replace(/[^a-zA-Zअ-ज्ञ0-9]/g, '').toLowerCase(); }
     
-    // 🌟 नवीन सुपर स्मार्ट मॅचिंग सिस्टीम (आकडे कायम ठेवण्यासाठी) 🌟
-    function findBestFarmerMatch(ocrName) {
-        let fArr = getMergedFarmers(); // ही तुमची ओरिजिनल लिस्ट आहे (उदा. "1. सौदी")
-        if (!ocrName) return ""; 
-        
-        // 1. तंतोतंत मॅच होत असेल तर
-        let exactMatch = fArr.find(f => f.trim() === ocrName.trim());
-        if (exactMatch) return exactMatch;
-
-        // 2. फक्त नावावरून (अक्षरांवरून) ओरिजिनल नाव (आकड्यासकट) शोधणे
-        let cleanOcr = ocrName.replace(/[^a-zA-Zअ-ज्ञ]/g, ''); 
-        if (cleanOcr.length >= 2) {
-            let alphaMatch = fArr.find(f => { 
-                let cleanF = f.replace(/[^a-zA-Zअ-ज्ञ]/g, ''); 
-                return cleanF.length >= 2 && (cleanF === cleanOcr || cleanOcr.includes(cleanF) || cleanF.includes(cleanOcr)); 
-            });
-            if (alphaMatch) return alphaMatch; // जर नाव मॅच झाले, तर लिस्ट मधील '1. सौदी' असे पूर्ण नाव देईल
-        }
-        
-        // 3. जर AI ने चुकून फक्त आकडा वाचला (उदा. '1' किंवा '1.'), तरीही नाव शोधणे
-        let ocrNumMatch = ocrName.match(/^(\d+)/);
-        if (ocrNumMatch) {
-            let numMatch = fArr.find(f => f.startsWith(ocrNumMatch[0] + ".") || f.startsWith(ocrNumMatch[0] + " "));
-            if (numMatch) return numMatch;
-        }
-
-        return ocrName; // जर नवीनच शेतकरी असेल, तर AI ने जे वाचलेय तेच देईल
-    }
-
-    function initOcr() { document.getElementById("ocrDateInput").value = val("dateInput"); document.getElementById("ocrResultSection").style.display = 'none'; document.getElementById("ocrPreview").style.display = 'none'; document.getElementById("ocrStatus").innerText = ''; document.getElementById("ocrResultBody").innerHTML = ''; let savedKey = localStorage.getItem("geminiApiKey"); if(savedKey) { document.getElementById("geminiApiKey").value = savedKey; document.getElementById("apiKeySection").style.display = "none"; } else { document.getElementById("apiKeySection").style.display = "block"; } }
-    function saveApiKey() { const key = val("geminiApiKey"); if(key) localStorage.setItem("geminiApiKey", key); }
-    
-    let currentBase64Image = "";
-    function previewOcrImage(event) {
-        const file = event.target.files[0];
-        if (file) { const reader = new FileReader(); reader.onload = function(e) { const img = new Image(); img.onload = function() { const canvas = document.createElement('canvas'); const MAX_WIDTH = 1000; let width = img.width, height = img.height; if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height); const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7); const previewEl = document.getElementById("ocrPreview"); previewEl.src = compressedDataUrl; currentBase64Image = compressedDataUrl.split(',')[1]; previewEl.style.display = 'block'; document.getElementById("ocrStatus").innerText = '✅ फोटो लोड झाला.'; }; img.src = e.target.result; }; reader.readAsDataURL(file); }
-    }
-    
-async function processVisionAI() {
-        let rawKey = val("geminiApiKey") || localStorage.getItem('geminiApiKey') || ""; 
-        const apiKey = rawKey.trim(); 
-        const rate = parseFloat(val("ocrCommonRate"));
-        
-        if (!apiKey) { alert('API Key टाका!'); return; } 
-        if (!currentBase64Image) { alert('फोटो निवडा!'); return; } 
-        if (!rate) { alert('भाव टाका!'); return; }
-        
-        const statusLabel = document.getElementById("ocrStatus"); 
-        const btn = document.getElementById("ocrProcessBtn"); 
-        btn.disabled = true; 
-        btn.style.opacity = '0.5'; 
-        statusLabel.innerHTML = '⚡ स्कॅन सुरू आहे...';
-
-        const promptText = `Act as an expert Marathi data entry operator. 
-Known Names List: [${getMergedFarmers().join(', ')}]
-
-CRITICAL RULES:
-1. Extract names and weights from the image EXACTLY line by line.
-2. The names in the Known Names List have numbers in front of them (e.g., "1. सौदी"). Whenever you see a name in the image that matches a name in the list, YOU MUST output the FULL name from the list WITH THE NUMBER. 
-3. DO NOT SUM OR COMBINE ANYTHING. Output exactly what is written, row by row.
-4. Read numbers extremely carefully (don't confuse 1 and 9, 8 and 5).
-5. Fractions: 1 line (/,|,\\) = .25, 2 lines (//,||) = .50, 3 lines (///,|||) = .75.
-6. Return ONLY a valid JSON array format. Example: [{"name": "1. सौदी", "weight": 45.75}, {"name": "2. पोपट", "weight": 10.50}]`;
-
-        const payload = { contents: [{ parts: [ { text: promptText }, { inlineData: { mimeType: "image/jpeg", data: currentBase64Image } } ] }] };
-        
-        // 🌟 तुमच्या जुन्या कोडमधील सर्व मॉडेल्सची लिस्ट (जे १००% चालतात) 🌟
-        const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash", "gemini-1.5-flash-latest"];
-        let successfulModel = "";
-        let limitHit = false;
-        let response = null;
-        let finalErrorMsg = "सर्वरशी संपर्क झाला नाही किंवा API Key चुकीची आहे.";
-
-        for (let model of modelsToTry) {
-            // iOS आणि PC दोन्हीसाठी कॅशे प्रॉब्लेम येऊ नये म्हणून &t=${Date.now()}
-            let url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}&t=${Date.now()}`;
-            
-            try { 
-                response = await fetch(url, { 
-                    method: "POST", 
-                    headers: { "Content-Type": "application/json" }, 
-                    body: JSON.stringify(payload),
-                    cache: "no-store"
-                }); 
-                
-                if (response.ok) { 
-                    successfulModel = model; 
-                    break; // 🟢 बरोबर मॉडेल सापडलं की थांबेल
-                } else {
-                    let errData = await response.json(); 
-                    if (response.status === 429) {
-                        limitHit = true;
-                        break; // 🔴 लिमिट संपली की लगेच बाहेर पडेल (वेळ वाया घालवणार नाही)
-                    }
-                    finalErrorMsg = errData.error?.message || "Google API Error";
-                }
-            } catch (e) { 
-                finalErrorMsg = e.message;
-            }
-        }
-
-        try {
-            if (limitHit) {
-                // 🌟 कुठेही न अडकता थेट मेसेज 🌟
-                throw new Error("⏳ गुगलची '१ मिनिटाची' लिमिट संपली आहे! कृपया 60 सेकंद थांबा आणि पुन्हा बटण दाबा.");
-            }
-            if (!successfulModel) {
-                throw new Error(finalErrorMsg); // आता खोटा एरर न येता खरा एरर दिसेल
-            }
-            
-            const result = await response.json(); 
-            let aiText = result.candidates[0].content.parts[0].text;
-            let jsonMatch = aiText.match(/\[[\s\S]*\]/);
-            
-            if (jsonMatch) { 
-                const extractedData = JSON.parse(jsonMatch[0]); 
-                let finalDataArray = extractedData.map(item => {
-                    return { name: findBestFarmerMatch(item.name), weight: parseFloat(item.weight) || 0 };
-                });
-                renderAiResult(finalDataArray, rate); 
-                statusLabel.innerHTML = `✅ स्कॅनिंग पूर्ण! (${finalDataArray.length} नोंदी) <br><span style="font-size:10px; color:gray;">(AI: ${successfulModel})</span>`; 
-                document.getElementById("ocrResultSection").style.display = 'block'; 
-                document.getElementById("apiKeySection").style.display = "none"; 
-            } else { throw new Error("डेटा वाचता आला नाही. फोटो क्लिअर काढा."); }
-        } catch (error) {
-            statusLabel.innerHTML = `<span style="color:red; font-weight:700;">❌ ${error.message}</span>`; 
-            if(error.message.includes("API key not valid")) {
-                document.getElementById("apiKeySection").style.display = "block"; 
-            }
-        } finally { 
-            btn.disabled = false; 
-            btn.style.opacity = '1'; 
-        }
-    }
-    function renderAiResult(dataArray, rate) {
-        const tbody = document.getElementById("ocrResultBody"); tbody.innerHTML = ''; let idCounter = 0;
-        dataArray.forEach(item => {
-            let name = findBestFarmerMatch(item.name); let weight = parseFloat(item.weight); let total = Math.floor((weight * rate) / 5) * 5; let tr = document.createElement('tr'); tr.id = `ocr_row_${idCounter}`;
-            tr.innerHTML = `<td><input type="text" class="ocr-name" value="${name}" list="farmerList" style="padding:8px; font-size:13px; width: 130px; border:1px solid #10b981; border-radius:8px; font-weight:700;"></td><td><input type="number" class="ocr-weight" value="${weight}" oninput="updateOcrRowTotal(${idCounter})" style="padding:8px; font-size:13px; width:65px; border:1px solid #cbd5e1; border-radius:8px; font-weight:700;"></td><td class="ocr-rate" style="font-weight:700;">${rate}</td><td class="ocr-total" style="font-weight:800; color:var(--primary); font-size:14px;">${total}</td><td><button class="small-btn btn-del" onclick="document.getElementById('ocr_row_${idCounter}').remove()">🗑</button></td>`;
-            tbody.appendChild(tr); idCounter++;
-        });
-        if(idCounter === 0) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red; padding: 15px;">माहिती सापडली नाही.</td></tr>';
-    }
-
-    function updateOcrRowTotal(id) { const tr = document.getElementById(`ocr_row_${id}`); if(!tr) return; const w = parseFloat(tr.querySelector('.ocr-weight').value) || 0; const r = parseFloat(tr.querySelector('.ocr-rate').innerText) || 0; tr.querySelector('.ocr-total').innerText = Math.floor((w * r) / 5) * 5; }
-    function updateOcrTotals() { const newRate = parseFloat(val('ocrCommonRate')) || 0; document.querySelectorAll('#ocrResultBody tr').forEach(tr => { if(tr.id && tr.id.startsWith('ocr_row_')) { tr.querySelector('.ocr-rate').innerText = newRate; const w = parseFloat(tr.querySelector('.ocr-weight').value) || 0; tr.querySelector('.ocr-total').innerText = Math.floor((w * newRate) / 5) * 5; } }); }
-
-    function saveOcrEntries() {
-        const rows = document.querySelectorAll('#ocrResultBody tr'); if(rows.length === 0 || rows[0].innerText.includes('माहिती सापडली नाही')) { alert('डेटा नाही!'); return; }
-        let date = val("ocrDateInput"); let data = getData(); let savedCount = 0; let currentFarmers = safeArray(farmers);
-        rows.forEach(tr => {
-            if(!tr.id || !tr.id.startsWith('ocr_row_')) return;
-            let rawName = tr.querySelector('.ocr-name').value.trim(); let w = parseFloat(tr.querySelector('.ocr-weight').value); let r = parseFloat(tr.querySelector('.ocr-rate').innerText); let t = parseFloat(tr.querySelector('.ocr-total').innerText);
-            if (rawName && w && r) {
-                if (!currentFarmers.includes(rawName)) { currentFarmers.push(rawName); database.ref('farmers').set(currentFarmers); }
-                if(!data.some(e => e && e.date === date && e.name === rawName && e.type === 'crop' && e.weight === w)) { data.push({ id: Date.now() + Math.floor(Math.random()*10000), date: date, name: rawName, type: 'crop', weight: w, rate: r, total: t }); savedCount++; }
-            }
-        });
-        if (savedCount > 0) { saveData(data); alert(`✅ ${savedCount} नोंदी सेव्ह झाल्या.`); closeModal('ocrModal'); document.getElementById("farmerName").focus(); } else { alert('नवीन डेटा नाही.'); }
-    }
 
     function toggleBillDateMode() { let mode = document.querySelector('input[name="billDateMode"]:checked').value; if(mode === 'month') { document.getElementById("monthlyBillDiv").style.display = 'block'; document.getElementById("customBillDiv").style.display = 'none'; } else { document.getElementById("monthlyBillDiv").style.display = 'none'; document.getElementById("customBillDiv").style.display = 'flex'; } }
     
@@ -819,8 +788,10 @@ function generateFinalBill() {
             document.getElementById("billAdvBox").innerText=""; let d=[...getData()].sort((a,b)=>new Date(a.date)-new Date(b.date)); let filteredData = []; let totalAdvInPeriod = 0;
             d.forEach(e => { if(e && e.name === n && e.date >= startFilter && e.date <= endFilter) { filteredData.push(e); if(e.type === 'advance') totalAdvInPeriod += (Number(e.amount)||0); } });
             
-            let html = `<table style="width:100%; max-width:320px; margin:0 auto; border-collapse:collapse; font-family:sans-serif; color:#000;"><thead><tr><th style="padding:2px 0; border-bottom:2px solid #000; text-align:left; width:33%; font-size:12px; color:#000;">तारीख</th><th style="padding:2px 0; border-bottom:2px solid #000; text-align:center; width:34%; font-size:12px; color:#000;">तपशील</th><th style="padding:2px 0; border-bottom:2px solid #000; text-align:right; width:33%; font-size:12px; color:#000;">रक्कम (₹)</th></tr></thead><tbody style="font-size:13px;">`;
+            let tStyle = `width:100%; max-width:100%; border-collapse:collapse; font-family:sans-serif; color:#000;`;
+            let tHead = `<table style="${tStyle}"><thead><tr><th style="padding:10px 8px; border-bottom:2px solid #000; text-align:left; width:25%; font-size:14px; color:#000;">तारीख</th><th style="padding:10px 8px; border-bottom:2px solid #000; text-align:center; width:50%; font-size:14px; color:#000;">तपशील</th><th style="padding:10px 8px; border-bottom:2px solid #000; text-align:right; width:25%; font-size:14px; color:#000;">रक्कम (₹)</th></tr></thead><tbody style="font-size:14px;">`;
             let runningBal = 0; let totalCropAmount = 0; let totalBhade = 0; let totalAdv = 0; let totalPay = 0;
+            let allRows = [];
             
            if(filteredData.length > 0) {
                 let currD = new Date(startFilter + "T00:00:00"); let endD = new Date(endFilter + "T00:00:00");
@@ -832,30 +803,52 @@ function generateFinalBill() {
                     // 🌟 फक्त शेतकरी बिलासाठी: ज्या दिवशी माल नाही, तिथे 'माल नाही' दाखवा 🌟
                     let hasCrop = dailyEntries.some(e => e.type === 'crop');
                     if (!hasCrop) {
-                        html += `<tr><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; font-weight:800; color:#64748b;">${fDate}</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700; color:#94a3b8;">माल नाही</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800; color:#94a3b8;">-</td></tr>`;
+                        allRows.push(`<tr><td style="padding:8px 4px; border-bottom:1px solid #e2e8f0; font-weight:800; color:#64748b;">${fDate}</td><td style="padding:8px 4px; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700; color:#94a3b8;">माल नाही</td><td style="padding:8px 4px; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800; color:#94a3b8;">-</td></tr>`);
                     }
                     
                     dailyEntries.forEach(e => {
                         if (e.type === 'crop') {
                             totalCropAmount += e.total;
                             let cR = getCommonRateForDate(dStr); let rateDisplay = (e.rate !== cR && cR > 0) ? `<span style="color:#ef4444; font-weight:900;">${e.rate}⚠️</span>` : e.rate;
-                            html += `<tr><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; font-weight:800;">${fDate}</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700;">नि ${e.weight}x${rateDisplay}</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800;">${e.total}</td></tr>`;
+                            allRows.push(`<tr><td style="padding:8px 4px; border-bottom:1px solid #e2e8f0; font-weight:800;">${fDate}</td><td style="padding:8px 4px; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700;">नि ${e.weight}x${rateDisplay}</td><td style="padding:8px 4px; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800;">${e.total}</td></tr>`);
                         } else if (e.type === 'bhade') {
                             totalBhade += e.amount;
-                            html += `<tr><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; font-weight:800;">${fDate}</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700; color:#dc2626;">गाडी भाडे</td><td style="padding:2px 0; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800; color:#dc2626;">- ${e.amount}</td></tr>`;
+                            allRows.push(`<tr><td style="padding:8px 4px; border-bottom:1px solid #e2e8f0; font-weight:800;">${fDate}</td><td style="padding:8px 4px; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700; color:#dc2626;">गाडी भाडे</td><td style="padding:8px 4px; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800; color:#dc2626;">- ${e.amount}</td></tr>`);
                         } else if (e.type === 'advance') {
                             totalAdv += e.amount;
                             let lbl = e.amount > 0 ? "उचल (दिली)" : "उचल (जमा)"; let col = e.amount > 0 ? "#ea580c" : "#10b981";
-                            html += `<tr style="background:#fff7ed;"><td style="padding:2px 4px; font-weight:800;">${fDate}</td><td style="padding:2px 4px; text-align:center; font-weight:600; color:${col};">${lbl}</td><td style="padding:2px 4px; text-align:right; font-weight:800; color:${col};">${e.amount > 0 ? "- " : "+ "}${Math.abs(e.amount)}</td></tr>`;
+                            allRows.push(`<tr style="background:#fff7ed;"><td style="padding:8px 4px; font-weight:800;">${fDate}</td><td style="padding:8px 4px; text-align:center; font-weight:600; color:${col};">${lbl}</td><td style="padding:8px 4px; text-align:right; font-weight:800; color:${col};">${e.amount > 0 ? "- " : "+ "}${Math.abs(e.amount)}</td></tr>`);
                         } else if (e.type === 'payment') {
                             totalPay += e.amount;
-                            html += `<tr style="background:#ecfdf5;"><td style="padding:2px 4px; font-weight:800;">${fDate}</td><td style="padding:2px 4px; text-align:center; font-weight:600; color:#059669;">पैसे जमा</td><td style="padding:2px 4px; text-align:right; font-weight:800; color:#059669;">- ${e.amount}</td></tr>`;
+                            allRows.push(`<tr style="background:#ecfdf5;"><td style="padding:8px 4px; font-weight:800;">${fDate}</td><td style="padding:8px 4px; text-align:center; font-weight:600; color:#059669;">पैसे जमा</td><td style="padding:8px 4px; text-align:right; font-weight:800; color:#059669;">- ${e.amount}</td></tr>`);
                         }
                     });
+                    
+                    // Spacer row between dates
+                    allRows.push(`<tr><td colspan="3" style="height:20px;"></td></tr>`);
                     currD.setDate(currD.getDate() + 1);
                 }
+                
+                let mid = Math.ceil(allRows.length / 2);
+                let leftRows = allRows.slice(0, mid);
+                let rightRows = allRows.slice(mid);
+                
+                let html = `<div style="display:flex; justify-content:space-between; gap:20px; margin-bottom:15px;">`;
+                html += `<div style="width:48%; border-right:1px dashed #cbd5e1; padding-right:15px;">${tHead}${leftRows.join('')}</tbody></table></div>`;
+                html += `<div style="width:48%; padding-left:10px;">${tHead}${rightRows.join('')}</tbody></table></div>`;
+                html += `</div>`;
+                
+                html += `<table style="${tStyle} margin:0 auto; border-top:2px solid #000;"><tbody style="font-size:14px;">`;
+                
                 runningBal = totalCropAmount;
-                html += `<tr style="border-top:2px solid #000;"><td colspan="2" style="padding:6px 4px; text-align:right; font-weight:800; font-size:14px;">एकूण माल :</td><td style="padding:6px 0; text-align:right; font-weight:800; font-size:15px;">${totalCropAmount}</td></tr>`;
+                html += `<tr><td colspan="2" style="padding:6px 4px; text-align:right; font-weight:800; font-size:14px;">एकूण माल :</td><td style="padding:6px 0; text-align:right; font-weight:800; font-size:15px; width:25%;"> ${totalCropAmount}</td></tr>`;
+                
+                let tenPercentDeduction = Math.round((totalCropAmount * 0.10) / 5) * 5;
+                if (tenPercentDeduction > 0) {
+                    runningBal -= tenPercentDeduction;
+                    html += `<tr><td colspan="2" style="padding:4px 4px; text-align:right; font-weight:700; color:#d97706;"> </td><td style="padding:4px 0; text-align:right; font-weight:800; color:#d97706; border-bottom:1px solid #cbd5e1;">- ${tenPercentDeduction}</td></tr>`;
+                    html += `<tr><td colspan="2" style="padding:4px 4px; text-align:right; font-weight:800; font-size:14px; color:#1e293b;">एकूण :</td><td style="padding:4px 0; text-align:right; font-weight:800; font-size:15px; color:#1e293b;">${runningBal}</td></tr>`;
+                }
 
                 if (totalBhade > 0) {
                     runningBal -= totalBhade;
@@ -865,19 +858,18 @@ function generateFinalBill() {
                     runningBal -= totalPay;
                     html += `<tr><td colspan="2" style="padding:4px 4px; text-align:right; font-weight:700; color:#059669;">पैसे जमा :</td><td style="padding:4px 0; text-align:right; font-weight:800; color:#059669;">- ${totalPay}</td></tr>`;
                 }
-
-                let finalPrefix = runningBal < 0 ? "जास्त दिले :" : "सध्याची बाकी :"; let finalColor = runningBal < 0 ? "#ef4444" : "#1e3a8a"; let finalBg = runningBal < 0 ? "#fef2f2" : "#e0eafc";
-                html += `<tr style="background:${finalBg}; border:2px solid ${finalColor};"><td colspan="2" style="padding:8px 4px; text-align:right; font-weight:800; color:${finalColor}; font-size:15px;">${finalPrefix}</td><td style="padding:8px 0; text-align:right; white-space:nowrap;"><span style="color:#fff; background:${finalColor}; padding:4px 8px; border-radius:6px; font-weight:800; font-size:18px;">₹ ${Math.abs(runningBal)} /-</span></td></tr>`; 
-            } else { html += `<tr><td colspan="3" style="text-align:center; padding: 20px; color: #8e8e93; font-weight:600;">No Data Found</td></tr>`; }
-            
-            list.innerHTML = html + "</tbody></table>"; 
+                
+                list.innerHTML = html + "</tbody></table>"; 
+            } else { 
+                list.innerHTML = `<table style="width:100%; max-width:100%; margin:0 auto; border-collapse:collapse;"><tbody style="font-size:14px;"><tr><td colspan="3" style="text-align:center; padding: 20px; color: #8e8e93; font-weight:600;">No Data Found</td></tr></tbody></table>`; 
+            }
             
             if(totalAdvInPeriod !== 0) { document.getElementById("billAdvBox").innerText = `⚠️ या कालावधीत नेलेली एकूण उचल : ₹ ${totalAdvInPeriod} (बिलातून वजा केलेली नाही)`; } else { document.getElementById("billAdvBox").innerText = ""; }
         } else {
             // MERCHANT BILL
             document.getElementById("billAdvBox").innerText=""; let d=[...getMerchantDB()].sort((a,b)=>new Date(a.date)-new Date(b.date)); let openingBal = 0; let filteredData = [];
             d.forEach(e => { if(e && e.name === n) { if (e.date < openingBalDateFilter) { if(e.type !== 'payment') openingBal += (Number(e.total)||0); else openingBal -= (Number(e.amount)||0); } else if (e.date >= startFilter && e.date <= endFilter) { filteredData.push(e); } } });
-            let html = `<table style="width:100%; max-width:700px; margin:0 auto; border-collapse:collapse; font-family:'Poppins',sans-serif; color:#0f172a;"><thead><tr><th style="padding:15px 10px; border-bottom:2px solid #cbd5e1; text-align:left; width:25%; font-size:13px; color:#64748b; text-transform:uppercase; white-space:nowrap;">तारीख</th><th style="padding:15px 10px; border-bottom:2px solid #cbd5e1; text-align:center; width:50%; font-size:13px; color:#64748b; text-transform:uppercase; white-space:nowrap;">तपशील</th><th style="padding:15px 10px; border-bottom:2px solid #cbd5e1; text-align:right; width:25%; font-size:13px; color:#64748b; text-transform:uppercase; white-space:nowrap;">रक्कम (₹)</th></tr></thead><tbody style="font-size:15px;">`;
+            let html = `<table style="width:100%; max-width:100%; margin:0 auto; border-collapse:collapse; font-family:'Poppins',sans-serif; color:#0f172a;"><thead><tr><th style="padding:10px 5px; border-bottom:2px solid #cbd5e1; text-align:left; width:25%; font-size:14px; color:#64748b; text-transform:uppercase; white-space:nowrap;">तारीख</th><th style="padding:10px 5px; border-bottom:2px solid #cbd5e1; text-align:center; width:50%; font-size:14px; color:#64748b; text-transform:uppercase; white-space:nowrap;">तपशील</th><th style="padding:10px 5px; border-bottom:2px solid #cbd5e1; text-align:right; width:25%; font-size:14px; color:#64748b; text-transform:uppercase; white-space:nowrap;">रक्कम (₹)</th></tr></thead><tbody style="font-size:15px;">`;
             let billTotalSoFar = 0; let runningTotal = 0; let hasAddedPrevBal = false; let lastBillDate = "";
             if(openingBal === 0 && filteredData.length === 0) { html += `<tr><td colspan="3" style="text-align:center; padding: 30px; color: #8e8e93; font-weight:500;">No Data Found</td></tr>`; } else {
                 filteredData.forEach(e => {
@@ -1019,17 +1011,19 @@ function generateFinalBill() {
             let farmerArr = getMergedFarmers();
             farmerArr.forEach(f => { 
                 if(!f) return;
-                let total = 0; let totalAdv = 0; let hasDataForMonth = false;
+                let cropTotal = 0; let payTotal = 0; let totalAdv = 0; let hasDataForMonth = false;
                 data.forEach(e => { 
                     if(e && e.name === f) { 
                         if(selMonth && (!e.date || !e.date.startsWith(selMonth))) return; 
                         if(selMonth && e.date && e.date.startsWith(selMonth)) hasDataForMonth = true;
                         
-                        if(e.type==='crop') total += (Number(e.total) || 0); 
-                        else if(e.type==='payment') total -= (Number(e.amount) || 0); 
+                        if(e.type==='crop') cropTotal += (Number(e.total) || 0); 
+                        else if(e.type==='payment') payTotal += (Number(e.amount) || 0); 
                         else if(e.type==='advance') totalAdv += (Number(e.amount) || 0); 
                     } 
                 }); 
+                let tenPercentDeduction = Math.round((cropTotal * 0.10) / 5) * 5;
+                let total = cropTotal - tenPercentDeduction - payTotal;
                 
                 if (selMonth && !hasDataForMonth && total === 0 && totalAdv === 0) return; 
                 if(total > 0) allFarmersGrandTotal += total; 
@@ -1039,7 +1033,7 @@ function generateFinalBill() {
                 if(total < 0) { badgeClass = "badge-red"; prefix = "जास्त दिले: ₹ "; styleStr = "color:var(--danger); border-color:var(--danger);"; total = Math.abs(total); } 
                 let advBadge = totalAdv !== 0 ? `<div style="font-size:11px; color:var(--warning); margin-top:4px; font-weight:600;">उचल: ₹ ${Math.abs(totalAdv).toLocaleString('en-IN')}</div>` : ""; 
                 
-                html += `<tr class='premium-row'><td><div style="display:flex; align-items:center;"><div class="user-avatar">🧑‍🌾</div><span onclick="openDetailModal('${f}')" style="cursor:pointer; font-weight:600;">${f}</span></div>${btns}</td><td style="text-align:right;"><span style="${showAll ? '' : 'display:none'} ${styleStr}" class="${badgeClass}">${prefix}${total.toLocaleString('en-IN')}</span><div style="${showAll ? '' : 'display:none'}">${advBadge}</div><span style="${showAll ? 'display:none' : ''}" style="color:var(--text-muted); font-weight:600;">****</span></td></tr>`; 
+                html += `<tr class='premium-row'><td><div style="display:flex; align-items:center;"><div class="user-avatar">🧑🌾</div><span onclick="openDetailModal('${f}')" style="cursor:pointer; font-weight:600;">${f}</span></div>${btns}</td><td style="text-align:right;"><span style="${showAll ? '' : 'display:none'} ${styleStr}" class="${badgeClass}">${prefix}${total.toLocaleString('en-IN')}</span><div style="${showAll ? '' : 'display:none'}">${advBadge}</div><span style="${showAll ? 'display:none' : ''}" style="color:var(--text-muted); font-weight:600;">****</span></td></tr>`; 
             }); 
             
             tbody.innerHTML = html || "<tr><td colspan='2' style='text-align:center; padding:20px; color:#8e8e93; font-weight:600;'>No Data Found</td></tr>"; 
@@ -1182,7 +1176,7 @@ function generateFinalBill() {
     function editBagEntry(id) { if(currentUserRole !== 'admin') { alert("❌ हे फक्त मालक करू शकतात."); return; } let data=getBagDB(); let idx=data.findIndex(e=>e&&e.id===id); if(idx===-1)return; let e = data[idx]; if(e.type === 'payment') { let a = prompt("जमा रक्कम:", Math.abs(e.amount)); if(a){ data[idx].amount = parseFloat(a); saveBagDB(data); } } else { let q=prompt("Qty:", e.qty); if(!q)return; data[idx].qty=parseInt(q); data[idx].total=data[idx].qty*(data[idx].rate||0); saveBagDB(data); } if(document.getElementById("bagPersonDetailModal").classList.contains("show")) renderBagPersonDetail(val("activeBagPersonName")); if(document.getElementById("bagListModal").classList.contains("show")) renderBagList(); if(document.getElementById("bagPersonListModal").classList.contains("show")) renderBagPersonList(); if(document.getElementById("bagPreviewModal").classList.contains("show")) renderBagPreview(); }
     function delBagEntry(id) { if(currentUserRole !== 'admin') { alert("❌ प्रवेश नाकारला!"); return; } if(prompt("Enter PIN:")===ADMIN_PIN){ saveBagDB(getBagDB().filter(e=>e&&e.id!==id)); if(document.getElementById("bagPersonDetailModal").classList.contains("show")) renderBagPersonDetail(val("activeBagPersonName")); if(document.getElementById("bagListModal").classList.contains("show")) renderBagList(); if(document.getElementById("bagPersonListModal").classList.contains("show")) renderBagPersonList(); if(document.getElementById("bagPreviewModal").classList.contains("show")) renderBagPreview(); } }
     
-    function generateBagBill(){let n=val("bagBillName").trim();let s=val("bagStartDate");let e=val("bagEndDate");if(!n||!s||!e)return;closeModal("bagBillModal");openModal("finalBagBillModal");document.getElementById("bagBillHeaderName").innerText=n;document.getElementById("bagBillDateDisplay").innerText=`📅 ${formatDate(s)} ते ${formatDate(e)}`;let d=[...getBagDB()].sort((a,b)=>new Date(a.date)-new Date(b.date));let bQ=0,bA=0,fD=[];d.forEach(x=>{if(x&&x.name===n){if(x.date<s){if(x.type==='payment')bA-=(Number(x.amount)||0);else{bQ+=(Number(x.qty)||0);bA+=(Number(x.total)||0);}}else if(x.date>=s&&x.date<=e)fD.push(x);}});let w=document.getElementById("bagBillTableWrapper");let h=`<table style="width:100%;max-width:400px;margin:0 auto;border-collapse:collapse;color:#000;"><thead><tr><th style="padding:4px 0;border-bottom:2px solid #000;text-align:left;width:30%;font-size:12px;">तारीख</th><th style="padding:4px 0;border-bottom:2px solid #000;text-align:center;width:40%;font-size:12px;">तपशील</th><th style="padding:4px 0;border-bottom:2px solid #000;text-align:right;width:30%;font-size:12px;">रक्कम (₹)</th></tr></thead><tbody style="font-size:13px;">`;let rQ=bQ,rA=bA,lD="";if(bA!==0||fD.length>0){if(bA!==0)h+=`<tr style="background:#fffbeb;"><td colspan="2" style="padding:4px 8px;text-align:right;font-weight:600;color:#d97706;font-size:13px;">मागील बाकी :</td><td style="padding:4px 0;text-align:right;font-weight:700;color:#d97706;font-size:15px;">${bA}</td></tr>`;fD.forEach(x=>{if(x.type!=='payment'){let dD=(x.date!==lD)?formatDate(x.date):"";lD=x.date;rQ+=x.qty;rA+=x.total;h+=`<tr><td style="padding:3px 0;border-bottom:1px dashed #cbd5e1;color:#000;font-weight:700;font-size:12px;">${dD}</td><td style="padding:3px 0;border-bottom:1px dashed #cbd5e1;text-align:center;font-weight:600;font-size:13px;">${x.qty} ${x.type==='Poti'?'पोती':'बॅग'} x ${x.rate}</td><td style="padding:3px 0;border-bottom:1px dashed #cbd5e1;text-align:right;font-weight:700;font-size:15px;color:#000;">${x.total}</td></tr>`;}else{h+=`<tr style="background:#f8fafc;"><td colspan="2" style="padding:4px 8px;text-align:right;font-weight:600;font-size:13px;">एकूण :</td><td style="padding:4px 0;text-align:right;font-weight:700;font-size:15px;color:#000;">${rA}</td></tr>`;rA-=x.amount;let payDate=formatDate(x.date);h+=`<tr style="background:#ecfdf5;"><td style="padding:3px 8px;color:#000;font-weight:700;font-size:12px;">${payDate}</td><td style="padding:3px 8px;text-align:center;font-weight:600;color:#059669;font-size:13px;">जमा :</td><td style="padding:3px 0;text-align:right;font-weight:700;font-size:15px;color:#059669;">- ${x.amount}</td></tr><tr><td colspan="3" style="padding:3px 0;text-align:right;border-bottom:2px solid #cbd5e1;"><span style="font-weight:700;font-size:12px;color:#1d4ed8;">बाकी: ${rA} /-</span></td></tr>`;lastBillDate="";}});if(fD.length>0&&fD[fD.length-1].type!=='payment')h+=`<tr style="background:#fce7f3;border:2px solid #af52de;"><td colspan="2" style="padding:8px 4px;text-align:right;font-weight:700;font-size:14px;color:#af52de;">सध्याची बाकी :</td><td style="padding:8px 0;text-align:right;"><span style="color:#af52de;font-weight:800;font-size:18px;">₹ ${rA} /-</span></td></tr>`;}else{h+=`<tr><td colspan="3" style="text-align:center;padding:30px;color:#8e8e93;font-weight:500;">No Data</td></tr>`;}h+=`</tbody></table>`;w.innerHTML=h;}
+    function generateBagBill(){let n=val("bagBillName").trim();let s=val("bagStartDate");let e=val("bagEndDate");if(!n||!s||!e)return;closeModal("bagBillModal");openModal("finalBagBillModal");document.getElementById("bagBillHeaderName").innerText=n;document.getElementById("bagBillDateDisplay").innerText=`📅 ${formatDate(s)} ते ${formatDate(e)}`;let d=[...getBagDB()].sort((a,b)=>new Date(a.date)-new Date(b.date));let bQ=0,bA=0,fD=[];d.forEach(x=>{if(x&&x.name===n){if(x.date<s){if(x.type==='payment')bA-=(Number(x.amount)||0);else{bQ+=(Number(x.qty)||0);bA+=(Number(x.total)||0);}}else if(x.date>=s&&x.date<=e)fD.push(x);}});let w=document.getElementById("bagBillTableWrapper");let h=`<table style="width:100%;max-width:100%;margin:0 auto;border-collapse:collapse;color:#000;"><thead><tr><th style="padding:6px 4px;border-bottom:2px solid #000;text-align:left;width:25%;font-size:14px;">तारीख</th><th style="padding:6px 4px;border-bottom:2px solid #000;text-align:center;width:50%;font-size:14px;">तपशील</th><th style="padding:6px 4px;border-bottom:2px solid #000;text-align:right;width:25%;font-size:14px;">रक्कम (₹)</th></tr></thead><tbody style="font-size:14px;">`;let rQ=bQ,rA=bA,lD="";if(bA!==0||fD.length>0){if(bA!==0)h+=`<tr style="background:#fffbeb;"><td colspan="2" style="padding:4px 8px;text-align:right;font-weight:600;color:#d97706;font-size:13px;">मागील बाकी :</td><td style="padding:4px 0;text-align:right;font-weight:700;color:#d97706;font-size:15px;">${bA}</td></tr>`;fD.forEach(x=>{if(x.type!=='payment'){let dD=(x.date!==lD)?formatDate(x.date):"";lD=x.date;rQ+=x.qty;rA+=x.total;h+=`<tr><td style="padding:3px 0;border-bottom:1px dashed #cbd5e1;color:#000;font-weight:700;font-size:12px;">${dD}</td><td style="padding:3px 0;border-bottom:1px dashed #cbd5e1;text-align:center;font-weight:600;font-size:13px;">${x.qty} ${x.type==='Poti'?'पोती':'बॅग'} x ${x.rate}</td><td style="padding:3px 0;border-bottom:1px dashed #cbd5e1;text-align:right;font-weight:700;font-size:15px;color:#000;">${x.total}</td></tr>`;}else{h+=`<tr style="background:#f8fafc;"><td colspan="2" style="padding:4px 8px;text-align:right;font-weight:600;font-size:13px;">एकूण :</td><td style="padding:4px 0;text-align:right;font-weight:700;font-size:15px;color:#000;">${rA}</td></tr>`;rA-=x.amount;let payDate=formatDate(x.date);h+=`<tr style="background:#ecfdf5;"><td style="padding:3px 8px;color:#000;font-weight:700;font-size:12px;">${payDate}</td><td style="padding:3px 8px;text-align:center;font-weight:600;color:#059669;font-size:13px;">जमा :</td><td style="padding:3px 0;text-align:right;font-weight:700;font-size:15px;color:#059669;">- ${x.amount}</td></tr><tr><td colspan="3" style="padding:3px 0;text-align:right;border-bottom:2px solid #cbd5e1;"><span style="font-weight:700;font-size:12px;color:#1d4ed8;">बाकी: ${rA} /-</span></td></tr>`;lastBillDate="";}});if(fD.length>0&&fD[fD.length-1].type!=='payment')h+=`<tr style="background:#fce7f3;border:2px solid #af52de;"><td colspan="2" style="padding:8px 4px;text-align:right;font-weight:700;font-size:14px;color:#af52de;">सध्याची बाकी :</td><td style="padding:8px 0;text-align:right;"><span style="color:#af52de;font-weight:800;font-size:18px;">₹ ${rA} /-</span></td></tr>`;}else{h+=`<tr><td colspan="3" style="text-align:center;padding:30px;color:#8e8e93;font-weight:500;">No Data</td></tr>`;}h+=`</tbody></table>`;w.innerHTML=h;}
 
     function openDetailModal(name) { openModal("detailModal"); document.getElementById("activeFarmerName").value = name; document.getElementById("detailFarmerName").innerText = name; renderDetail(name); }
     let isFarmerHistMode = false; function toggleFarmerHistMode() { if(currentUserRole !== 'admin') return; isFarmerHistMode = !isFarmerHistMode; document.getElementById("farmerHistManageBtn").innerHTML = isFarmerHistMode ? "❌ Done" : "✏️ Edit"; renderDetail(val("activeFarmerName")); }
@@ -1223,6 +1217,13 @@ function generateFinalBill() {
             let mRunningBal = mTotalCrop;
             html += `<tr style="border-top:1px solid #ddd;"><td colspan="2" style="text-align:right; font-weight:700; font-size:12px;">एकूण माल:</td><td style="font-weight:800; text-align:right;">${mTotalCrop}</td><td></td></tr>`;
             
+            let mTenPercent = Math.round((mTotalCrop * 0.10) / 5) * 5;
+            if (mTenPercent > 0) { 
+                mRunningBal -= mTenPercent; 
+                html += `<tr><td colspan="2" style="text-align:right; font-weight:700; color:#d97706; font-size:12px;"> </td><td style="font-weight:800; text-align:right; color:#d97706; border-bottom:1px solid #ddd;">- ${mTenPercent}</td><td></td></tr>`; 
+                html += `<tr><td colspan="2" style="text-align:right; font-weight:700; font-size:12px; color:#1e293b;">एकूण:</td><td style="font-weight:800; text-align:right; color:#1e293b;">${mRunningBal}</td><td></td></tr>`;
+            }
+            
             if (mTotalBhade > 0) { mRunningBal -= mTotalBhade; html += `<tr><td colspan="2" style="text-align:right; font-weight:700; color:#dc2626; font-size:12px;">गाडी भाडे:</td><td style="font-weight:800; text-align:right; color:#dc2626;">- ${mTotalBhade}</td><td></td></tr>`; }
             if (mTotalPay > 0) { mRunningBal -= mTotalPay; html += `<tr><td colspan="2" style="text-align:right; font-weight:700; color:#10b981; font-size:12px;">पैसे जमा:</td><td style="font-weight:800; text-align:right; color:#10b981;">- ${mTotalPay}</td><td></td></tr>`; }
             html += `<tr style="background:#f1f5f9;"><td colspan="2" style="text-align:right; font-weight:700; color:var(--primary); font-size:13px;">बाकी:</td><td style="font-weight:800; text-align:right; color:var(--primary); font-size:14px;">₹${mRunningBal}</td><td></td></tr>`;
@@ -1230,8 +1231,7 @@ function generateFinalBill() {
         tbody.innerHTML = html; 
     }
     
-    function initFarmerJama() { document.getElementById("farmerJamaDate").value = val("dateInput"); }
-    function saveFarmerPayment() { let d=val("farmerJamaDate"); let n=val("farmerJamaName").trim(); let a=parseFloat(val("farmerJamaAmount")); if(!d||!n||!a) return; let mArr = safeArray(farmers); if(!mArr.includes(n)) { mArr.push(n); database.ref('farmers').set(mArr); } let data=getData(); data.push({id:Date.now(), date:d, name:n, type:'payment', amount:a}); saveData(data); document.getElementById("farmerJamaAmount").value=""; closeModal('farmerPaymentModal'); if(document.getElementById("listModal").classList.contains("show")) generateFarmerStatus(); }
+
     
     function initAdv() { document.getElementById("advDate").value = val("dateInput"); }
     function saveAdvance(mode) { let d=val("advDate"); let n=val("advFarmerName").trim(); let a=parseFloat(val("advAmount")); if(!d||!n||!a) return; let mArr = safeArray(farmers); if(!mArr.includes(n)) { mArr.push(n); database.ref('farmers').set(mArr); } let finalAmt = mode === 'GIVE' ? a : -a; let data = getData(); data.push({id:Date.now(), date:d, name:n, type:'advance', amount:finalAmt}); saveData(data); document.getElementById("advAmount").value=""; document.getElementById("advFarmerName").value=""; alert("✅ उचल नोंदवली!"); if(document.getElementById("advListModal").classList.contains("show")) renderAdvList(); }
@@ -1290,94 +1290,6 @@ function generateFinalBill() {
             renderNotes();
         }
     }
-   // 🤖 Smart AI Chatbot Logic
-async function sendAiMessage() {
-    let inputField = document.getElementById("aiChatInput");
-    let userText = inputField.value.trim();
-    if (!userText) return;
-
-    let chatBox = document.getElementById("aiChatBox");
-    
-    // 1. Show User Message
-    chatBox.innerHTML += `<div style="text-align:right;"><span style="background:linear-gradient(135deg,#3b82f6,#1d4ed8); color:#fff; padding:10px 14px; border-radius:16px 16px 0 16px; display:inline-block; font-size:13px; max-width:85%; font-weight:500; box-shadow:0 4px 6px rgba(0,0,0,0.1);">${userText}</span></div>`;
-    inputField.value = "";
-    chatBox.scrollTop = chatBox.scrollHeight;
-
-    // 2. Check API Key
-    let apiKey = document.getElementById("geminiApiKey").value || localStorage.getItem("geminiApiKey");
-    if (!apiKey) {
-        chatBox.innerHTML += `<div style="text-align:left;"><span style="background:#fee2e2; color:#ef4444; padding:10px 14px; border-radius:16px 16px 16px 0; display:inline-block; font-size:13px; max-width:85%; font-weight:600;">⚠️ कृपया 'वही स्कॅन' सेक्शन मध्ये जाऊन आधी API Key टाका.</span></div>`;
-        chatBox.scrollTop = chatBox.scrollHeight;
-        return;
-    }
-
-    // 3. Show Loading Animation
-    let loadingId = "loading_" + Date.now();
-    chatBox.innerHTML += `<div id="${loadingId}" style="text-align:left;"><span style="background:#e2e8f0; color:#475569; padding:10px 14px; border-radius:16px 16px 16px 0; display:inline-block; font-size:13px; font-weight:500; animation: pulse 1.5s infinite;">⏳ माहिती शोधत आहे...</span></div>`;
-    chatBox.scrollTop = chatBox.scrollHeight;
-
-    // 4. Gather Live Software Data for AI Context
-    let selDate = val("dateInput");
-    let cData = getData() || [];
-    let mData = getMerchantDB() || [];
-    let bData = getBagDB() || [];
-    
-    let tKharedi = 0, tVikri = 0, pendingAmt = 0;
-    
-    // Calculate stats
-    cData.forEach(e => { if(e && e.date === selDate && e.type === 'crop') tKharedi += (e.total || 0); });
-    mData.forEach(e => { 
-        if(e) {
-            if(e.type === 'payment') pendingAmt -= (e.amount || 0);
-            else { 
-                pendingAmt += (e.total || 0); 
-                if(e.date === selDate) tVikri += (e.total || 0); 
-            }
-        }
-    });
-
-    let systemPrompt = `You are a helpful and intelligent Marathi AI assistant integrated inside a billing software. 
-    You must answer the user's questions based strictly on the current live data provided below. Keep your answers natural, accurate, and in Marathi.
-    
-    [LIVE SOFTWARE DATA SUMMARY]
-    Selected Date: ${selDate}
-    Today's Farmer Purchase (आजची शेतकरी खरेदी): ₹ ${tKharedi}
-    Today's Merchant Sales (आजची व्यापारी विक्री): ₹ ${tVikri}
-    Total Market Outstanding (एकूण व्यापाऱ्यांकडून येणे बाकी): ₹ ${pendingAmt}
-    
-    If the user asks something outside this data, politely tell them that you currently only have access to basic summary data. Do not make up numbers.`;
-
-    let payload = {
-        contents: [{ parts: [{ text: systemPrompt + "\n\nUser Question: " + userText }] }]
-    };
-
-    // 5. Call Gemini API
-    try {
-        let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        });
-        
-        let result = await response.json();
-        document.getElementById(loadingId).remove();
-
-        if (response.ok && result.candidates) {
-            let aiReply = result.candidates[0].content.parts[0].text;
-            // Convert markdown bold (**) to HTML bold (<b>) for neat display
-            aiReply = aiReply.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-            aiReply = aiReply.replace(/\n/g, '<br>');
-            
-            chatBox.innerHTML += `<div style="text-align:left;"><span style="background:#ffffff; color:#334155; padding:12px 16px; border-radius:16px 16px 16px 0; display:inline-block; font-size:13px; max-width:85%; line-height:1.6; box-shadow:0 4px 6px rgba(0,0,0,0.05); border:1px solid #e2e8f0;">${aiReply}</span></div>`;
-        } else {
-            throw new Error(result.error?.message || "Unknown error");
-        }
-    } catch (e) {
-        if(document.getElementById(loadingId)) document.getElementById(loadingId).remove();
-        chatBox.innerHTML += `<div style="text-align:left;"><span style="background:#fee2e2; color:#ef4444; padding:10px 14px; border-radius:16px 16px 16px 0; display:inline-block; font-size:13px; max-width:85%; font-weight:500;">❌ सर्व्हर एरर: ${e.message}</span></div>`;
-    }
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
 </script>
 </body>
 </html>
