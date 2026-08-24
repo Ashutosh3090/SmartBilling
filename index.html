@@ -762,6 +762,7 @@
                     <button class="action-btn bg-gradient-red" onclick="openModal('advModal');"><i>💰</i>
                         Advance</button>
                     <button class="action-btn" style="background:linear-gradient(135deg, #db2777, #be185d);" onclick="openModal('bhadeListModal'); initBhade();"><i>🚚</i> गाडी भाडे</button>
+                    <button class="action-btn" style="background:linear-gradient(135deg, #8b5cf6, #6d28d9);" onclick="openModal('recentJamaModal'); renderRecentJama();"><i>🕒</i> Recent Jama</button>
                 </div>
             </div>
 
@@ -847,8 +848,9 @@
                                 <option value="के">के</option>
                                 <option value="शे">शे</option>
                                 <option value="रु">रु</option>
+                                <option value="पा">पा</option>
                             </select></div>
-                    </div><button class="btn-add bg-gradient-merchant" style="margin-top: 5px;"
+                    </div><button id="merSaveBtn" class="btn-add bg-gradient-merchant" style="margin-top: 5px;"
                         onclick="saveMerchantEntry()">Save Entry</button>
                 </div>
                 <div class="list-header-bar" style="background:transparent; padding:0; border:none;"><button
@@ -1327,8 +1329,9 @@
                 <h3 style="color: #db2777; margin-bottom: 5px;">🚚 गाडी भाडे (Vehicle Rent)</h3>
                 <p style="text-align: center; color: var(--text-muted); font-size: 12px; margin-bottom: 15px;">या महिन्याचे गाडी भाडे. कोणाच्या नावावर क्लिक करून वजा करा.</p>
                 
-                <div class="list-header-bar" style="background:#fce7f3; border:none; padding:10px; margin-bottom:15px; border-radius:10px; justify-content:center;">
-                    <input type="month" id="bhadeMonth" onchange="renderBhadeList()" class="date-picker" style="font-weight:700; width:auto; border:none; background:transparent; font-size:16px;">
+                <div class="list-header-bar" style="background:#fce7f3; border:none; padding:10px; margin-bottom:15px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+                    <input type="month" id="bhadeMonth" onchange="renderBhadeList()" class="date-picker" style="font-weight:700; width:auto; border:none; background:transparent; font-size:16px; color:#db2777; outline:none;">
+                    <div style="font-weight:800; font-size:16px; color:#db2777;">एकूण: <span id="bhadeMonthTotalDisplay">₹ 0</span></div>
                 </div>
                 
                 <div class="table-container" style="max-height: 55vh; overflow-y: auto;">
@@ -1431,6 +1434,21 @@
             </div>
         </div>
     </div>
+
+    <div id="recentJamaModal" class="modal no-print">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="close-icon" onclick="closeModal('recentJamaModal')">✕</div>
+            <h3 style="color: #8b5cf6; margin-bottom: 5px;">🕒 Recent Jama (जमा)</h3>
+            <p style="text-align: center; color: var(--text-muted); font-size: 12px; margin-bottom: 15px;">नुकतीच जमा केलेली रक्कम पाहण्यासाठी नावावर क्लिक करा.</p>
+            
+            <div class="table-container" style="max-height: 55vh; overflow-y: auto;">
+                <table class="styled-table">
+                    <tbody id="recentJamaBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <div id="todaySummaryModal" class="modal no-print">
         <div class="modal-content">
             <div class="close-icon" onclick="closeModal('todaySummaryModal')">✕</div>
@@ -1824,13 +1842,11 @@
             if (!d || !n || !w || !r) { alert("माहिती भरा!"); return; }
 
             // 🛑 --- डबल एंट्री अलर्ट कोड --- 🛑
-            if (['नि', 'पि', 'के', 'रु'].includes(tSel)) {
-                let isDuplicate = getMerchantDB().some(e => e && e.date === d && e.name === n && e.merType === tSel && (!e.type || e.type === 'bill'));
-                if (isDuplicate) {
-                    let yesSave = confirm(`⚠️ सावधान!\n\n${n} यांची आजच्या तारखेत '${tSel}' ची नोंद आधीच झालेली आहे.\n\nतरीही तुम्हाला पुन्हा (डबल) नोंद सेव्ह करायची आहे का?`);
-                    if (!yesSave) {
-                        return; // Cancel केल्यास सेव्ह होणार नाही
-                    }
+            let existingEntry = getMerchantDB().find(e => e && e.date === d && e.name === n && e.merType === tSel && (!e.type || e.type === 'bill'));
+            if (existingEntry) {
+                let yesSave = confirm(`⚠️ सावधान!\nमागील नोंद: ${existingEntry.merType} ${existingEntry.weight} x ${existingEntry.rate}`);
+                if (!yesSave) {
+                    return; // Cancel केल्यास सेव्ह होणार नाही
                 }
             }
             // 🛑 ------------------------- 🛑
@@ -1840,7 +1856,16 @@
             data.push({ id: Date.now(), date: d, name: n, type: 'bill', merType: tSel, weight: w, rate: r, total: Math.round(w * r) });
             saveMerchantDB(data);
             document.getElementById("merWeight").value = ""; document.getElementById("merName").value = "";
-            alert("✅ व्यापारी नोंद सेव्ह झाली!");
+            let btn = document.getElementById("merSaveBtn");
+            if(btn) {
+                let old = btn.innerHTML;
+                btn.innerHTML = "✅ Saved!";
+                btn.style.background = "linear-gradient(135deg, #10b981, #059669)";
+                setTimeout(() => {
+                    btn.innerHTML = old;
+                    btn.style.background = "";
+                }, 1500);
+            }
         }
 
         function initMerJama() { document.getElementById("merJamaDateOut").value = val("dateInput"); }
@@ -1874,6 +1899,7 @@
                 if (document.getElementById("merPreviewModal").classList.contains("show")) renderMerPreview();
                 if (document.getElementById("merDetailModal").classList.contains("show")) renderMerHistory(val("activeMerchantName"));
                 if (document.getElementById("merchantListModal").classList.contains("show")) renderMerList();
+                if (document.getElementById("recentJamaModal").classList.contains("show")) renderRecentJama();
             }
         }
 
@@ -1905,6 +1931,7 @@
             if (document.getElementById("merPreviewModal").classList.contains("show")) renderMerPreview();
             if (document.getElementById("merDetailModal").classList.contains("show")) renderMerHistory(val("activeMerchantName"));
             if (document.getElementById("merchantListModal").classList.contains("show")) renderMerList();
+            if (document.getElementById("recentJamaModal").classList.contains("show")) renderRecentJama();
         }
 
         function sendWhatsAppBill(areaId) {
@@ -2400,7 +2427,8 @@
             for (let m in monthsData) {
                 let monthEntries = monthsData[m];
                 let mYear = parseInt(m.split('-')[0]); let mMonth = parseInt(m.split('-')[1]);
-                html += `<tr style="background:#e2e8f0;"><td colspan="4" style="text-align:center; font-weight:800; font-size:13px; padding:6px;">📅 ${marathiMonths[mMonth - 1]} ${mYear}</td></tr>`;
+                let delMonthBtn = isFarmerHistMode ? `<button class="small-btn btn-del" style="position:absolute; right:10px; top:4px; padding:2px 6px;" onclick="deleteMonthData('${name}', '${m}')" title="Delete whole month data">🗑</button>` : "";
+                html += `<tr style="background:#e2e8f0; position:relative;"><td colspan="4" style="text-align:center; font-weight:800; font-size:13px; padding:6px;">📅 ${marathiMonths[mMonth - 1]} ${mYear} ${delMonthBtn}</td></tr>`;
 
                 let mTotalCrop = 0; let mTotalBhade = 0; let mTotalPay = 0;
 
@@ -2434,6 +2462,20 @@
 
 
 
+        function deleteMonthData(farmerName, monthStr) {
+            if (currentUserRole !== 'admin') { alert("❌ हे फक्त मालक करू शकतात."); return; }
+            if (confirm(`⚠️ सावधान!\nतुम्ही ${farmerName} चा ${monthStr} महिन्याचा संपूर्ण डेटा डिलीट करत आहात.\nही क्रिया कायमस्वरूपी आहे.\n\nनक्की डिलीट करायचे आहे का?`)) {
+                if(prompt("Enter PIN:") === ADMIN_PIN) {
+                    let data = getData();
+                    let newData = data.filter(e => !(e && e.name === farmerName && e.date && e.date.startsWith(monthStr)));
+                    saveData(newData);
+                    renderDetail(farmerName);
+                    if(document.getElementById("listModal").classList.contains("show")) generateFarmerStatus();
+                    if(document.getElementById("previewModal").classList.contains("show")) renderPreview();
+                }
+            }
+        }
+
         function initBhade() { 
             let today = new Date(); let m = String(today.getMonth() + 1).padStart(2, '0'); let y = today.getFullYear();
             document.getElementById("bhadeMonth").value = `${y}-${m}`;
@@ -2449,6 +2491,16 @@
         function renderBhadeList() {
             let selMonth = val("bhadeMonth"); if(!selMonth) return;
             let data = getData() || [];
+            
+            let monthTotalBhade = 0;
+            data.forEach(e => {
+                if (e && e.type === 'bhade' && e.date && e.date.startsWith(selMonth)) {
+                    monthTotalBhade += (Number(e.amount) || 0);
+                }
+            });
+            let totalDisplayEl = document.getElementById("bhadeMonthTotalDisplay");
+            if(totalDisplayEl) totalDisplayEl.innerText = "₹ " + monthTotalBhade.toLocaleString('en-IN');
+
             let tbody = document.getElementById("bhadeListBody");
             let html = "";
             let allFarmers = safeArray(farmers);
@@ -2657,6 +2709,64 @@
             document.getElementById("advHistoryTotal").innerText = `${totPrefix}${Math.abs(tot)}`;
             document.getElementById("advHistoryTotal").style.color = totCol;
             document.getElementById("advHistoryBody").innerHTML = html;
+        }
+
+        // 🌟 Recent Jama Logic 🌟
+        function toggleRecentJamaExpand(id) {
+            let el = document.getElementById("expand_" + id);
+            if(el.style.display === "none") el.style.display = "table-row";
+            else el.style.display = "none";
+        }
+
+        function renderRecentJama() {
+            let data = getMerchantDB() || [];
+            let tbody = document.getElementById("recentJamaBody");
+            
+            let payments = data.filter(e => e && e.type === 'payment' && e.amount).sort((a, b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
+            
+            let html = "";
+            payments.slice(0, 30).forEach((p, index) => {
+                let safeId = "jama_" + index;
+                let currentTotal = 0;
+                data.forEach(e => {
+                    if(e && e.name === p.name) {
+                        if(e.type === 'payment') currentTotal -= Number(e.amount);
+                        else currentTotal += (Number(e.total) || 0);
+                    }
+                });
+                
+                let col = currentTotal > 0 ? "#ea580c" : (currentTotal < 0 ? "#10b981" : "#1e293b");
+                let beforeTotal = currentTotal + Number(p.amount);
+
+                html += `<tr class='premium-row' onclick="toggleRecentJamaExpand('${safeId}')" style="cursor:pointer;">
+                    <td style="font-weight:700; color:#1e293b; display:flex; justify-content:space-between; align-items:center;">
+                        <div style="display:flex; align-items:center;">
+                            <div class="user-avatar" style="background:#f3e8ff; color:#8b5cf6; width:34px; height:34px; font-weight:800; font-size:16px;">🏢</div>
+                            <span style="margin-left:10px; font-size:15px;">${p.name}</span>
+                        </div>
+                        <div style="display:flex; align-items:center;">
+                            <span style="color:#059669; font-weight:800; font-size:15px; margin-right:8px;">₹ ${Number(p.amount).toLocaleString('en-IN')}</span>
+                            <span style="font-size:10px; color:#8b5cf6;">▼</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr id="expand_${safeId}" style="display:none; background:#faf5ff;">
+                    <td style="padding:15px; font-size:14px; border-bottom:1px solid #e2e8f0;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:#475569;"><span>तारीख:</span><span style="font-weight:600;">${formatDate(p.date)}</span></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:#1e293b;"><span>एकूण रक्कम:</span><span style="font-weight:700;">₹ ${beforeTotal.toLocaleString('en-IN')}</span></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:#059669;"><span>जमा रक्कम:</span><span style="font-weight:800; font-size:16px;">- ₹ ${Number(p.amount).toLocaleString('en-IN')}</span></div>
+                        <hr style="border:0; border-top:1px dashed #d8b4fe; margin:8px 0;">
+                        <div style="display:flex; justify-content:space-between; color:${col};"><span>उर्वरित बाकी:</span><span style="font-weight:800; font-size:15px;">₹ ${Math.abs(currentTotal).toLocaleString('en-IN')}</span></div>
+                        <div style="text-align:right; margin-top:10px;">
+                            <button class="small-btn btn-edit" onclick="openEditMerEntryModal(${p.id})">✏️ Edit</button>
+                            <button class="small-btn btn-del" onclick="delMerEntry(${p.id})">🗑 Delete</button>
+                        </div>
+                    </td>
+                </tr>`;
+            });
+            
+            if(payments.length === 0) html = `<tr><td style="text-align:center; padding:20px; color:#8e8e93; font-weight:600;">कोणतीही अलीकडील जमा नोंद नाही</td></tr>`;
+            tbody.innerHTML = html;
         }
         // 🌟 Daily Notes Logic 🌟
         function initNotes() {
