@@ -721,8 +721,7 @@
                             <div style="position: relative; width: 100%;">
                                 <input type="text" id="farmerName" list="farmerList"
                                     onclick="try{this.showPicker()}catch(e){}" placeholder="Name..."
-                                    onchange="autoSelectFarmerName()" style="padding-right: 45px;">
-                                <button id="micBtn" class="mic-btn" onclick="startVoiceRecognition()">🎙️</button>
+                                    onchange="autoSelectFarmerName()">
                             </div>
                             <datalist id="farmerList"></datalist>
                         </div>
@@ -753,8 +752,7 @@
                         Traders</button>
                     <button class="action-btn bg-gradient-blue"
                         onclick="openModal('monthlyReportModal'); initMonthlyReport();"><i>📊</i> मासिक रिपोर्ट</button>
-                    <button class="action-btn" style="background:linear-gradient(135deg,#0ea5e9,#0369a1);"
-                        onclick="openModal('notesModal'); initNotes();"><i>📝</i> रोजच्या नोंदी</button>
+
                     <button class="action-btn" style="background:linear-gradient(135deg,#14b8a6,#0d9488);"
                         onclick="openModal('profitModal'); initProfit();"><i>💸</i> Profit</button>
                     <button class="action-btn" style="background:linear-gradient(135deg,#6366f1,#4338ca);"
@@ -763,24 +761,68 @@
                         Advance</button>
                     <button class="action-btn" style="background:linear-gradient(135deg, #db2777, #be185d);" onclick="openModal('bhadeListModal'); initBhade();"><i>🚚</i> गाडी भाडे</button>
                     <button class="action-btn" style="background:linear-gradient(135deg, #8b5cf6, #6d28d9);" onclick="openModal('recentJamaModal'); renderRecentJama();"><i>🕒</i> Recent Jama</button>
+                    <button class="action-btn" style="background:linear-gradient(135deg, #0ea5e9, #0284c7);" onclick="openBulkEntryModal()"><i>⚡</i> Fast Entry</button>
+                    <button class="action-btn" style="background:linear-gradient(135deg, #ec4899, #be185d);" onclick="openOtherFModal()"><i>🌸</i> इतर फुले</button>
                 </div>
             </div>
+
+    <div id="bulkEntryModal" class="modal no-print">
+        <div class="modal-content" style="max-width: 600px; padding: 20px 15px;">
+            <div class="close-icon" onclick="closeModal('bulkEntryModal')">✕</div>
+            <h3 style="color: #0ea5e9; margin-bottom: 5px;">⚡ Fast Bulk Entry</h3>
+            <p style="text-align: center; color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">कागदावरून बघून सर्वांची वजने एकाच वेळी भरा.</p>
+            
+            <div class="list-header-bar" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0;">
+                <div style="flex:1; min-width:120px;">
+                    <label style="font-size:12px; font-weight:700; color:#475569;">तारीख:</label>
+                    <input type="date" id="bulkDate" class="input-field" style="margin:0; padding:8px; font-size:14px; margin-top:4px;" onchange="onBulkDateChange()">
+                </div>
+                <div style="flex:1; min-width:100px;">
+                    <label style="font-size:12px; font-weight:700; color:#475569;">आजचा भाव (Rate):</label>
+                    <input type="number" id="bulkRate" class="input-field" placeholder="उदा. 45" style="margin:0; padding:8px; font-size:15px; font-weight:800; color:#0ea5e9; margin-top:4px;">
+                </div>
+            </div>
+
+            <div style="margin-bottom:10px;">
+                <input type="text" id="bulkSearch" class="input-field" placeholder="🔍 शेतकरी शोधा (Search)..." style="margin:0; border-radius:8px; padding:10px 15px;" onkeyup="filterBulkFarmers()">
+            </div>
+
+            <div style="max-height: 50vh; overflow-y: auto; background:#fff; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:15px; box-shadow:inset 0 2px 4px rgba(0,0,0,0.02);">
+                <table class="styled-table" style="margin:0;">
+                    <thead style="position: sticky; top: 0; background: #f1f5f9; z-index: 1; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+                        <tr>
+                            <th style="padding:12px; color:#475569;">शेतकऱ्याचे नाव</th>
+                            <th style="text-align:right; width:120px; padding:12px; color:#475569;">वजन (kg)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bulkEntryBody">
+                        <!-- JS will populate rows -->
+                    </tbody>
+                </table>
+            </div>
+
+            <button class="btn-add bg-gradient-green" style="width:100%; font-size:17px; padding:15px; border-radius:12px; font-weight:800; box-shadow:0 4px 6px rgba(16, 185, 129, 0.2);" onclick="saveBulkData(event)">✅ सर्व सेव्ह करा (Save All)</button>
+        </div>
+    </div>
 
             <div id="alertModal" class="modal no-print">
                 <div class="modal-content">
                     <div class="close-icon" onclick="closeModal('alertModal')">✕</div>
                     <h3 style="color: var(--danger);">⚠️ चुकीचे भाव (Rate Alerts)</h3>
+                    
+                    <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center;">
+                        <input type="month" id="alertMonth" onchange="renderAlerts()" style="flex:1; padding:8px; border-radius:8px; border:1px solid #cbd5e1;">
+                        <button class="btn-action-small bg-gradient-blue" style="padding:10px 15px; font-size:13px;" onclick="document.getElementById('alertMonth').value=''; renderAlerts();">All Time</button>
+                    </div>
+                    
                     <p style="font-size: 12px; color: #64748b; text-align: center; margin-bottom: 15px;">इतर
-                        शेतकऱ्यांपेक्षा वेगळा भाव लागलेल्या नोंदी खालीलप्रमाणे आहेत.</p>
+                        शेतकऱ्यांपेक्षा वेगळा भाव लागलेल्या नोंदी खालीलप्रमाणे आहेत. नावावर क्लिक करून चुका दुरुस्त करा.</p>
                     <div class="table-container" style="max-height: 55vh; overflow-y: auto;">
                         <table class="styled-table">
                             <thead>
                                 <tr>
-                                    <th>तारीख</th>
                                     <th>नाव</th>
-                                    <th>चुकीचा भाव</th>
-                                    <th>बरोबर भाव</th>
-                                    <th>⚙️</th>
+                                    <th style="text-align:right;">एकूण चुका</th>
                                 </tr>
                             </thead>
                             <tbody id="alertBody"></tbody>
@@ -824,6 +866,164 @@
                 </div>
             </div>
         </div>
+        
+        <div id="otherFModal" class="modal no-print">
+            <div class="modal-content">
+                <div class="close-icon" onclick="closeModal('otherFModal')">✕</div>
+                <h3 style="color: #ec4899; display: flex; align-items: center; gap: 8px;">🌸 इतर फुले <span style="font-size: 12px; background: #fce7f3; padding: 2px 8px; border-radius: 12px; color: #be185d;">वेगळे शेतकरी</span></h3>
+                
+                <div class="section-box" style="background:#fff; border:1px solid #fbcfe8; box-shadow:0 4px 6px rgba(236,72,153,0.1);">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>तारीख (Date):</label>
+                            <input type="date" id="otherFDate" onchange="renderOtherFList()">
+                        </div>
+                        <div class="input-group" style="flex:2;">
+                            <label>शेतकऱ्याचे नाव:</label>
+                            <input type="text" id="otherFName" placeholder="नाव लिहा..." list="otherFList" onclick="try{this.showPicker()}catch(e){}">
+                            <datalist id="otherFList"></datalist>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>वजन (kg):</label>
+                            <input type="number" id="otherFWt" placeholder="0.00">
+                        </div>
+                        <div class="input-group">
+                            <label>भाव (₹):</label>
+                            <input type="number" id="otherFRate" placeholder="0.00">
+                        </div>
+                        <div class="input-group">
+                            <label>प्रकार:</label>
+                            <select id="otherFType" style="padding:12px; border-radius:12px; border:1px solid #cbd5e1; width:100%;">
+                                <option value="पि">पि</option>
+                                <option value="के">के</option>
+                                <option value="पा">पा</option>
+                                <option value="शे">शे</option>
+                                <option value="रु">रु</option>
+                                <option value="ग">ग</option>
+                                <option value="म">म</option>
+                                <option value="अ">अ</option>
+                                <option value="प">प</option>
+                                <option value="बे">बे</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div style="background:linear-gradient(to right, #fdf2f8, #fce7f3); padding:10px 15px; border-radius:12px; margin-top:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; border:1px solid #fbcfe8;">
+                        <span style="font-size:14px; font-weight:700; color:#be185d;">आजचे एकूण बिल:</span>
+                        <span id="otherFTotalBill" style="font-size:20px; font-weight:900; color:#db2777;">₹ 0</span>
+                    </div>
+
+                    <button class="btn-add" style="background:linear-gradient(135deg, #ec4899, #be185d); margin-top:5px; box-shadow:0 4px 10px rgba(236,72,153,0.3);" onclick="saveOtherFEntry()">✅ सेव्ह करा</button>
+                </div>
+
+                <div class="list-header-bar" style="background:transparent; padding:0; border:none; margin-top: 15px; display:flex; flex-wrap:wrap; gap:5px;">
+                    <button class="btn-action-small bg-gradient-purple" style="flex:1;" onclick="openOtherFPreviewModal()">👁️ Preview</button>
+                    <button class="btn-action-small bg-gradient-orange" style="flex:1;" onclick="openOtherFListModal()">👥 List</button>
+                    <button class="btn-action-small bg-gradient-blue" style="flex:1;" onclick="openModal('billModal'); initOtherFBill();">📜 Bill</button>
+                    <button class="btn-action-small" style="flex:1; background:linear-gradient(135deg, #10b981, #047857);" onclick="openOtherFCommissionModal()">💰 Comm.</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="otherFListModal" class="modal no-print">
+            <div class="modal-content">
+                <div class="close-icon" onclick="closeModal('otherFListModal')">✕</div>
+                <h3 style="color: #ec4899;">📜 शेतकरी यादी (वेगळे शेतकरी)</h3>
+                
+                <div style="background:#fdf2f8; padding:15px; border-radius:12px; margin-bottom:15px; margin-top: 10px; text-align:center; border:1px solid #fbcfe8;">
+                    <span style="font-size:14px; font-weight:700; color:#be185d;">सर्वांचे एकूण देय: </span>
+                    <span id="otherFListGrandTotal" style="font-size:22px; font-weight:900; color:#db2777;">₹ 0</span>
+                </div>
+                
+                <div class="table-container" style="max-height: 55vh; overflow-y: auto;">
+                    <table class="styled-table">
+                        <tbody id="otherFListBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="otherFDetailModal" class="modal no-print">
+            <div class="modal-content">
+                <div class="close-icon" onclick="closeModal('otherFDetailModal')">✕</div>
+                <h3 style="color: #ec4899;" id="otherFDetailName">नाव</h3>
+                
+                <div style="background:#fdf2f8; padding:15px; border-radius:12px; margin-bottom:15px; text-align:center; border:1px solid #fbcfe8;">
+                    <span style="font-size:14px; font-weight:700; color:#be185d;">एकूण देय बाकी: </span>
+                    <span id="otherFDetailTotal" style="font-size:22px; font-weight:900; color:#db2777;">₹ 0</span>
+                </div>
+
+                <div class="table-container" style="max-height: 55vh; overflow-y: auto;" id="otherFDetailBody">
+                </div>
+            </div>
+        </div>
+
+        <div id="otherFPreviewModal" class="modal no-print">
+            <div class="modal-content">
+                <div class="close-icon" onclick="closeModal('otherFPreviewModal')">✕</div>
+                <h3 style="color: #ec4899;">👁️ Preview (वेगळे शेतकरी)</h3>
+                
+                <div class="input-row" style="margin-bottom: 10px;">
+                    <div class="input-group">
+                        <label>तारीख (Date):</label>
+                        <input type="date" id="otherFPreviewDate" onchange="renderOtherFPreview()">
+                    </div>
+                </div>
+                
+                <div style="background:#fdf2f8; padding:15px; border-radius:12px; margin-bottom:15px; text-align:center; border:1px solid #fbcfe8;">
+                    <span style="font-size:14px; font-weight:700; color:#be185d;">आजचे एकूण बिल: </span>
+                    <span id="otherFPreviewTotal" style="font-size:22px; font-weight:900; color:#db2777;">₹ 0</span>
+                </div>
+
+                <div class="table-container" style="max-height: 50vh; overflow-y: auto;">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>नाव</th>
+                                <th>प्रकार</th>
+                                <th style="text-align:right;">वजन x भाव</th>
+                                <th style="text-align:right;">देय (₹)</th>
+                                <th style="text-align:center;">⚙️</th>
+                            </tr>
+                        </thead>
+                        <tbody id="otherFPreviewBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="otherFCommissionModal" class="modal no-print">
+            <div class="modal-content">
+                <div class="close-icon" onclick="closeModal('otherFCommissionModal')">✕</div>
+                <h3 style="color: #059669;">💰 कमिशन रिपोर्ट (इतर फुले)</h3>
+                
+                <div style="display:flex; gap:10px; margin-bottom:15px;">
+                    <div style="flex:1; background:#f0fdf4; padding:15px; border-radius:12px; text-align:center; border:1px solid #bbf7d0;">
+                        <span style="font-size:12px; font-weight:700; color:#166534; display:block; margin-bottom:5px;">आजचे कमिशन</span>
+                        <span id="otherFCommToday" style="font-size:20px; font-weight:900; color:#15803d;">₹ 0</span>
+                    </div>
+                    <div style="flex:1; background:#ecfdf5; padding:15px; border-radius:12px; text-align:center; border:1px solid #a7f3d0;">
+                        <span style="font-size:12px; font-weight:700; color:#065f46; display:block; margin-bottom:5px;">एकूण कमिशन</span>
+                        <span id="otherFCommTotal" style="font-size:20px; font-weight:900; color:#047857;">₹ 0</span>
+                    </div>
+                </div>
+
+                <div class="table-container" style="max-height: 40vh; overflow-y: auto;">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left;">महिना</th>
+                                <th style="text-align:right;">कमिशन (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="otherFCommMonthBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <div id="merchantHubModal" class="modal no-print">
             <div class="modal-content">
                 <div class="close-icon" onclick="closeModal('merchantHubModal')">✕</div>
@@ -1243,7 +1443,9 @@
                         style="flex:1; padding:8px; border-radius:8px;"><button
                         class="btn-action-small bg-gradient-blue" style="padding:10px 15px; font-size:13px;"
                         onclick="document.getElementById('farmerListMonth').value=''; generateFarmerStatus();">All
-                        Time</button></div>
+                        Time</button>
+                    <button class="btn-action-small" style="background:#f59e0b; padding:10px 15px; font-size:13px; color:#fff;" onclick="openModal('hiddenFarmersModal'); renderHiddenFarmers();">🚫 Hidden</button>
+                </div>
                 <div
                     style="text-align:center; padding:15px; background:linear-gradient(135deg, #1e3a8a, #3b82f6); color:white; border-radius:12px; margin-bottom:15px;">
                     <div style="font-size:12px;">निवडलेल्या महिन्याचे एकूण देणे</div>
@@ -1262,6 +1464,24 @@
             </div>
         </div>
 
+        <div id="hiddenFarmersModal" class="modal no-print">
+            <div class="modal-content">
+                <div class="close-icon" onclick="closeModal('hiddenFarmersModal')">✕</div>
+                <h3 style="color: #f59e0b;">🚫 लपवलेले शेतकरी (Hidden)</h3>
+                <p style="font-size:12px; color:#64748b; text-align:center;">या शेतकऱ्यांचा माल येणे बंद आहे, पण त्यांचा जुना हिशोब सुरक्षित आहे.</p>
+                <div class="table-container" style="max-height: 60vh; overflow-y:auto; margin-top:15px;">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>नाव</th>
+                                <th style="text-align:right;">कृती (Action)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hiddenFarmersBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
         <div id="detailModal" class="modal no-print">
             <div class="modal-content">
@@ -1392,48 +1612,7 @@
         </div>
     </div>
     </div>
-    <div id="notesModal" class="modal no-print">
-        <div class="modal-content">
-            <div class="close-icon" onclick="closeModal('notesModal')">✕</div>
-            <h3 style="color: #0ea5e9;">📝 महत्त्वाच्या नोंदी</h3>
-            <div class="section-box" style="background:#f0f9ff; border-color:#bae6fd;">
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>तारीख (Date):</label>
-                        <input type="date" id="noteDate">
-                    </div>
-                </div>
-                <div class="input-group" style="margin-bottom: 15px;">
-                    <label>नोंद (Note):</label>
-                    <textarea id="noteText" placeholder="येथे महत्त्वाची माहिती लिहा..."
-                        style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-family: inherit; font-size: 14px; min-height: 80px; resize: vertical;"></textarea>
-                </div>
-                <button class="btn-add" style="background:linear-gradient(135deg,#0ea5e9,#0369a1); margin-bottom: 10px;"
-                    onclick="saveNote()">✅ नोंद सेव्ह करा</button>
-            </div>
-            <button class="btn-add" style="background:#1c1c1e;" onclick="openModal('notesListModal'); renderNotes();">📜
-                List</button>
-        </div>
-    </div>
 
-    <div id="notesListModal" class="modal no-print">
-        <div class="modal-content">
-            <div class="close-icon" onclick="closeModal('notesListModal')">✕</div>
-            <h3 style="color: #0ea5e9;">📜 नोंदींची यादी</h3>
-            <div class="table-container" style="max-height: 55vh; overflow-y: auto;">
-                <table class="styled-table">
-                    <thead>
-                        <tr>
-                            <th style="width:25%;">तारीख</th>
-                            <th>तपशील</th>
-                            <th style="width:15%; text-align:center;">⚙️</th>
-                        </tr>
-                    </thead>
-                    <tbody id="notesListBody"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
 
     <div id="recentJamaModal" class="modal no-print">
         <div class="modal-content" style="max-width: 450px;">
@@ -1522,12 +1701,14 @@
         }
 
         let farmers = loadLocalBackup('farmers', defaultFarmersList);
+        let hiddenFarmers = loadLocalBackup('hiddenFarmers', []);
         let merchants = loadLocalBackup('merchants', ["Traders A"]);
         let bagPersons = loadLocalBackup('bagPersons', []);
         let cropDataDB = loadLocalBackup('cropData', []);
         let merchantDB = loadLocalBackup('merchantData', []);
         let bagDB = loadLocalBackup('bagData', []);
-        let notesDB = loadLocalBackup('notesData', []);
+        let otherFarmersDB = loadLocalBackup('otherFarmersData', []);
+
 
         let isSyncing = false;
         const originalRef = database.ref.bind(database);
@@ -1619,12 +1800,14 @@
         // --- 🌟 END OFFLINE SYNC MANAGER 🌟 ---
 
 
-        function getMergedFarmers() {
+        function getMergedFarmers(includeHidden = false) {
             let s = new Set();
             safeArray(farmers).forEach(x => { if (x && typeof x === 'string' && x.trim() !== '') s.add(x.trim()) });
             getData().forEach(e => { if (e && e.name && typeof e.name === 'string' && e.name.trim() !== '') s.add(e.name.trim()) });
             if (s.size === 0) defaultFarmersList.forEach(f => s.add(f));
-            return Array.from(s).sort((a, b) => (parseInt(a) || 99999) - (parseInt(b) || 99999));
+            let list = Array.from(s).sort((a, b) => (parseInt(a) || 99999) - (parseInt(b) || 99999));
+            if(includeHidden) return list;
+            return list.filter(f => !hiddenFarmers.includes(f));
         }
 
         function getMergedMerchants() {
@@ -1643,22 +1826,18 @@
         }
 
         database.ref('farmers').on('value', s => { if (!s.exists()) { database.ref('farmers').set(defaultFarmersList); } else { farmers = safeArray(s.val()); localStorage.setItem('local_farmers', JSON.stringify(farmers)); } loadFarmerList(); if (document.getElementById("listModal").classList.contains("show")) generateFarmerStatus(); });
+        database.ref('hiddenFarmers').on('value', s => { hiddenFarmers = safeArray(s.val()); localStorage.setItem('local_hiddenFarmers', JSON.stringify(hiddenFarmers)); loadFarmerList(); if (document.getElementById("listModal").classList.contains("show")) generateFarmerStatus(); });
         database.ref('merchants').on('value', s => { if (!s.exists()) { database.ref('merchants').set(["Traders A"]); } else { merchants = safeArray(s.val()); localStorage.setItem('local_merchants', JSON.stringify(merchants)); } loadMerchantList(); if (document.getElementById("merchantListModal").classList.contains("show")) renderMerList(); });
         database.ref('bagPersons').on('value', s => { if (!s.exists()) { database.ref('bagPersons').set([]); } else { bagPersons = safeArray(s.val()); localStorage.setItem('local_bagPersons', JSON.stringify(bagPersons)); } loadBagPersonList(); if (document.getElementById("bagPersonListModal").classList.contains("show")) renderBagPersonList(); });
         database.ref('cropData').on('value', s => { cropDataDB = sanitizeData(s.val()); localStorage.setItem('local_cropData', JSON.stringify(cropDataDB)); updateDashboard(); syncRates(); loadFarmerList(); if (document.getElementById("listModal").classList.contains("show")) generateFarmerStatus(); });
         database.ref('merchantData').on('value', s => { merchantDB = sanitizeData(s.val()); localStorage.setItem('local_merchantData', JSON.stringify(merchantDB)); updateDashboard(); syncRates(); loadMerchantList(); if (document.getElementById("merchantListModal").classList.contains("show")) renderMerList(); });
         database.ref('bagData').on('value', s => { bagDB = sanitizeData(s.val()); localStorage.setItem('local_bagData', JSON.stringify(bagDB)); loadBagPersonList(); if (document.getElementById("bagPersonListModal").classList.contains("show")) renderBagPersonList(); });
+        database.ref('otherFarmersData').on('value', s => { otherFarmersDB = sanitizeData(s.val()); localStorage.setItem('local_otherFarmersData', JSON.stringify(otherFarmersDB)); if(typeof renderOtherFList === 'function' && document.getElementById("otherFModal") && document.getElementById("otherFModal").classList.contains("show")) renderOtherFList(); });
 
-        database.ref('notesData').on('value', s => {
-            notesDB = sanitizeData(s.val()); localStorage.setItem('local_notesData', JSON.stringify(notesDB));
-            if (document.getElementById("notesListModal").classList.contains("show")) renderNotes();
-        });
-
-        function getNotesDB() { return notesDB || []; }
-        function saveNotesDB(d) { notesDB = sanitizeData(d); database.ref('notesData').set(notesDB); }
         function getData() { return cropDataDB || []; } function saveData(d) { cropDataDB = sanitizeData(d); database.ref('cropData').set(cropDataDB); updateDashboard(); }
         function getMerchantDB() { return merchantDB || []; } function saveMerchantDB(d) { merchantDB = sanitizeData(d); database.ref('merchantData').set(merchantDB); updateDashboard(); }
         function getBagDB() { return bagDB || []; } function saveBagDB(d) { bagDB = sanitizeData(d); database.ref('bagData').set(bagDB); }
+        function getOtherFDB() { return otherFarmersDB || []; } function saveOtherFDB(d) { otherFarmersDB = sanitizeData(d); database.ref('otherFarmersData').set(otherFarmersDB); }
         function formatDate(dStr) { if (!dStr) return ""; let d = new Date(dStr); return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}`; }
         const marathiMonths = ["जानेवारी", "फेब्रुवारी", "मार्च", "एप्रिल", "मे", "जून", "जुलै", "ऑगस्ट", "सप्टेंबर", "ऑक्टोबर", "नोव्हेंबर", "डिसेंबर"];
 
@@ -1669,6 +1848,146 @@
         function onDateChange() { let d = val("dateInput"); document.getElementById("rate").value = getRateForDate(d); updateDashboard(); }
         function onMerDateOrTypeChange() { let d = val("merDate"); let t = val("merTypeSel"); if (t === 'नि') document.getElementById("merRate").value = getRateForDate(d); else document.getElementById("merRate").value = ""; }
         function onOcrDateChange() { let d = val("ocrDateInput"); let r = getRateForDate(d); if (r) { document.getElementById("ocrCommonRate").value = r; updateOcrTotals(); } }
+
+        function openBulkEntryModal() {
+            openModal('bulkEntryModal');
+            let d = val("dateInput") || new Date().toISOString().slice(0, 10);
+            document.getElementById("bulkDate").value = d;
+            document.getElementById("bulkRate").value = getRateForDate(d) || val("rate") || "";
+            document.getElementById("bulkSearch").value = "";
+            renderBulkEntryList();
+        }
+
+        function renderBulkEntryList() {
+            let d = val("bulkDate");
+            let data = getData();
+            let farmers = getMergedFarmers();
+            let tbody = document.getElementById("bulkEntryBody");
+            let html = "";
+            farmers.forEach((f, index) => {
+                if(!f) return;
+                
+                let existing = data.find(e => e && e.date === d && e.name === f && e.type === 'crop');
+                let inputHtml = "";
+                if (existing) {
+                    inputHtml = `<div style="background:#dcfce7; color:#166534; padding:6px 10px; border-radius:6px; font-weight:700; font-size:13px; display:inline-block;">✅ ${existing.weight} kg</div>`;
+                } else {
+                    inputHtml = `<input type="number" class="bulk-weight-input" data-name="${f}" placeholder="0" style="width:100%; max-width:80px; padding:8px; border:2px solid #cbd5e1; border-radius:6px; text-align:right; font-weight:800; font-size:15px; color:#ea580c; outline:none; transition:border-color 0.2s;" onfocus="this.select(); this.style.borderColor='#0ea5e9';" onblur="this.style.borderColor='#cbd5e1';">`;
+                }
+                
+                html += `<tr class="bulk-row">
+                    <td style="font-weight:700; font-size:14px; color:#1e293b; padding:10px 12px;" class="bulk-name">${f}</td>
+                    <td style="text-align:right; padding:5px 12px;">
+                        ${inputHtml}
+                    </td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        const marathiMap = {
+            'अ':'a','आ':'a','इ':'i','ई':'i','उ':'u','ऊ':'u','ए':'e','ऐ':'ai','ओ':'o','औ':'au','अं':'n','अः':'h',
+            'क':'k','ख':'kh','ग':'g','घ':'gh','च':'ch','छ':'chh','ज':'j','झ':'jh',
+            'ट':'t','ठ':'th','ड':'d','ढ':'dh','ण':'n','त':'t','थ':'th','द':'d','ध':'dh','न':'n',
+            'प':'p','फ':'f','ब':'b','भ':'bh','म':'m','य':'y','र':'r','ल':'l','व':'v','श':'sh','ष':'sh','स':'s','ह':'h','ळ':'l','क्ष':'ksh','ज्ञ':'dny',
+            'ा':'a','ि':'i','ी':'i','ु':'u','ू':'u','ृ':'ru','े':'e','ै':'ai','ो':'o','ौ':'au','ं':'n','ः':'h','्':''
+        };
+
+        function getFuzzy(text) {
+            if(!text) return "";
+            let t = text.toLowerCase();
+            let eng = "";
+            for(let i=0; i<t.length; i++) eng += marathiMap[t[i]] || t[i];
+            eng = eng.replace(/w/g, 'v');
+            return eng.replace(/a/g, ''); // strip 'a' for flexible matching
+        }
+
+        function filterBulkFarmers() {
+            let qRaw = val("bulkSearch").toLowerCase();
+            let qFuzzy = getFuzzy(qRaw);
+            
+            let rows = document.querySelectorAll(".bulk-row");
+            rows.forEach(r => {
+                let name = r.querySelector(".bulk-name").innerText.toLowerCase();
+                let nameFuzzy = getFuzzy(name);
+                
+                if(name.includes(qRaw) || nameFuzzy.includes(qFuzzy)) {
+                    r.style.display = "";
+                } else {
+                    r.style.display = "none";
+                }
+            });
+        }
+
+        function onBulkDateChange() {
+            let d = val("bulkDate");
+            let r = getRateForDate(d);
+            if(r) document.getElementById("bulkRate").value = r;
+            renderBulkEntryList();
+        }
+
+        function saveBulkData(event) {
+            let inputs = document.querySelectorAll(".bulk-weight-input");
+            let date = val("bulkDate");
+            let rate = parseFloat(val("bulkRate"));
+            
+            if(!rate) {
+                alert("⚠️ कृपया आधी भाव (Rate) टाका!");
+                document.getElementById("bulkRate").focus();
+                return;
+            }
+            
+            let data = getData();
+            let count = 0;
+            let skipped = [];
+            
+            inputs.forEach(inp => {
+                let w = parseFloat(inp.value);
+                let n = inp.getAttribute("data-name");
+                
+                if(w > 0 && n) {
+                    if (data.some(e => e && e.date === date && e.name === n && e.type === 'crop')) {
+                        skipped.push(n);
+                    } else {
+                        data.push({
+                            id: Date.now() + count,
+                            date: date,
+                            name: n,
+                            type: 'crop',
+                            weight: w,
+                            rate: rate,
+                            total: Math.round(w * rate)
+                        });
+                        count++;
+                    }
+                }
+            });
+            
+            if(count === 0 && skipped.length === 0) {
+                alert("⚠️ तुम्ही कोणतेही वजन टाकलेले नाही. कृपया किमान एका शेतकऱ्याचे वजन टाका.");
+                return;
+            }
+            
+            if (skipped.length > 0) {
+                alert(`⚠️ लक्ष द्या!\n\nखालील ${skipped.length} शेतकऱ्यांची आजची (${date}) एंट्री आधीच झालेली असल्यामुळे त्यांची 'डबल एंट्री' टाळण्यात आली आहे:\n\n${skipped.join(', ')}\n\n(बाकीचे ${count} अचूक सेव्ह झाले आहेत.)`);
+                if(count === 0) return;
+            }
+            
+            saveData(data);
+            
+            let btn = event.target;
+            let oldTxt = btn.innerText;
+            btn.style.background = "linear-gradient(135deg, #10b981, #059669)";
+            btn.innerText = `✅ ${count} नोंदी सेव्ह झाल्या!`;
+            
+            setTimeout(() => {
+                btn.style.background = "";
+                btn.innerText = oldTxt;
+                closeModal("bulkEntryModal");
+                generateFarmerStatus();
+                updateDashboard();
+            }, 1500);
+        }
 
         function initProfit() {
             let data = getData().filter(e => e && e.type === 'crop' && e.date);
@@ -1766,12 +2085,74 @@
             }
         }
 
+        let expandedAlertNames = new Set();
+        function toggleAlertExpand(id, name) {
+            let el = document.getElementById(id);
+            if (el) {
+                if (el.style.display === "none") {
+                    el.style.display = "table-row";
+                    expandedAlertNames.add(name);
+                } else {
+                    el.style.display = "none";
+                    expandedAlertNames.delete(name);
+                }
+            }
+        }
+
         function renderAlerts() {
-            let disc = checkRateDiscrepancies(); let tbody = document.getElementById("alertBody"); let html = "";
+            let disc = checkRateDiscrepancies();
+            let month = document.getElementById('alertMonth') ? document.getElementById('alertMonth').value : "";
+            
+            if (month) {
+                disc = disc.filter(e => e.date && e.date.startsWith(month));
+            }
+            
+            let grouped = {};
             disc.forEach(e => {
-                html += `<tr><td style="font-weight:600; font-size:12px;">${formatDate(e.date)}</td><td style="font-weight:600; font-size:12px;">${e.name}</td><td style="color:var(--danger); font-weight:700;">${e.rate}</td><td style="color:var(--success); font-weight:700;">${e.commonRate}</td><td style="text-align:center;"><button class="small-btn btn-edit" onclick="fixRate(${e.id}, ${e.commonRate})" style="padding:4px 8px; margin-right:4px;">Fix</button><button class="small-btn bg-gradient-green" onclick="ignoreRateError(${e.id})" style="padding:4px 8px;">OK</button></td></tr>`;
+                if(!grouped[e.name]) grouped[e.name] = [];
+                grouped[e.name].push(e);
             });
-            if (disc.length === 0) { html = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#8e8e93; font-weight:600;">कोणतीही चूक सापडली नाही. सर्व भाव बरोबर आहेत! 🎉</td></tr>`; }
+            
+            let tbody = document.getElementById("alertBody");
+            let html = "";
+            let counter = 0;
+            
+            let sortedNames = Object.keys(grouped).sort((a, b) => a.localeCompare(b));
+            
+            for(let name of sortedNames) {
+                let errs = grouped[name];
+                let safeId = "err_exp_" + counter++;
+                let displayStyle = expandedAlertNames.has(name) ? "table-row" : "none";
+                
+                html += `<tr class='premium-row' onclick="toggleAlertExpand('${safeId}', '${name}')" style="cursor:pointer;">
+                    <td style="font-weight:700; color:#1e293b; font-size:15px; padding:12px;">${name}</td>
+                    <td style="text-align:right; font-weight:800; color:var(--danger); padding:12px;">${errs.length} <span style="font-size:10px; color:#8b5cf6;">▼</span></td>
+                </tr>
+                <tr id="${safeId}" style="display:${displayStyle}; background:#faf5ff;">
+                    <td colspan="2" style="padding:10px; border-bottom:1px solid #e2e8f0;">`;
+                
+                errs.forEach(e => {
+                    html += `<div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:10px; margin-bottom:8px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                            <span style="font-weight:600; font-size:13px; color:#475569;">${formatDate(e.date)}</span>
+                            <div style="font-weight:700; font-size:13px;">
+                                <span style="color:var(--danger); text-decoration:line-through; margin-right:5px;">${e.rate}</span>
+                                <span style="color:var(--success);">➜ ${e.commonRate}</span>
+                            </div>
+                        </div>
+                        <div style="text-align:right;">
+                            <button class="small-btn btn-edit" onclick="fixRate(${e.id}, ${e.commonRate})" style="padding:4px 12px; margin-right:4px;">Fix</button>
+                            <button class="small-btn bg-gradient-green" onclick="ignoreRateError(${e.id})" style="padding:4px 12px;">OK</button>
+                        </div>
+                    </div>`;
+                });
+                
+                html += `</td></tr>`;
+            }
+
+            if (Object.keys(grouped).length === 0) { 
+                html = `<tr><td colspan="2" style="text-align:center; padding:20px; color:#8e8e93; font-weight:600;">कोणतीही चूक सापडली नाही. सर्व भाव बरोबर आहेत! 🎉</td></tr>`; 
+            }
             tbody.innerHTML = html;
         }
 
@@ -1973,8 +2354,9 @@
 
         function toggleBillDateMode() { let mode = document.querySelector('input[name="billDateMode"]:checked').value; if (mode === 'month') { document.getElementById("monthlyBillDiv").style.display = 'block'; document.getElementById("customBillDiv").style.display = 'none'; } else { document.getElementById("monthlyBillDiv").style.display = 'none'; document.getElementById("customBillDiv").style.display = 'flex'; } }
 
-        function initFarmerBill() { document.getElementById("searchName").value = ""; document.getElementById("billType").value = 'FARMER'; document.getElementById("billTitle").innerText = "📜 Farmer Bill"; let dl = document.getElementById("billNameSuggestions"); dl.innerHTML = ""; getMergedFarmers().forEach(f => { let op = document.createElement("option"); op.value = f; dl.appendChild(op); }); }
+        function initFarmerBill() { document.getElementById("searchName").value = ""; document.getElementById("billType").value = 'FARMER'; document.getElementById("billTitle").innerText = "📜 Farmer Bill"; let dl = document.getElementById("billNameSuggestions"); dl.innerHTML = ""; getMergedFarmers(true).forEach(f => { let op = document.createElement("option"); op.value = f; dl.appendChild(op); }); }
         function initMerBill() { document.getElementById("searchName").value = ""; document.getElementById("billType").value = 'MERCHANT'; document.getElementById("billTitle").innerText = "📜 Merchant Bill"; let dl = document.getElementById("billNameSuggestions"); dl.innerHTML = ""; getMergedMerchants().forEach(m => { let op = document.createElement("option"); op.value = m; dl.appendChild(op); }); }
+        function initOtherFBill() { document.getElementById("searchName").value = ""; document.getElementById("billType").value = 'OTHER_FARMER'; document.getElementById("billTitle").innerText = "📜 शेतकरी बिल (इतर फुले)"; let dl = document.getElementById("billNameSuggestions"); dl.innerHTML = ""; let allNames = [...new Set(getOtherFDB().map(e => e.name))]; allNames.forEach(n => { let op = document.createElement("option"); op.value = n; dl.appendChild(op); }); }
 
         // 🌟 Merchant Bill TOP Previous Balance & Flow Fix 🌟
         // 🌟 Farmer Bill Month-to-Month (No Opening Balance) & Merchant Bill 🌟
@@ -2069,6 +2451,46 @@
                 }
 
                 if (totalAdvInPeriod !== 0) { document.getElementById("billAdvBox").innerText = `⚠️ या कालावधीत नेलेली एकूण उचल : ₹ ${totalAdvInPeriod} (बिलातून वजा केलेली नाही)`; } else { document.getElementById("billAdvBox").innerText = ""; }
+            } else if (type === 'OTHER_FARMER') {
+                document.getElementById("billAdvBox").innerText = "";
+                let d = getOtherFDB().filter(e => e.name === n && e.date >= startFilter && e.date <= endFilter).sort((a,b) => new Date(a.date) - new Date(b.date));
+                
+                let html = `<table style="width:100%; max-width:100%; margin:0 auto; border-collapse:collapse; color:#000;">
+                    <thead>
+                        <tr><th style="padding:6px 4px; border-bottom:2px solid #000; text-align:left; width:25%; font-size:14px;">तारीख</th>
+                        <th style="padding:6px 4px; border-bottom:2px solid #000; text-align:center; width:50%; font-size:14px;">तपशील</th>
+                        <th style="padding:6px 4px; border-bottom:2px solid #000; text-align:right; width:25%; font-size:14px;">रक्कम (₹)</th></tr>
+                    </thead><tbody style="font-size:14px;">`;
+                
+                let grandTotal = 0;
+                let lastBillDate = "";
+                
+                d.forEach(e => {
+                    if (!e.isPaid) grandTotal += e.finalAmt;
+                    let displayDate = (e.date !== lastBillDate) ? formatDate(e.date) : "";
+                    lastBillDate = e.date;
+                    
+                    let paidBadge = e.isPaid ? `<br><span style="font-size:10px; color:#16a34a; background:#dcfce7; padding:1px 4px; border-radius:4px; margin-top:2px; display:inline-block;">Paid ✅</span>` : "";
+                    let amtStyle = e.isPaid ? "text-decoration:line-through; opacity:0.6;" : "";
+                    
+                    html += `<tr style="${e.isPaid ? 'background:#f0fdf4;' : ''}">
+                        <td style="padding:3px 0; border-bottom:1px dashed #cbd5e1; color:#000; font-weight:700; font-size:12px;">${displayDate}</td>
+                        <td style="padding:3px 0; border-bottom:1px dashed #cbd5e1; text-align:center; font-weight:600; font-size:13px;">${e.type} (${e.wt}kg x ₹${e.rate})${paidBadge}</td>
+                        <td style="padding:3px 0; border-bottom:1px dashed #cbd5e1; text-align:right; font-weight:700; font-size:15px; color:#000; ${amtStyle}">${e.finalAmt}</td>
+                    </tr>`;
+                });
+                
+                if (d.length > 0) {
+                    html += `<tr style="background:#fce7f3; border:2px solid #be185d;">
+                        <td colspan="2" style="padding:8px 4px; text-align:right; font-weight:700; font-size:14px; color:#be185d;">एकूण बिल :</td>
+                        <td style="padding:8px 0; text-align:right;"><span style="color:#be185d; font-weight:800; font-size:18px;">₹ ${grandTotal} /-</span></td>
+                    </tr>`;
+                } else {
+                    html += `<tr><td colspan="3" style="text-align:center; padding: 20px; color: #8e8e93; font-weight:600;">कोणतीही नोंद नाही</td></tr>`;
+                }
+                
+                html += "</tbody></table>";
+                list.innerHTML = html;
             } else if (type === 'MERCHANT_JAMA') {
                 // MERCHANT JAMA BILL (Only Payments, no balances)
                 document.getElementById("billAdvBox").innerText = ""; let d = [...getMerchantDB()].sort((a, b) => new Date(a.date) - new Date(b.date)); let filteredData = []; let totalJama = 0;
@@ -2233,7 +2655,7 @@
                 let selMonth = document.getElementById("farmerListMonth") ? document.getElementById("farmerListMonth").value : "";
                 let html = ""; let allFarmersGrandTotal = 0;
 
-                let farmerArr = getMergedFarmers();
+                let farmerArr = getMergedFarmers(true);
                 farmerArr.forEach(f => {
                     if (!f) return;
                     let cropTotal = 0; let payTotal = 0; let totalAdv = 0; let bhadeTotal = 0; let hasDataForMonth = false;
@@ -2253,8 +2675,10 @@
 
                     if (selMonth && !hasDataForMonth && total === 0 && totalAdv === 0) return;
                     if (total > 0) allFarmersGrandTotal += total;
+                    
+                    if (safeArray(hiddenFarmers).includes(f)) return;
 
-                    let btns = listMode ? `<div style='float:right'><button class='manage-btn' onclick="editFarmerName('${f}')">✎</button><button class='manage-btn' style='color:#ef4444;' onclick="delFarmerName('${f}')">🗑</button></div>` : "";
+                    let btns = listMode ? `<div style='float:right'><button class='manage-btn' style='color:#f59e0b; margin-right:5px;' title='नाव लपवा' onclick="hideFarmerName('${f}')">🚫</button><button class='manage-btn' onclick="editFarmerName('${f}')">✎</button><button class='manage-btn' style='color:#ef4444;' onclick="delFarmerName('${f}')">🗑</button></div>` : "";
                     let badgeClass = "badge-green"; let styleStr = ""; let prefix = "₹ ";
                     if (total < 0) { badgeClass = "badge-red"; prefix = "जास्त दिले: ₹ "; styleStr = "color:var(--danger); border-color:var(--danger);"; total = Math.abs(total); }
 
@@ -2300,6 +2724,42 @@
 
         function addNewFarmerPrompt() { let n = prompt("New Farmer Name:"); if (n && n.trim() !== "") { let fArr = safeArray(farmers); if (!fArr.includes(n.trim())) { fArr.push(n.trim()); database.ref('farmers').set(fArr); } generateFarmerStatus(); loadFarmerList(); } }
         function editFarmerName(old) { let n = prompt("Edit Name:", old); if (n && n !== old) { let fArr = safeArray(farmers); let i = fArr.indexOf(old); if (i !== -1) fArr[i] = n; database.ref('farmers').set(fArr); let d = getData(); d.forEach(e => { if (e && e.name === old) e.name = n; }); saveData(d); generateFarmerStatus(); } }
+
+        function hideFarmerName(n) {
+            let arr = safeArray(hiddenFarmers);
+            if(!arr.includes(n)) {
+                arr.push(n);
+                hiddenFarmers = arr; // Update locally immediately
+                database.ref('hiddenFarmers').set(arr);
+                generateFarmerStatus(); // Update UI immediately
+            }
+        }
+        
+        function unhideFarmerName(n) {
+            let arr = safeArray(hiddenFarmers).filter(f => f !== n);
+            hiddenFarmers = arr; // Update locally immediately
+            database.ref('hiddenFarmers').set(arr);
+            if (document.getElementById("hiddenFarmersModal").classList.contains("show")) renderHiddenFarmers();
+            generateFarmerStatus(); // Update UI immediately
+        }
+
+        function renderHiddenFarmers() {
+            let tbody = document.getElementById("hiddenFarmersBody");
+            let html = "";
+            let arr = safeArray(hiddenFarmers);
+            arr.forEach(f => {
+                html += `<tr>
+                    <td style="font-weight:700; color:#1d4ed8; cursor:pointer;" onclick="openDetailModal('${f}')"><u>${f}</u></td>
+                    <td style="text-align:right;">
+                        <button class="btn-action-small bg-gradient-green" style="padding:6px 12px; font-size:12px;" onclick="unhideFarmerName('${f}')">✅ परत चालू करा (Unhide)</button>
+                    </td>
+                </tr>`;
+            });
+            if(arr.length === 0) {
+                html = `<tr><td colspan="2" style="text-align:center; color:#94a3b8; font-weight:600; padding:20px;">कोणतेही नाव लपवलेले नाही.</td></tr>`;
+            }
+            tbody.innerHTML = html;
+        }
 
         // 🌟 1. Delete ALL Farmer Data when name is deleted 🌟
         function delFarmerName(n) {
@@ -2674,32 +3134,70 @@
             data.sort((a, b) => new Date(a.date) - new Date(b.date));
             let html = "";
             let tot = 0; let totalGiven = 0; let totalDeposit = 0;
-            let lastDepositId = null;
+            let runningBal = 0;
             
             data.forEach(e => {
                 let isGive = e.amount > 0;
+                let btns = isAdvHistMode ? `<button class="small-btn btn-edit" onclick="editEntry(${e.id})" style="padding:2px 4px; font-size:11px;">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})" style="padding:2px 4px; font-size:11px;">🗑</button>` : "";
+                
+                let previousBal = runningBal; // capture the balance before this entry
+                
                 if (isGive) {
                     totalGiven += e.amount;
                 } else {
                     totalDeposit += Math.abs(e.amount);
-                    lastDepositId = e.id;
                 }
+                
                 tot += e.amount;
+                runningBal += e.amount; // new balance
+
+                let pColor = previousBal > 0 ? "#ea580c" : (previousBal < 0 ? "#10b981" : "#64748b");
+                let rColor = runningBal > 0 ? "#ea580c" : (runningBal < 0 ? "#10b981" : "#1e293b");
 
                 if (isGive) {
-                    let btns = isAdvHistMode ? `<button class="small-btn btn-edit" onclick="editEntry(${e.id})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${e.id})">🗑</button>` : "";
                     html += `<tr>
-                        <td style="font-weight:600; color:#8e8e93;">${formatDate(e.date)}</td>
-                        <td style="font-weight:800; color:#1e293b; text-align:right;">${Math.abs(e.amount)}</td>
-                        <td style="text-align:center;">${btns}</td>
+                        <td colspan="3" style="padding: 10px; border-bottom: 2px solid #e2e8f0; background: #fff;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
+                                <span style="font-weight:600; color:#475569; font-size:13px;">📅 ${formatDate(e.date)} ${btns}</span>
+                                <span style="font-size:12px; color:#ea580c; font-weight:700; background:#fff7ed; padding:2px 6px; border-radius:4px;">दिलेली उचल</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom: 4px; font-size:13px;">
+                                <span style="color:#64748b;">मागील बाकी:</span> <span style="font-weight:600; color:${pColor};">₹ ${Math.abs(previousBal)}</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom: 4px; font-size:14px;">
+                                <span style="color:#64748b;">उचल:</span> <span style="font-weight:800; color:#ea580c;">+ ₹ ${Math.abs(e.amount)}</span>
+                            </div>
+                            <hr style="border:0; border-top:1px dashed #cbd5e1; margin:4px 0;">
+                            <div style="display:flex; justify-content:space-between; font-size:14px;">
+                                <span style="color:#1e293b; font-weight:700;">उर्वरित बाकी:</span> <span style="font-weight:800; color:${rColor};">₹ ${Math.abs(runningBal)}</span>
+                            </div>
+                        </td>
+                    </tr>`;
+                } else {
+                    html += `<tr>
+                        <td colspan="3" style="padding: 10px; border-bottom: 2px solid #e2e8f0; background: #f8fafc;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
+                                <span style="font-weight:600; color:#475569; font-size:13px;">📅 ${formatDate(e.date)} ${btns}</span>
+                                <span style="font-size:12px; color:#10b981; font-weight:700; background:#ecfdf5; padding:2px 6px; border-radius:4px;">जमा</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom: 4px; font-size:13px;">
+                                <span style="color:#64748b;">मागील बाकी:</span> <span style="font-weight:600; color:${pColor};">₹ ${Math.abs(previousBal)}</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom: 4px; font-size:14px;">
+                                <span style="color:#64748b;">जमा:</span> <span style="font-weight:800; color:#10b981;">- ₹ ${Math.abs(e.amount)}</span>
+                            </div>
+                            <hr style="border:0; border-top:1px dashed #cbd5e1; margin:4px 0;">
+                            <div style="display:flex; justify-content:space-between; font-size:14px;">
+                                <span style="color:#1e293b; font-weight:700;">उर्वरित बाकी:</span> <span style="font-weight:800; color:${rColor};">₹ ${Math.abs(runningBal)}</span>
+                            </div>
+                        </td>
                     </tr>`;
                 }
             });
 
             html += `<tr style="background:#fffbeb; border-top:2px solid #cbd5e1;"><td style="text-align:right; font-weight:700; color:#b91c1c; font-size:13px;">एकूण उचल :</td><td style="text-align:right; font-weight:800; color:#b91c1c; font-size:15px;">${totalGiven}</td><td></td></tr>`;
             if (totalDeposit > 0) {
-                let depBtns = isAdvHistMode && lastDepositId ? `<button class="small-btn btn-edit" onclick="editEntry(${lastDepositId})">✏️</button><button class="small-btn btn-del" onclick="delEntry(${lastDepositId})">🗑</button>` : "";
-                html += `<tr style="background:#ecfdf5;"><td style="text-align:right; font-weight:700; color:#059669; font-size:13px;">एकूण जमा :</td><td style="text-align:right; font-weight:800; color:#059669; font-size:15px;">- ${totalDeposit}</td><td style="text-align:center;">${depBtns}</td></tr>`;
+                html += `<tr style="background:#ecfdf5;"><td style="text-align:right; font-weight:700; color:#059669; font-size:13px;">एकूण जमा :</td><td style="text-align:right; font-weight:800; color:#059669; font-size:15px;">- ${totalDeposit}</td><td style="text-align:center;"></td></tr>`;
             }
             let finalLbl = tot < 0 ? "जास्त जमा :" : "सध्याची बाकी :";
             html += `<tr style="background:#e0f2fe; border-top:2px solid #3b82f6;"><td style="text-align:right; font-weight:700; color:#1d4ed8; font-size:14px;">${finalLbl}</td><td style="text-align:right; font-weight:800; color:#1d4ed8; font-size:17px;">₹ ${Math.abs(tot)}</td><td></td></tr>`;
@@ -2758,6 +3256,7 @@
                         <hr style="border:0; border-top:1px dashed #d8b4fe; margin:8px 0;">
                         <div style="display:flex; justify-content:space-between; color:${col};"><span>उर्वरित बाकी:</span><span style="font-weight:800; font-size:15px;">₹ ${Math.abs(currentTotal).toLocaleString('en-IN')}</span></div>
                         <div style="text-align:right; margin-top:10px;">
+                            <button class="small-btn bg-gradient-green" style="padding:6px 12px; margin-right:5px; font-weight:700;" onclick="sendRecentJamaMsg('${p.name}', '${p.date}', ${beforeTotal}, ${p.amount}, ${currentTotal})">💬 WhatsApp</button>
                             <button class="small-btn btn-edit" onclick="openEditMerEntryModal(${p.id})">✏️ Edit</button>
                             <button class="small-btn btn-del" onclick="delMerEntry(${p.id})">🗑 Delete</button>
                         </div>
@@ -2768,60 +3267,358 @@
             if(payments.length === 0) html = `<tr><td style="text-align:center; padding:20px; color:#8e8e93; font-weight:600;">कोणतीही अलीकडील जमा नोंद नाही</td></tr>`;
             tbody.innerHTML = html;
         }
-        // 🌟 Daily Notes Logic 🌟
-        function initNotes() {
-            document.getElementById("noteDate").value = val("dateInput") || new Date().toISOString().slice(0, 10);
-            document.getElementById("noteText").value = "";
+        
+        function sendRecentJamaMsg(name, dateStr, beforeTotal, amount, currentTotal) {
+            let msg = `एकूण रक्कम: ₹${Number(beforeTotal).toLocaleString('en-IN')}\n`;
+            msg += `जमा रक्कम: - ₹${Number(amount).toLocaleString('en-IN')}\n`;
+            msg += `--------------------------\n`;
+            
+            let balTxt = currentTotal > 0 ? "येणे बाकी" : (currentTotal < 0 ? "जास्त जमा" : "निरंक");
+            msg += `*${balTxt}: ₹${Math.abs(currentTotal).toLocaleString('en-IN')}*`;
+            
+            window.open("https://wa.me/?text=" + encodeURIComponent(msg), '_blank');
         }
 
-        function saveNote() {
-            let d = val("noteDate"); let t = val("noteText").trim();
-            if (!d || !t) { alert("कृपया तारीख आणि नोंद टाका!"); return; }
-            let data = getNotesDB();
-            data.push({ id: Date.now(), date: d, text: t });
-            saveNotesDB(data);
-            document.getElementById("noteText").value = "";
-            alert("✅ नोंद सेव्ह झाली!");
+        // 🌸 OTHER FARMERS LOGIC 🌸
+        function openOtherFModal() {
+            openModal('otherFModal');
+            document.getElementById('otherFDate').value = new Date().toISOString().slice(0, 10);
+            renderOtherFList();
         }
 
-        function renderNotes() {
-            let data = getNotesDB();
+        function saveOtherFEntry() {
+            let date = document.getElementById("otherFDate").value;
+            let name = document.getElementById("otherFName").value.trim();
+            let wt = parseFloat(document.getElementById("otherFWt").value);
+            let rate = parseFloat(document.getElementById("otherFRate").value);
+            let type = document.getElementById("otherFType").value;
 
-            // तारखेनुसार अचूक सॉर्टिंग (नवीन नोंद सर्वात वर)
-            data.sort((a, b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
+            if (!date || !name || isNaN(wt) || wt <= 0 || isNaN(rate) || rate <= 0) {
+                alert("कृपया सर्व माहिती अचूक भरा!");
+                return;
+            }
 
-            let tbody = document.getElementById("notesListBody");
-            let html = "";
-            let lastDate = "";
+            let data = getOtherFDB();
+            let total = Math.round(wt * rate);
+            let commission = Math.round(total * 0.10);
+            let finalAmt = total - commission;
 
-            data.forEach(e => {
-                let displayDate = (e.date !== lastDate) ? formatDate(e.date) : "";
-                lastDate = e.date;
-
-                let btns = (currentUserRole === 'admin') ? `<button class="small-btn btn-del" style="margin:0 auto;" onclick="deleteNote(${e.id})">🗑</button>` : "";
-
-                html += `<tr>
-                <td style="font-weight:800; color:var(--primary); font-size:12px; vertical-align:top; padding-top:12px;">${displayDate}</td>
-                <td style="font-weight:500; font-size:13px; white-space:pre-wrap; vertical-align:top; padding-top:12px; color:#1e293b;">${e.text}</td>
-                <td style="text-align:center; vertical-align:top; padding-top:12px;">${btns}</td>
-            </tr>`;
+            data.push({
+                id: Date.now(),
+                date: date,
+                name: name,
+                wt: wt,
+                rate: rate,
+                type: type,
+                total: total,
+                finalAmt: finalAmt
             });
 
-            if (data.length === 0) {
-                html = `<tr><td colspan="3" style="text-align:center; padding:20px; color:#8e8e93; font-weight:600;">कोणतीही नोंद उपलब्ध नाही.</td></tr>`;
+            saveOtherFDB(data);
+            
+            document.getElementById("otherFWt").value = "";
+            document.getElementById("otherFRate").value = "";
+            document.getElementById("otherFName").focus();
+            
+            renderOtherFList();
+        }
+
+        let expandedOtherFNames = new Set();
+        function toggleOtherFExpand(id, name) {
+            let el = document.getElementById(id);
+            if(el.style.display === "none") { el.style.display = "table-row"; expandedOtherFNames.add(name); }
+            else { el.style.display = "none"; expandedOtherFNames.delete(name); }
+        }
+
+        function renderOtherFList() {
+            let date = document.getElementById("otherFDate").value;
+            if(!date) return;
+            
+            let data = getOtherFDB().filter(e => e.date === date).sort((a,b) => b.id - a.id);
+            let grandTotal = data.reduce((sum, e) => sum + e.finalAmt, 0);
+            
+            if(document.getElementById("otherFTotalBill")) {
+                document.getElementById("otherFTotalBill").innerText = `₹ ${grandTotal.toLocaleString('en-IN')}`;
             }
+
+            let dl = document.getElementById("otherFList");
+            if (dl) {
+                dl.innerHTML = "";
+                let allData = getOtherFDB();
+                let allNames = [...new Set(allData.map(e => e.name))];
+                allNames.forEach(n => {
+                    let op = document.createElement("option");
+                    op.value = n;
+                    dl.appendChild(op);
+                });
+            }
+        }
+
+        function openOtherFListModal() {
+            openModal('otherFListModal');
+            renderOtherFListModal();
+        }
+
+        function renderOtherFListModal() {
+            let data = getOtherFDB();
+            let grouped = {};
+            let grandTotalAll = 0;
+            data.forEach(e => {
+                if(!grouped[e.name]) grouped[e.name] = [];
+                grouped[e.name].push(e);
+                if(!e.isPaid) grandTotalAll += e.finalAmt;
+            });
+            
+            if(document.getElementById("otherFListGrandTotal")) {
+                document.getElementById("otherFListGrandTotal").innerText = `₹ ${grandTotalAll.toLocaleString('en-IN')}`;
+            }
+
+            let tbody = document.getElementById("otherFListBody");
+            if(!tbody) return;
+            
+            let html = "";
+            let sortedNames = Object.keys(grouped).sort((a,b) => a.localeCompare(b));
+            
+            sortedNames.forEach(name => {
+                let errs = grouped[name];
+                let totalForName = errs.reduce((sum, val) => sum + (!val.isPaid ? val.finalAmt : 0), 0);
+                
+                let isFullyPaid = totalForName === 0 && errs.length > 0;
+                let bgStyle = isFullyPaid ? "background:#f0fdf4;" : "";
+                
+                html += `<tr class='premium-row' onclick="openOtherFDetailModal('${name}')" style="cursor:pointer; ${bgStyle}">
+                    <td style="font-weight:700; color:#1e293b; font-size:15px; padding:12px;">${name} ${isFullyPaid ? '✅' : ''}</td>
+                    <td style="text-align:right; font-weight:800; color:${isFullyPaid ? '#16a34a' : '#ec4899'}; padding:12px;">₹ ${totalForName.toLocaleString('en-IN')} <span style="font-size:12px; color:#8b5cf6;">➡️</span></td>
+                </tr>`;
+            });
+            
+            if(sortedNames.length === 0) {
+                html = `<tr><td colspan="2" style="text-align:center; padding:20px; color:#8e8e93;">कोणतीही नोंद नाही.</td></tr>`;
+            }
+            
             tbody.innerHTML = html;
         }
 
-        function deleteNote(id) {
-            if (currentUserRole !== 'admin') { alert("❌ प्रवेश नाकारला!"); return; }
-            if (prompt("ही नोंद डिलीट करण्यासाठी PIN टाका:") === ADMIN_PIN) {
-                let data = getNotesDB().filter(e => e && e.id !== id);
-                saveNotesDB(data);
-                renderNotes();
+        function openOtherFDetailModal(name) {
+            closeModal('otherFListModal');
+            openModal('otherFDetailModal');
+            
+            document.getElementById("otherFDetailName").innerText = name;
+            
+            let data = getOtherFDB().filter(e => e.name === name).sort((a,b) => new Date(b.date) - new Date(a.date));
+            let total = data.reduce((sum, val) => sum + (!val.isPaid ? val.finalAmt : 0), 0);
+            
+            document.getElementById("otherFDetailTotal").innerText = `₹ ${total.toLocaleString('en-IN')}`;
+            document.getElementById("otherFDetailTotal").style.color = total === 0 ? "#16a34a" : "#db2777";
+            
+            let container = document.getElementById("otherFDetailBody");
+            let html = "";
+            
+            let dateGrouped = {};
+            data.forEach(e => {
+                if(!dateGrouped[e.date]) dateGrouped[e.date] = [];
+                dateGrouped[e.date].push(e);
+            });
+            
+            let sortedDates = Object.keys(dateGrouped).sort((a,b) => new Date(b) - new Date(a));
+            
+            sortedDates.forEach(d => {
+                let isAllPaid = dateGrouped[d].length > 0 && dateGrouped[d].every(e => e.isPaid);
+                let dTotal = dateGrouped[d].reduce((sum, val) => sum + val.finalAmt, 0);
+                
+                let bgCol = isAllPaid ? "#dcfce7" : "#faf5ff";
+                let borderCol = isAllPaid ? "#86efac" : "#e9d5ff";
+                let textCol = isAllPaid ? "#166534" : "#db2777";
+                
+                let paidBtn = isAllPaid 
+                    ? `<button class="small-btn" style="background:#16a34a; color:#fff; border:none; padding:3px 8px; border-radius:4px; font-size:12px; cursor:pointer;" onclick="markOtherFDatePaid('${name}', '${d}', false)">✅ Paid</button>`
+                    : `<button class="small-btn" style="background:#f59e0b; color:#fff; border:none; padding:3px 8px; border-radius:4px; font-size:12px; cursor:pointer;" onclick="markOtherFDatePaid('${name}', '${d}', true)">⏳ Paid करा</button>`;
+                
+                html += `<div style="margin-bottom:10px; background:${bgCol}; border-radius:10px; padding:10px; border:1px solid ${borderCol};">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #cbd5e1; padding-bottom:5px; margin-bottom:8px;">
+                        <span style="font-weight:800; color:#475569; font-size:14px;">📅 ${formatDate(d)}</span>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="font-weight:800; color:${textCol}; font-size:14px;">₹ ${dTotal.toLocaleString('en-IN')}</span>
+                            ${paidBtn}
+                        </div>
+                    </div>`;
+                
+                dateGrouped[d].forEach(e => {
+                    let eStyle = e.isPaid ? "text-decoration:line-through; opacity:0.6;" : "";
+                    html += `<div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:8px; margin-bottom:5px; display:flex; justify-content:space-between; align-items:center; ${eStyle}">
+                        <div>
+                            <span style="font-weight:700; color:#1e293b; font-size:13px;">प्रकार: ${e.type}</span>
+                            <span style="color:#64748b; font-size:12px; margin-left:5px;">(${e.wt}kg x ₹${e.rate})</span>
+                        </div>
+                        <div style="text-align:right;">
+                            <span style="font-weight:800; color:#059669; font-size:14px; margin-right:5px;">₹ ${e.finalAmt}</span>
+                            <button class="small-btn" style="background:#3b82f6; color:#fff; border:none; padding:2px 6px; border-radius:4px; font-size:12px; cursor:pointer;" onclick="editOtherFEntry(${e.id}, 'detail', '${name}')">✏️</button>
+                            <button class="small-btn btn-del" style="margin-left:5px; padding:2px 5px;" onclick="delOtherFEntry(${e.id}, '${name}')">🗑</button>
+                        </div>
+                    </div>`;
+                });
+                
+                html += `</div>`;
+            });
+            
+            if(data.length === 0) {
+                html = `<div style="text-align:center; padding:20px; color:#8e8e93;">कोणतीही नोंद नाही.</div>`;
             }
+            
+            container.innerHTML = html;
+        }
+
+        function markOtherFDatePaid(name, date, status) {
+            if(!confirm(status ? "या तारखेचे सर्व बिल Paid (जमा) करायचे आहे का?" : "Paid रद्द करायचे आहे का?")) return;
+            let data = getOtherFDB();
+            data.forEach(e => {
+                if(e.name === name && e.date === date) {
+                    e.isPaid = status;
+                }
+            });
+            saveOtherFDB(data);
+            
+            if(document.getElementById("otherFListModal").classList.contains("show")) renderOtherFListModal();
+            if(document.getElementById("otherFDetailModal").classList.contains("show")) openOtherFDetailModal(name);
+        }
+
+        function delOtherFEntry(id, name, isPreview = false) {
+            if(confirm("ही नोंद खरोखर डिलीट करायची आहे का?")) {
+                let data = getOtherFDB().filter(e => e.id !== id);
+                saveOtherFDB(data);
+                renderOtherFList();
+                if(document.getElementById("otherFListModal").classList.contains("show")) {
+                    renderOtherFListModal();
+                }
+                if(name && document.getElementById("otherFDetailModal").classList.contains("show")) {
+                    openOtherFDetailModal(name);
+                }
+                if(isPreview && document.getElementById("otherFPreviewModal").classList.contains("show")) {
+                    renderOtherFPreview();
+                }
+            }
+        }
+
+        function editOtherFEntry(id, modalContext, farmerName) {
+            let data = getOtherFDB();
+            let idx = data.findIndex(e => e.id === id);
+            if(idx === -1) return;
+            let e = data[idx];
+            
+            let w = prompt("नवीन वजन (Weight):", e.wt);
+            if(w === null) return;
+            let r = prompt("नवीन भाव (Rate):", e.rate);
+            if(r === null) return;
+            
+            w = parseFloat(w);
+            r = parseFloat(r);
+            if(isNaN(w) || w <= 0 || isNaN(r) || r <= 0) {
+                alert("चुकीची माहिती!"); return;
+            }
+            
+            e.wt = w;
+            e.rate = r;
+            e.total = Math.round(w * r);
+            let comm = Math.round(e.total * 0.10);
+            e.finalAmt = e.total - comm;
+            
+            saveOtherFDB(data);
+            renderOtherFList();
+            if(document.getElementById("otherFListModal").classList.contains("show")) {
+                renderOtherFListModal();
+            }
+            if(modalContext === 'detail' && farmerName && document.getElementById("otherFDetailModal").classList.contains("show")) {
+                openOtherFDetailModal(farmerName);
+            }
+            if(modalContext === 'preview' && document.getElementById("otherFPreviewModal").classList.contains("show")) {
+                renderOtherFPreview();
+            }
+        }
+
+        function openOtherFPreviewModal() {
+            closeModal('otherFModal');
+            openModal('otherFPreviewModal');
+            document.getElementById('otherFPreviewDate').value = document.getElementById('otherFDate').value || new Date().toISOString().slice(0, 10);
+            renderOtherFPreview();
+        }
+
+        function renderOtherFPreview() {
+            let date = document.getElementById("otherFPreviewDate").value;
+            if(!date) return;
+            
+            let data = getOtherFDB().filter(e => e.date === date).sort((a,b) => b.id - a.id);
+            let tbody = document.getElementById("otherFPreviewBody");
+            let html = "";
+            let grandTotal = 0;
+            
+            data.forEach(e => {
+                grandTotal += e.finalAmt;
+                let btns = `<button class="small-btn" style="background:#3b82f6; color:#fff; border:none; padding:4px 6px; border-radius:4px; font-size:12px; cursor:pointer;" onclick="editOtherFEntry(${e.id}, 'preview')">✏️</button>
+                            <button class="small-btn btn-del" onclick="delOtherFEntry(${e.id}, null, true)">🗑</button>`;
+                html += `<tr>
+                    <td style="font-weight:700; color:#1e293b; font-size:14px;">${e.name}</td>
+                    <td style="font-weight:600; color:#ec4899; font-size:14px; text-align:center;">${e.type}</td>
+                    <td style="text-align:right; font-size:13px; color:#475569;">${e.wt} x ${e.rate} = <br><span style="text-decoration:line-through; font-size:11px;">₹${e.total}</span></td>
+                    <td style="text-align:right; font-weight:800; color:#059669; font-size:15px;">₹${e.finalAmt}</td>
+                    <td style="text-align:center;">${btns}</td>
+                </tr>`;
+            });
+
+            if (data.length === 0) {
+                html = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#8e8e93; font-weight:600;">कोणतीही नोंद नाही.</td></tr>`;
+            }
+            
+            tbody.innerHTML = html;
+            document.getElementById("otherFPreviewTotal").innerText = `₹ ${grandTotal.toLocaleString('en-IN')}`;
+        }
+
+        function openOtherFCommissionModal() {
+            closeModal('otherFModal');
+            openModal('otherFCommissionModal');
+            
+            let data = getOtherFDB();
+            let today = new Date().toISOString().slice(0, 10);
+            
+            let commToday = 0;
+            let commTotal = 0;
+            let monthGrouped = {};
+            
+            data.forEach(e => {
+                let comm = e.total - e.finalAmt;
+                if(comm > 0) {
+                    commTotal += comm;
+                    if(e.date === today) commToday += comm;
+                    
+                    let m = e.date.substring(0, 7); // YYYY-MM
+                    if(!monthGrouped[m]) monthGrouped[m] = 0;
+                    monthGrouped[m] += comm;
+                }
+            });
+            
+            document.getElementById("otherFCommToday").innerText = `₹ ${commToday.toLocaleString('en-IN')}`;
+            document.getElementById("otherFCommTotal").innerText = `₹ ${commTotal.toLocaleString('en-IN')}`;
+            
+            let tbody = document.getElementById("otherFCommMonthBody");
+            let html = "";
+            let sortedMonths = Object.keys(monthGrouped).sort((a,b) => b.localeCompare(a));
+            
+            sortedMonths.forEach(m => {
+                let parts = m.split('-');
+                let y = parts[0];
+                let mon = parseInt(parts[1]);
+                let mName = marathiMonths[mon - 1];
+                
+                html += `<tr>
+                    <td style="font-weight:700; color:#1e293b; font-size:14px;">📅 ${mName} ${y}</td>
+                    <td style="text-align:right; font-weight:800; color:#059669; font-size:15px;">₹ ${monthGrouped[m].toLocaleString('en-IN')}</td>
+                </tr>`;
+            });
+            
+            if(sortedMonths.length === 0) {
+                html = `<tr><td colspan="2" style="text-align:center; padding:20px; color:#8e8e93;">कमिशन डेटा उपलब्ध नाही.</td></tr>`;
+            }
+            tbody.innerHTML = html;
         }
     </script>
 </body>
-
 </html>
