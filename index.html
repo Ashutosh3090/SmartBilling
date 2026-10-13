@@ -606,6 +606,53 @@
             width: 100%;
         }
 
+        /* 🌸 OTHER FLOWERS (इतर फुले) PREMIUM STYLES 🌸 */
+        .otherf-tab-btn {
+            flex: 1;
+            padding: 8px 6px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #9d174d;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        .otherf-tab-btn.active {
+            background: linear-gradient(135deg, #ec4899, #be185d);
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(236, 72, 153, 0.35);
+        }
+        .otherf-chip {
+            padding: 5px 9px;
+            border-radius: 16px;
+            border: 1px solid #fbcfe8;
+            background: #fff;
+            color: #831843;
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .otherf-chip:hover, .otherf-chip.active {
+            background: #fdf2f8;
+            border-color: #db2777;
+            color: #be185d;
+            transform: translateY(-1px);
+        }
+        .otherf-chip.selected {
+            background: linear-gradient(135deg, #ec4899, #be185d) !important;
+            color: #fff !important;
+            border-color: #be185d !important;
+            box-shadow: 0 2px 6px rgba(219, 39, 119, 0.25);
+        }
+
         /* 🌟 100% FIXED PRINT CSS 🌟 */
         @media print {
             @page {
@@ -736,12 +783,37 @@
                         Entry</button>
                 </div>
 
+                <!-- 🌟 WEIGHT REMINDER BANNER 🌟 -->
+                <div id="weightReminderBanner" style="display:none; margin-bottom: 15px; background: linear-gradient(135deg, #fff7ed, #ffedd5); border: 1.5px solid #fdba74; border-radius: 14px; padding: 12px 14px; box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.1); cursor: pointer;" onclick="openWeightReminderModal()">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 22px;">⏰</span>
+                            <div>
+                                <div id="weightReminderTitle" style="font-weight: 800; font-size: 14px; color: #c2410c;">वजन शिल्लक रिमाइंडर</div>
+                                <div id="weightReminderSubtitle" style="font-size: 12px; color: #ea580c; font-weight: 600;">या तारखेची वजने भरणे बाकी आहेत.</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <span id="weightReminderBadge" style="background: #ea580c; color: #fff; padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 12px;">0 बाकी</span>
+                            <span style="font-size: 14px; color: #ea580c; font-weight: 800;">👉</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="action-buttons">
                     <button class="action-btn bg-gradient-red" onclick="openModal('alertModal'); renderAlerts();">
                         <i>⚠️</i> भाव चुका
                         <span id="alertBadge"
                             style="position:absolute; top:-5px; right:-5px; background:#fff; color:red; border-radius:50%; width:22px; height:22px; font-size:12px; font-weight:900; display:none; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.3); border:2px solid red;">0</span>
                     </button>
+                    <button class="action-btn" style="position:relative; background:linear-gradient(135deg, #f97316, #ea580c);"
+                        onclick="openWeightReminderModal()">
+                        <i>⏰</i> वजन रिमाइंडर
+                        <span id="reminderActionBadge"
+                            style="position:absolute; top:-5px; right:-5px; background:#fff; color:#ea580c; border-radius:50%; width:22px; height:22px; font-size:12px; font-weight:900; display:none; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.3); border:2px solid #ea580c;">0</span>
+                    </button>
+                    <button class="action-btn" style="background:linear-gradient(135deg, #8b5cf6, #6366f1);"
+                        onclick="openCropPredictionModal()"><i>🔮</i> माल अंदाज</button>
                     <button class="action-btn bg-gradient-purple"
                         onclick="openModal('previewModal'); renderPreview();"><i>👁️</i> Preview</button>
                     <button class="action-btn bg-gradient-blue"
@@ -763,42 +835,61 @@
                         onclick="openModal('bhadeListModal'); initBhade();"><i>🚚</i> गाडी भाडे</button>
                     <button class="action-btn" style="background:linear-gradient(135deg, #8b5cf6, #6d28d9);"
                         onclick="openModal('recentJamaModal'); renderRecentJama();"><i>🕒</i> Recent Jama</button>
-                    <button class="action-btn" style="background:linear-gradient(135deg, #0ea5e9, #0284c7);"
-                        onclick="openBulkEntryModal()"><i>⚡</i> Fast Entry</button>
-                    <button class="action-btn" style="background:linear-gradient(135deg, #ec4899, #be185d);"
-                        onclick="openOtherFModal()"><i>🌸</i> इतर फुले</button>
+                    <button class="action-btn" style="position:relative; background:linear-gradient(135deg, #0ea5e9, #0284c7);"
+                        onclick="openBulkEntryModal()">
+                        <i>⚡</i> Fast Entry
+                        <span id="fastEntryReminderBadge"
+                            style="position:absolute; top:-5px; right:-5px; background:#ea580c; color:#fff; border-radius:50%; width:22px; height:22px; font-size:11px; font-weight:900; display:none; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.3); border:2px solid #fff;">0</span>
+                    </button>
+                    <button class="action-btn" style="position:relative; background:linear-gradient(135deg, #ec4899, #be185d);"
+                        onclick="openOtherFModal()">
+                        <i>🌸</i> इतर फुले
+                        <span id="otherFTodayBadge"
+                            style="position:absolute; top:-5px; right:-5px; background:#db2777; color:#fff; border-radius:50%; min-width:22px; height:22px; font-size:11px; font-weight:900; display:none; align-items:center; justify-content:center; padding:0 4px; box-shadow:0 2px 4px rgba(0,0,0,0.3); border:2px solid #fff;">0</span>
+                    </button>
                 </div>
             </div>
 
             <div id="bulkEntryModal" class="modal no-print">
-                <div class="modal-content" style="max-width: 600px; padding: 15px;">
+                <div class="modal-content" style="width: 96%; max-width: 650px; padding: 15px 12px; margin: 2% auto; border-radius: 16px;">
                     <div class="close-icon" onclick="closeModal('bulkEntryModal')">✕</div>
-                    <h3 style="color: #0ea5e9; display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">⚡ Fast Bulk Entry <span style="font-size: 11px; background: #e0f2fe; padding: 2px 8px; border-radius: 12px; color: #0284c7;">एकाच वेळी भरा</span></h3>
+                    <h3 style="color: #0ea5e9; display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">⚡
+                        Fast Bulk Entry <span
+                            style="font-size: 11px; background: #e0f2fe; padding: 2px 8px; border-radius: 12px; color: #0284c7;">एकाच
+                            वेळी भरा</span></h3>
 
-                    <div class="section-box" style="background:#fff; border:1px solid #bae6fd; box-shadow:0 2px 4px rgba(14,165,233,0.1); padding:10px; margin-bottom:12px;">
+                    <div class="section-box"
+                        style="background:#fff; border:1px solid #bae6fd; box-shadow:0 2px 4px rgba(14,165,233,0.1); padding:10px; margin-bottom:12px;">
                         <div class="input-row" style="margin-bottom:0;">
                             <div class="input-group" style="flex:1;">
                                 <label style="font-size:12px; color:#475569; font-weight:700;">तारीख:</label>
-                                <input type="date" id="bulkDate" class="input-field" style="margin:0; padding:8px; font-size:13px;" onchange="onBulkDateChange()">
+                                <input type="date" id="bulkDate" class="input-field"
+                                    style="margin:0; padding:8px; font-size:13px;" onchange="onBulkDateChange()">
                             </div>
                             <div class="input-group" style="flex:1;">
                                 <label style="font-size:12px; color:#475569; font-weight:700;">भाव (Rate):</label>
-                                <input type="number" id="bulkRate" class="input-field" placeholder="0.00" style="margin:0; padding:8px; font-size:14px; font-weight:800; color:#0ea5e9;">
+                                <input type="number" id="bulkRate" class="input-field" placeholder="0.00"
+                                    style="margin:0; padding:8px; font-size:14px; font-weight:800; color:#0ea5e9;">
                             </div>
                         </div>
                     </div>
 
                     <div style="margin-bottom:10px;">
                         <input type="text" id="bulkSearch" class="input-field" placeholder="🔍 शेतकरी शोधा..."
-                            style="margin:0; border-radius:8px; padding:8px 12px; font-size:13px;" onkeyup="filterBulkFarmers()">
+                            style="margin:0; border-radius:8px; padding:8px 12px; font-size:13px;"
+                            onkeyup="filterBulkFarmers()">
                     </div>
 
-                    <div style="max-height: 55vh; overflow-y: auto; background:#fff; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:12px; box-shadow:inset 0 2px 4px rgba(0,0,0,0.02);">
+                    <div
+                        style="max-height: 55vh; overflow-y: auto; background:#fff; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:12px; box-shadow:inset 0 2px 4px rgba(0,0,0,0.02);">
                         <table class="styled-table" style="margin:0;">
-                            <thead style="position: sticky; top: 0; background: #f1f5f9; z-index: 1; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+                            <thead
+                                style="position: sticky; top: 0; background: #f1f5f9; z-index: 1; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
                                 <tr>
                                     <th style="padding:10px; font-size:13px; color:#475569;">शेतकऱ्याचे नाव</th>
-                                    <th style="text-align:right; width:100px; padding:10px; font-size:13px; color:#475569;">वजन (kg)</th>
+                                    <th
+                                        style="text-align:right; width:100px; padding:10px; font-size:13px; color:#475569;">
+                                        वजन (kg)</th>
                                 </tr>
                             </thead>
                             <tbody id="bulkEntryBody">
@@ -810,6 +901,165 @@
                     <button class="btn-add bg-gradient-green"
                         style="width:100%; font-size:15px; padding:12px; border-radius:10px; font-weight:800; box-shadow:0 2px 4px rgba(16, 185, 129, 0.2);"
                         onclick="saveBulkData(event)">✅ सेव्ह करा (Save All)</button>
+                </div>
+            </div>
+
+            <!-- 🌟 WEIGHT REMINDER MODAL 🌟 -->
+            <div id="weightReminderModal" class="modal no-print">
+                <div class="modal-content" style="width: 96%; max-width: 580px; padding: 18px 14px; margin: 3% auto; border-radius: 16px;">
+                    <div class="close-icon" onclick="closeModal('weightReminderModal')">✕</div>
+                    <h3 style="color: #ea580c; display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                        ⏰ वजन शिल्लक रिमाइंडर
+                    </h3>
+
+                    <div class="section-box" style="background:#fff; border:1px solid #fed7aa; padding:10px; margin-bottom:12px;">
+                        <div class="input-row" style="margin-bottom:0;">
+                            <div class="input-group" style="flex:1;">
+                                <label style="font-size:12px; font-weight:700; color:#475569;">तारीख (Date):</label>
+                                <input type="date" id="weightReminderDate" class="input-field" style="margin:0; padding:8px 12px; font-size:14px;" onchange="renderWeightReminderModal()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    <div style="display:flex; gap:6px; margin-bottom:12px;">
+                        <div style="flex:1; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 4px; text-align:center;">
+                            <span style="font-size:11px; color:#64748b; font-weight:700; display:block;">एकूण शेतकरी</span>
+                            <span id="remTotalCount" style="font-size:16px; font-weight:800; color:#1e293b;">0</span>
+                        </div>
+                        <div style="flex:1; background:#ecfdf5; border:1px solid #a7f3d0; border-radius:10px; padding:8px 4px; text-align:center;">
+                            <span style="font-size:11px; color:#047857; font-weight:700; display:block;">भरलेली वजने</span>
+                            <span id="remCompletedCount" style="font-size:16px; font-weight:800; color:#059669;">0</span>
+                        </div>
+                        <div style="flex:1; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:10px; padding:8px 4px; text-align:center;">
+                            <span style="font-size:11px; color:#475569; font-weight:700; display:block;">माल नाही</span>
+                            <span id="remNoCropCount" style="font-size:16px; font-weight:800; color:#64748b;">0</span>
+                        </div>
+                        <div style="flex:1; background:#fff7ed; border:1px solid #fdba74; border-radius:10px; padding:8px 4px; text-align:center;">
+                            <span style="font-size:11px; color:#c2410c; font-weight:700; display:block;">शिल्लक शेतकरी</span>
+                            <span id="remPendingCount" style="font-size:16px; font-weight:800; color:#ea580c;">0</span>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; gap:8px; margin-bottom:12px;">
+                        <button class="btn-action-small bg-gradient-blue" style="flex:1; padding:9px; font-size:13px; font-weight:700; border-radius:8px;" onclick="goToBulkEntryFromReminder()">⚡ Fast Entry मधून भरा</button>
+                        <button class="btn-action-small bg-gradient-purple" style="flex:1; padding:9px; font-size:13px; font-weight:700; border-radius:8px;" onclick="closeModal('weightReminderModal'); openCropPredictionModal();">🔮 आजचा माल अंदाज</button>
+                    </div>
+
+                    <!-- Pending Section -->
+                    <div style="margin-bottom:12px;">
+                        <div style="font-weight:800; font-size:14px; color:#ea580c; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                            <span>⏳ वजन भरणे बाकी असलेले:</span>
+                            <span id="pendingListBadge" style="font-size:11px; background:#ffedd5; color:#c2410c; padding:2px 8px; border-radius:10px; font-weight:800;"></span>
+                        </div>
+                        <div style="max-height: 42vh; overflow-y: auto; background:#fff; border:1px solid #fdba74; border-radius:10px; box-shadow:inset 0 1px 3px rgba(0,0,0,0.02);">
+                            <table class="styled-table" style="margin:0; width:100%;">
+                                <tbody id="weightReminderPendingBody">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Completed Section -->
+                    <div style="margin-top:10px;">
+                        <div style="font-weight:700; font-size:13px; color:#059669; margin-bottom:6px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;" onclick="toggleReminderCompletedList()">
+                            <span>✅ आज भरलेली वजने (<span id="remCompletedCount2">0</span>)</span>
+                            <span id="remCompletedArrow" style="font-size:12px;">▼</span>
+                        </div>
+                        <div id="remCompletedContainer" style="display:none; max-height: 25vh; overflow-y: auto; background:#fff; border:1px solid #cbd5e1; border-radius:8px;">
+                            <table class="styled-table" style="margin:0; width:100%;">
+                                <tbody id="weightReminderCompletedBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- No Crop Section -->
+                    <div style="margin-top:10px;">
+                        <div style="font-weight:700; font-size:13px; color:#64748b; margin-bottom:6px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;" onclick="toggleReminderNoCropList()">
+                            <span>🚫 आज माल नसलेले शेतकरी (<span id="remNoCropCount2">0</span>)</span>
+                            <span id="remNoCropArrow" style="font-size:12px;">▼</span>
+                        </div>
+                        <div id="remNoCropContainer" style="display:none; max-height: 25vh; overflow-y: auto; background:#fff; border:1px solid #cbd5e1; border-radius:8px;">
+                            <table class="styled-table" style="margin:0; width:100%;">
+                                <tbody id="weightReminderNoCropBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 🌟 CROP PREDICTION MODAL 🌟 -->
+            <div id="cropPredictionModal" class="modal no-print">
+                <div class="modal-content" style="width: 96%; max-width: 650px; padding: 18px 14px; margin: 2% auto; border-radius: 16px;">
+                    <div class="close-icon" onclick="closeModal('cropPredictionModal')">✕</div>
+                    <h3 style="color: #7c3aed; display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                        🔮 आजचा स्मार्ट माल अंदाज (AI Predictor)
+                    </h3>
+                    <p style="font-size:12px; color:#64748b; margin-bottom:12px;">आज आलेल्या ५ ते ८ शेतकऱ्यांच्या वजनावरून दिवसभरात एकूण किती माल येईल याचा अचूक अंदाज.</p>
+
+                    <div class="section-box" style="background:#fff; border:1px solid #ddd6fe; padding:10px; margin-bottom:12px;">
+                        <div class="input-row" style="margin-bottom:0;">
+                            <div class="input-group" style="flex:1;">
+                                <label style="font-size:12px; font-weight:700; color:#475569;">तारीख (Date):</label>
+                                <input type="date" id="predictDate" class="input-field" style="margin:0; padding:8px 12px; font-size:14px;" onchange="renderCropPredictionModal()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Highlighted Grand Prediction Box -->
+                    <div style="background:linear-gradient(135deg, #7c3aed, #4f46e5); color:#fff; border-radius:14px; padding:16px; margin-bottom:14px; box-shadow:0 10px 20px -5px rgba(124, 58, 237, 0.35); text-align:center;">
+                        <div style="font-size:12px; font-weight:700; opacity:0.9; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">🎯 आजचा एकूण अपेक्षित माल (Estimated Total)</div>
+                        <div id="predGrandTotal" style="font-size:32px; font-weight:900; line-height:1.2; margin-bottom:4px;">~0 Kg</div>
+                        <div id="predRangeText" style="font-size:13px; opacity:0.95; font-weight:600;">(अंदाजे Range: 0 - 0 Kg)</div>
+                    </div>
+
+                    <!-- 3 Comparison KPI Cards -->
+                    <div style="display:flex; gap:8px; margin-bottom:12px;">
+                        <div style="flex:1; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 4px; text-align:center;">
+                            <span id="predPrevDateLabel" style="font-size:11px; color:#64748b; font-weight:700; display:block;">कालचा माल</span>
+                            <span id="predPrevTotal" style="font-size:16px; font-weight:800; color:#1e293b;">0 Kg</span>
+                        </div>
+                        <div style="flex:1; background:#ecfdf5; border:1px solid #a7f3d0; border-radius:10px; padding:8px 4px; text-align:center;">
+                            <span style="font-size:11px; color:#047857; font-weight:700; display:block;">आज भरलेला</span>
+                            <span id="predTodayEntered" style="font-size:16px; font-weight:800; color:#059669;">0 Kg</span>
+                            <span id="predTodayCount" style="font-size:10px; color:#10b981; font-weight:700; display:block;">(0 शेतकरी)</span>
+                        </div>
+                        <div style="flex:1; background:#f5f3ff; border:1px solid #ddd6fe; border-radius:10px; padding:8px 4px; text-align:center;">
+                            <span style="font-size:11px; color:#6d28d9; font-weight:700; display:block;">आजचा कल (Trend)</span>
+                            <span id="predTrendPct" style="font-size:16px; font-weight:800; color:#7c3aed;">0%</span>
+                            <span id="predTrendText" style="font-size:10px; color:#8b5cf6; font-weight:700; display:block;">स्थिर</span>
+                        </div>
+                    </div>
+
+                    <!-- Insight Text Box -->
+                    <div id="predInsightBox" style="background:#fffbeb; border:1px solid #fef3c7; border-radius:10px; padding:10px 12px; margin-bottom:14px; font-size:12px; color:#92400e; line-height:1.4;">
+                        💡 <b>विश्लेषण:</b> माहिती लोड होत आहे...
+                    </div>
+
+                    <!-- Farmer Prediction Breakdown Table -->
+                    <div style="font-weight:800; font-size:14px; color:#475569; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                        <span>📋 शेतकरीनिहाय अंदाज (Farmer Breakdown):</span>
+                        <span id="predFarmerCountBadge" style="font-size:11px; background:#f1f5f9; color:#475569; padding:2px 8px; border-radius:10px; font-weight:800;"></span>
+                    </div>
+                    <div style="max-height: 45vh; overflow-y: auto; background:#fff; border:1px solid #e2e8f0; border-radius:10px; box-shadow:inset 0 1px 3px rgba(0,0,0,0.02);">
+                        <table class="styled-table" style="margin:0; width:100%;">
+                            <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 1;">
+                                <tr>
+                                    <th style="padding:8px 10px; font-size:12px; color:#475569;">शेतकरी</th>
+                                    <th style="text-align:right; padding:8px 10px; font-size:12px; color:#475569;">काल (Kg)</th>
+                                    <th style="text-align:right; padding:8px 10px; font-size:12px; color:#475569;">आज / अंदाज</th>
+                                    <th style="text-align:center; padding:8px 10px; font-size:12px; color:#475569;">स्थिती</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cropPredictionBody">
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
             </div>
 
@@ -878,107 +1128,333 @@
             </div>
         </div>
 
+        <!-- 🌸 PREMIUM OTHER FLOWERS (इतर फुले) MASTER MODAL 🌸 -->
         <div id="otherFModal" class="modal no-print">
-            <div class="modal-content">
+            <div class="modal-content" style="width: 96%; max-width: 720px; padding: 18px 14px; margin: 2% auto; border-radius: 18px;">
                 <div class="close-icon" onclick="closeModal('otherFModal')">✕</div>
-                <h3 style="color: #ec4899; display: flex; align-items: center; gap: 8px;">🌸 इतर फुले <span
-                        style="font-size: 12px; background: #fce7f3; padding: 2px 8px; border-radius: 12px; color: #be185d;">वेगळे
-                        शेतकरी</span></h3>
 
-                <div class="section-box"
-                    style="background:#fff; border:1px solid #fbcfe8; box-shadow:0 4px 6px rgba(236,72,153,0.1);">
-                    <div class="input-row">
-                        <div class="input-group">
-                            <label>तारीख (Date):</label>
-                            <input type="date" id="otherFDate" onchange="renderOtherFList()">
+                <!-- Header -->
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #fbcfe8; padding-bottom:8px; padding-right:32px;">
+                    <div>
+                        <h3 style="color: #db2777; display: flex; align-items: center; gap: 8px; margin:0; font-size:18px;">
+                            🌸 इतर फुले हब <span style="font-size: 11px; background: #fce7f3; padding: 2px 8px; border-radius: 12px; color: #be185d; font-weight:800;">PRO</span>
+                        </h3>
+                        <span style="font-size:11.5px; color:#9d174d; font-weight:600;">दैनंदिन आवक, कमिशन (१०%) व शेतकरी खाते व्यवस्थापन</span>
+                    </div>
+                </div>
+
+                <!-- 4 Live KPI Cards for Selected Date -->
+                <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:6px; margin-bottom:12px;">
+                    <div style="background:#fdf2f8; border:1px solid #fbcfe8; border-radius:10px; padding:8px 4px; text-align:center;">
+                        <span style="font-size:10.5px; color:#be185d; font-weight:700; display:block;">⚖️ आवक (Kg)</span>
+                        <span id="otherFKpiWt" style="font-size:15px; font-weight:800; color:#9d174d;">0 Kg</span>
+                    </div>
+                    <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:8px 4px; text-align:center;">
+                        <span style="font-size:10.5px; color:#15803d; font-weight:700; display:block;">💰 निव्वळ बिल</span>
+                        <span id="otherFKpiNet" style="font-size:15px; font-weight:800; color:#166534;">₹ 0</span>
+                    </div>
+                    <div style="background:#fefce8; border:1px solid #fef08a; border-radius:10px; padding:8px 4px; text-align:center;">
+                        <span style="font-size:10.5px; color:#a16207; font-weight:700; display:block;">🏷️ स. भाव</span>
+                        <span id="otherFKpiAvgRate" style="font-size:15px; font-weight:800; color:#854d0e;">₹ 0</span>
+                    </div>
+                    <div style="background:#faf5ff; border:1px solid #e9d5ff; border-radius:10px; padding:8px 4px; text-align:center;">
+                        <span style="font-size:10.5px; color:#7e22ce; font-weight:700; display:block;">💵 कमिशन</span>
+                        <span id="otherFKpiComm" style="font-size:15px; font-weight:800; color:#6b21a8;">₹ 0</span>
+                    </div>
+                </div>
+
+                <!-- 4 Navigation Tabs -->
+                <div style="display:flex; gap:6px; background:#fce7f3; padding:4px; border-radius:12px; margin-bottom:12px;">
+                    <button id="otherFTabBtn_entry" class="otherf-tab-btn active" onclick="switchOtherFTab('entry')">➕ नवीन नोंद</button>
+                    <button id="otherFTabBtn_today" class="otherf-tab-btn" onclick="switchOtherFTab('today')">📋 आजच्या नोंदी <span id="otherFTodayCountBadge" style="background:#db2777; color:#fff; border-radius:10px; padding:1px 6px; font-size:10px; margin-left:2px;">0</span></button>
+                    <button id="otherFTabBtn_farmers" class="otherf-tab-btn" onclick="switchOtherFTab('farmers')">👥 शेतकरी खाते</button>
+                    <button id="otherFTabBtn_comm" class="otherf-tab-btn" onclick="switchOtherFTab('comm')">📊 कमिशन</button>
+                </div>
+
+                <!-- TAB 1: ➕ नवीन नोंद -->
+                <div id="otherFTabContent_entry">
+                    <div class="section-box" style="background:#fff; border:1px solid #fbcfe8; box-shadow:0 4px 10px rgba(236,72,153,0.08); padding:14px; margin-bottom:12px;">
+                        <!-- Date with Quick Shortcuts -->
+                        <div class="input-row" style="margin-bottom:10px;">
+                            <div class="input-group" style="flex:1;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                                    <label style="margin:0; font-size:12px; font-weight:700; color:#475569;">तारीख (Date):</label>
+                                    <div style="display:flex; gap:4px;">
+                                        <button type="button" class="btn-action-small bg-gradient-pink" style="padding:2px 8px; font-size:11px; border-radius:6px;" onclick="setOtherFQuickDate('today')">⚡ आज</button>
+                                        <button type="button" class="btn-action-small" style="background:#e2e8f0; color:#475569; padding:2px 8px; font-size:11px; border-radius:6px;" onclick="setOtherFQuickDate('yesterday')">◀ काल</button>
+                                    </div>
+                                </div>
+                                <input type="date" id="otherFDate" class="input-field" style="margin:0; padding:8px 12px; font-size:14px;" onchange="onOtherFDateChange()">
+                            </div>
+                            <div class="input-group" style="flex:1.5;">
+                                <label style="font-size:12px; font-weight:700; color:#475569;">शेतकऱ्याचे नाव:</label>
+                                <input type="text" id="otherFName" class="input-field" placeholder="शेतकऱ्याचे नाव लिहा..." list="otherFList"
+                                    style="margin:0; padding:8px 12px; font-size:14px;"
+                                    onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('otherFWt').focus();}">
+                                <datalist id="otherFList"></datalist>
+                            </div>
                         </div>
-                        <div class="input-group" style="flex:2;">
-                            <label>शेतकऱ्याचे नाव:</label>
-                            <input type="text" id="otherFName" placeholder="नाव लिहा..." list="otherFList"
-                                onclick="try{this.showPicker()}catch(e){}">
-                            <datalist id="otherFList"></datalist>
+
+                        <!-- Quick Recent Farmers Chips -->
+                        <div id="otherFRecentChipsContainer" style="display:none; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
+                            <span style="font-size:11px; color:#94a3b8; font-weight:700;">जलद नाव:</span>
+                            <div id="otherFRecentChipsList" style="display:flex; gap:4px; flex-wrap:wrap;"></div>
+                        </div>
+
+                        <!-- Quick Flower Type Pills -->
+                        <div style="margin-bottom:10px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                                <label style="font-size:12px; font-weight:700; color:#475569; margin:0;">फूल प्रकार (Flower Type):</label>
+                                <select id="otherFType" style="padding:4px 8px; border-radius:8px; border:1px solid #fbcfe8; font-size:12px; font-weight:700; color:#9d174d; background:#fdf2f8;" onchange="syncOtherFTypeChip(this.value)">
+                                    <option value="पि">पि (पिवळा झेंडू)</option>
+                                    <option value="के">के (केशरी झेंडू)</option>
+                                    <option value="पा">पा (पांढरा शेवंती)</option>
+                                    <option value="शे">शे (शेवंती)</option>
+                                    <option value="ग">ग (गुलाब)</option>
+                                    <option value="म">म (मोगरा)</option>
+                                    <option value="रु">रु (रुई / इतर)</option>
+                                    <option value="अ">अ (अष्टर)</option>
+                                    <option value="प">प (पारिजातक)</option>
+                                    <option value="बे">बे (बेल / निशिगंध)</option>
+                                    <option value="का">का (कागडा)</option>
+                                    <option value="जा">जा (जास्वंद)</option>
+                                </select>
+                            </div>
+                            <div style="display:flex; gap:5px; flex-wrap:wrap;" id="otherFChipsContainer">
+                                <button type="button" class="otherf-chip selected" onclick="selectOtherFType('पि', this)">🟡 पि</button>
+                                <button type="button" class="otherf-chip" onclick="selectOtherFType('के', this)">🟠 के</button>
+                                <button type="button" class="otherf-chip" onclick="selectOtherFType('पा', this)">⚪ पा</button>
+                                <button type="button" class="otherf-chip" onclick="selectOtherFType('शे', this)">🌸 शे</button>
+                                <button type="button" class="otherf-chip" onclick="selectOtherFType('ग', this)">🌹 ग</button>
+                                <button type="button" class="otherf-chip" onclick="selectOtherFType('म', this)">🌼 म</button>
+                                <button type="button" class="otherf-chip" onclick="selectOtherFType('रु', this)">🌿 रु</button>
+                                <button type="button" class="otherf-chip" onclick="selectOtherFType('अ', this)">🟣 अ</button>
+                                <button type="button" class="otherf-chip" onclick="selectOtherFType('प', this)">🌺 प</button>
+                                <button type="button" class="otherf-chip" onclick="selectOtherFType('बे', this)">🌾 बे</button>
+                            </div>
+                        </div>
+
+                        <!-- Weight, Rate & Commission Row -->
+                        <div class="input-row" style="margin-bottom:10px;">
+                            <div class="input-group" style="flex:1;">
+                                <label style="font-size:12px; font-weight:700; color:#475569;">वजन (kg):</label>
+                                <input type="number" step="0.01" id="otherFWt" class="input-field" placeholder="0.00"
+                                    style="margin:0; padding:10px 12px; font-size:16px; font-weight:800; color:#0f172a;"
+                                    oninput="updateOtherFLiveCalc()"
+                                    onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('otherFRate').focus();}">
+                            </div>
+                            <div class="input-group" style="flex:1;">
+                                <label style="font-size:12px; font-weight:700; color:#475569;">भाव (₹/kg):</label>
+                                <input type="number" step="0.5" id="otherFRate" class="input-field" placeholder="0.00"
+                                    style="margin:0; padding:10px 12px; font-size:16px; font-weight:800; color:#0f172a;"
+                                    oninput="updateOtherFLiveCalc()"
+                                    onkeydown="if(event.key==='Enter'){event.preventDefault(); saveOtherFEntry();}">
+                            </div>
+                            <div class="input-group" style="flex:0.8;">
+                                <label style="font-size:12px; font-weight:700; color:#475569;">कमिशन:</label>
+                                <select id="otherFCommPct" style="padding:10px 6px; border-radius:12px; border:1px solid #cbd5e1; width:100%; font-size:13px; font-weight:700; background:#f8fafc;" onchange="updateOtherFLiveCalc()">
+                                    <option value="10" selected>१०% (नियमित)</option>
+                                    <option value="8">८%</option>
+                                    <option value="5">५%</option>
+                                    <option value="0">०% (नाही)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Live Calculation Card -->
+                        <div id="otherFLiveCalcCard" style="background:linear-gradient(135deg, #fdf2f8, #fce7f3); border:1px solid #fbcfe8; border-radius:12px; padding:10px 14px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <span id="otherFLiveCalcMath" style="font-size:13px; color:#9d174d; font-weight:700; display:block;">0 kg × ₹0 = ₹0</span>
+                                <span id="otherFLiveCalcComm" style="font-size:11.5px; color:#be185d; font-weight:600;">कमिशन (१०%): -₹0</span>
+                            </div>
+                            <div style="text-align:right;">
+                                <span style="font-size:10.5px; color:#831843; font-weight:700; display:block;">👉 निव्वळ देय रक्कम</span>
+                                <span id="otherFLiveCalcNet" style="font-size:20px; font-weight:900; color:#db2777;">₹ 0</span>
+                            </div>
+                        </div>
+
+                        <!-- Save Button -->
+                        <button class="btn-add" style="background:linear-gradient(135deg, #ec4899, #be185d); margin-top:0; padding:12px; font-size:15px; font-weight:800; box-shadow:0 4px 12px rgba(236,72,153,0.3); border-radius:12px;" onclick="saveOtherFEntry()">
+                            ✅ नोंद सेव्ह करा (Save)
+                        </button>
+                    </div>
+
+                    <!-- Recent Entries on Selected Date Card -->
+                    <div style="background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:12px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <span style="font-size:13px; font-weight:800; color:#475569;">🕒 नुकत्याच झालेल्या नोंदी (<span id="otherFRecentCountText">०</span>):</span>
+                            <button class="btn-action-small bg-gradient-pink" style="padding:3px 10px; font-size:11px;" onclick="switchOtherFTab('today')">सर्व यादी पहा ➡️</button>
+                        </div>
+                        <div id="otherFRecentListBody" style="max-height:220px; overflow-y:auto;">
+                            <!-- Populated dynamically -->
                         </div>
                     </div>
-                    <div class="input-row">
+                </div>
+
+                <!-- TAB 2: 📋 आजच्या नोंदी -->
+                <div id="otherFTabContent_today" style="display:none;">
+                    <div style="display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; align-items:center;">
+                        <div style="flex:1; min-width:180px; position:relative;">
+                            <input type="text" id="otherFTodaySearch" placeholder="🔍 नाव किंवा फूल शोधा..." class="input-field" style="margin:0; padding:8px 12px; font-size:13px;" oninput="renderOtherFTodayTable()">
+                        </div>
+                        <button class="btn-action-small bg-gradient-blue" style="padding:8px 12px; font-size:12px;" onclick="openModal('billModal'); initOtherFBill();">📜 शेतकरी बिल</button>
+                    </div>
+
+                    <div style="max-height: 48vh; overflow-y: auto; background:#fff; border:1px solid #e2e8f0; border-radius:12px;">
+                        <table class="styled-table" style="margin:0; width:100%;">
+                            <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 1;">
+                                <tr>
+                                    <th style="padding:8px 10px; font-size:12px; color:#475569;">शेतकरी</th>
+                                    <th style="padding:8px 6px; font-size:12px; color:#475569; text-align:center;">फूल</th>
+                                    <th style="text-align:right; padding:8px 8px; font-size:12px; color:#475569;">वजन x भाव</th>
+                                    <th style="text-align:right; padding:8px 10px; font-size:12px; color:#475569;">निव्वळ देय (₹)</th>
+                                    <th style="text-align:center; padding:8px 6px; font-size:12px; color:#475569;">स्थिती</th>
+                                    <th style="text-align:center; padding:8px 8px; font-size:12px; color:#475569;">कृती</th>
+                                </tr>
+                            </thead>
+                            <tbody id="otherFTodayTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="otherFTodayFooterSummary" style="background:#fdf2f8; border:1px solid #fbcfe8; border-radius:10px; padding:10px 14px; margin-top:8px; display:flex; justify-content:space-between; align-items:center; font-size:13px; font-weight:800; color:#9d174d;">
+                        <!-- Updated dynamically -->
+                    </div>
+                </div>
+
+                <!-- TAB 3: 👥 शेतकरी खाते -->
+                <div id="otherFTabContent_farmers" style="display:none;">
+                    <div style="background:linear-gradient(135deg, #fdf2f8, #fce7f3); border:1px solid #fbcfe8; border-radius:12px; padding:12px; text-align:center; margin-bottom:10px;">
+                        <span style="font-size:12px; font-weight:700; color:#9d174d; display:block;">सर्व शेतकऱ्यांचे एकूण देय बाकी (Outstanding Due):</span>
+                        <span id="otherFFarmersGrandDue" style="font-size:24px; font-weight:900; color:#db2777;">₹ 0</span>
+                    </div>
+
+                    <div style="margin-bottom:10px;">
+                        <input type="text" id="otherFFarmerSearch" placeholder="🔍 शेतकरी शोधा..." class="input-field" style="margin:0; padding:8px 12px; font-size:13px;" oninput="renderOtherFFarmersList()">
+                    </div>
+
+                    <div style="max-height: 48vh; overflow-y: auto; background:#fff; border:1px solid #e2e8f0; border-radius:12px;">
+                        <div id="otherFFarmersListContainer" style="padding:6px;">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: 📊 कमिशन रिपोर्ट -->
+                <div id="otherFTabContent_comm" style="display:none;">
+                    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-bottom:12px;">
+                        <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:10px 6px; text-align:center;">
+                            <span style="font-size:11px; color:#15803d; font-weight:700; display:block;">📅 आजचे कमिशन</span>
+                            <span id="otherFCommKpiToday" style="font-size:18px; font-weight:900; color:#166534;">₹ 0</span>
+                        </div>
+                        <div style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:10px; padding:10px 6px; text-align:center;">
+                            <span style="font-size:11px; color:#047857; font-weight:700; display:block;">📆 या महिन्याचे</span>
+                            <span id="otherFCommKpiMonth" style="font-size:18px; font-weight:900; color:#065f46;">₹ 0</span>
+                        </div>
+                        <div style="background:#faf5ff; border:1px solid #e9d5ff; border-radius:10px; padding:10px 6px; text-align:center;">
+                            <span style="font-size:11px; color:#7e22ce; font-weight:700; display:block;">📈 एकूण कमिशन</span>
+                            <span id="otherFCommKpiTotal" style="font-size:18px; font-weight:900; color:#6b21a8;">₹ 0</span>
+                        </div>
+                    </div>
+
+                    <div style="font-weight:800; font-size:13px; color:#475569; margin-bottom:6px;">📅 महिनानिहाय कमिशन विवरण (Monthly Breakdown):</div>
+                    <div style="max-height: 42vh; overflow-y: auto; background:#fff; border:1px solid #e2e8f0; border-radius:12px;">
+                        <table class="styled-table" style="margin:0; width:100%;">
+                            <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 1;">
+                                <tr>
+                                    <th style="padding:8px 10px; font-size:12px; color:#475569;">महिना</th>
+                                    <th style="text-align:right; padding:8px 10px; font-size:12px; color:#475569;">आवक (Kg)</th>
+                                    <th style="text-align:right; padding:8px 10px; font-size:12px; color:#475569;">उलाढाल (₹)</th>
+                                    <th style="text-align:right; padding:8px 10px; font-size:12px; color:#475569;">कमिशन (₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="otherFCommMonthBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 🌸 EDIT OTHER FLOWER ENTRY MODAL 🌸 -->
+        <div id="otherFEditModal" class="modal no-print">
+            <div class="modal-content" style="width: 92%; max-width: 480px; padding: 18px 14px; border-radius: 16px;">
+                <div class="close-icon" onclick="closeModal('otherFEditModal')">✕</div>
+                <h3 style="color: #db2777; margin-bottom:12px;">✏️ नोंद दुरुस्ती (Edit Flower Entry)</h3>
+                <input type="hidden" id="editOtherFId">
+                <div class="section-box" style="padding:10px; margin-bottom:12px;">
+                    <div class="input-row" style="margin-bottom:8px;">
                         <div class="input-group">
-                            <label>वजन (kg):</label>
-                            <input type="number" id="otherFWt" placeholder="0.00">
+                            <label style="font-size:11px; font-weight:700;">तारीख:</label>
+                            <input type="date" id="editOtherFDate" class="input-field" style="margin:0; padding:8px;">
+                        </div>
+                        <div class="input-group" style="flex:1.5;">
+                            <label style="font-size:11px; font-weight:700;">शेतकरी नाव:</label>
+                            <input type="text" id="editOtherFName" class="input-field" style="margin:0; padding:8px;">
+                        </div>
+                    </div>
+                    <div class="input-row" style="margin-bottom:8px;">
+                        <div class="input-group">
+                            <label style="font-size:11px; font-weight:700;">वजन (kg):</label>
+                            <input type="number" step="0.01" id="editOtherFWt" class="input-field" style="margin:0; padding:8px;" oninput="updateOtherFEditLiveCalc()">
                         </div>
                         <div class="input-group">
-                            <label>भाव (₹):</label>
-                            <input type="number" id="otherFRate" placeholder="0.00">
+                            <label style="font-size:11px; font-weight:700;">भाव (₹):</label>
+                            <input type="number" step="0.5" id="editOtherFRate" class="input-field" style="margin:0; padding:8px;" oninput="updateOtherFEditLiveCalc()">
                         </div>
-                        <div class="input-group">
-                            <label>प्रकार:</label>
-                            <select id="otherFType"
-                                style="padding:12px; border-radius:12px; border:1px solid #cbd5e1; width:100%;">
+                        <div class="input-group" style="flex:0.8;">
+                            <label style="font-size:11px; font-weight:700;">प्रकार:</label>
+                            <select id="editOtherFType" style="padding:8px 4px; border-radius:8px; border:1px solid #cbd5e1; width:100%; font-size:12px; font-weight:700;">
                                 <option value="पि">पि</option>
                                 <option value="के">के</option>
                                 <option value="पा">पा</option>
                                 <option value="शे">शे</option>
-                                <option value="रु">रु</option>
                                 <option value="ग">ग</option>
                                 <option value="म">म</option>
+                                <option value="रु">रु</option>
                                 <option value="अ">अ</option>
                                 <option value="प">प</option>
                                 <option value="बे">बे</option>
+                                <option value="का">का</option>
+                                <option value="जा">जा</option>
                             </select>
                         </div>
                     </div>
-
-                    <div
-                        style="background:linear-gradient(to right, #fdf2f8, #fce7f3); padding:10px 15px; border-radius:12px; margin-top:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; border:1px solid #fbcfe8;">
-                        <span style="font-size:14px; font-weight:700; color:#be185d;">आजचे एकूण बिल:</span>
-                        <span id="otherFTotalBill" style="font-size:20px; font-weight:900; color:#db2777;">₹ 0</span>
+                    <div class="input-row" style="margin-bottom:8px;">
+                        <div class="input-group">
+                            <label style="font-size:11px; font-weight:700;">कमिशन:</label>
+                            <select id="editOtherFCommPct" style="padding:8px 4px; border-radius:8px; border:1px solid #cbd5e1; width:100%; font-size:12px; font-weight:700;" onchange="updateOtherFEditLiveCalc()">
+                                <option value="10">१०%</option>
+                                <option value="8">८%</option>
+                                <option value="5">५%</option>
+                                <option value="0">०%</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label style="font-size:11px; font-weight:700;">स्थिती:</label>
+                            <select id="editOtherFPaid" style="padding:8px 4px; border-radius:8px; border:1px solid #cbd5e1; width:100%; font-size:12px; font-weight:700;">
+                                <option value="false">⏳ Unpaid (बाकी)</option>
+                                <option value="true">✅ Paid (जमा)</option>
+                            </select>
+                        </div>
                     </div>
-
-                    <button class="btn-add"
-                        style="background:linear-gradient(135deg, #ec4899, #be185d); margin-top:5px; box-shadow:0 4px 10px rgba(236,72,153,0.3);"
-                        onclick="saveOtherFEntry()">✅ सेव्ह करा</button>
-                </div>
-
-                <div class="list-header-bar"
-                    style="background:transparent; padding:0; border:none; margin-top: 15px; display:flex; flex-wrap:wrap; gap:5px;">
-                    <button class="btn-action-small bg-gradient-purple" style="flex:1;"
-                        onclick="openOtherFPreviewModal()">👁️ Preview</button>
-                    <button class="btn-action-small bg-gradient-orange" style="flex:1;"
-                        onclick="openOtherFListModal()">👥 List</button>
-                    <button class="btn-action-small bg-gradient-blue" style="flex:1;"
-                        onclick="openModal('billModal'); initOtherFBill();">📜 Bill</button>
-                    <button class="btn-action-small"
-                        style="flex:1; background:linear-gradient(135deg, #10b981, #047857);"
-                        onclick="openOtherFCommissionModal()">💰 Comm.</button>
+                    <div id="editOtherFLivePreview" style="background:#fdf2f8; border:1px solid #fbcfe8; border-radius:8px; padding:8px; font-size:12px; color:#be185d; font-weight:700; text-align:center; margin-bottom:8px;">
+                        <!-- Live preview -->
+                    </div>
+                    <button class="btn-add bg-gradient-pink" style="padding:10px; font-size:14px; font-weight:800; border-radius:10px;" onclick="saveOtherFEditedEntry()">💾 बदल सेव्ह करा</button>
                 </div>
             </div>
         </div>
 
-        <div id="otherFListModal" class="modal no-print">
-            <div class="modal-content">
-                <div class="close-icon" onclick="closeModal('otherFListModal')">✕</div>
-                <h3 style="color: #ec4899;">📜 शेतकरी यादी (वेगळे शेतकरी)</h3>
-
-                <div
-                    style="background:#fdf2f8; padding:15px; border-radius:12px; margin-bottom:15px; margin-top: 10px; text-align:center; border:1px solid #fbcfe8;">
-                    <span style="font-size:14px; font-weight:700; color:#be185d;">सर्वांचे एकूण देय: </span>
-                    <span id="otherFListGrandTotal" style="font-size:22px; font-weight:900; color:#db2777;">₹ 0</span>
-                </div>
-
-                <div class="table-container" style="max-height: 55vh; overflow-y: auto;">
-                    <table class="styled-table">
-                        <tbody id="otherFListBody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
+        <!-- 🌸 FARMER DETAIL LEDGER MODAL 🌸 -->
         <div id="otherFDetailModal" class="modal no-print">
-            <div class="modal-content">
+            <div class="modal-content" style="width: 96%; max-width: 600px; padding: 18px 14px; border-radius: 16px;">
                 <div class="close-icon" onclick="closeModal('otherFDetailModal')">✕</div>
-                <h3 style="color: #ec4899;" id="otherFDetailName">नाव</h3>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid #fbcfe8; padding-bottom:8px; padding-right:32px;">
+                    <h3 style="color: #db2777; margin:0;" id="otherFDetailName">नाव</h3>
+                    <button class="btn-action-small" style="background:#25d366; color:#fff; border:none; padding:4px 10px; border-radius:8px; font-weight:700;" onclick="shareOtherFCurrFarmerStatementWhatsApp()">📲 WhatsApp</button>
+                </div>
 
-                <div
-                    style="background:#fdf2f8; padding:15px; border-radius:12px; margin-bottom:15px; text-align:center; border:1px solid #fbcfe8;">
-                    <span style="font-size:14px; font-weight:700; color:#be185d;">एकूण देय बाकी: </span>
+                <div style="background:linear-gradient(135deg, #fdf2f8, #fce7f3); padding:12px; border-radius:12px; margin-bottom:12px; text-align:center; border:1px solid #fbcfe8;">
+                    <span style="font-size:12px; font-weight:700; color:#be185d;">एकूण देय बाकी (Due Balance): </span>
                     <span id="otherFDetailTotal" style="font-size:22px; font-weight:900; color:#db2777;">₹ 0</span>
                 </div>
 
@@ -987,76 +1463,10 @@
             </div>
         </div>
 
-        <div id="otherFPreviewModal" class="modal no-print">
-            <div class="modal-content">
-                <div class="close-icon" onclick="closeModal('otherFPreviewModal')">✕</div>
-                <h3 style="color: #ec4899;">👁️ Preview (वेगळे शेतकरी)</h3>
-
-                <div class="input-row" style="margin-bottom: 10px;">
-                    <div class="input-group">
-                        <label>तारीख (Date):</label>
-                        <input type="date" id="otherFPreviewDate" onchange="renderOtherFPreview()">
-                    </div>
-                </div>
-
-                <div
-                    style="background:#fdf2f8; padding:15px; border-radius:12px; margin-bottom:15px; text-align:center; border:1px solid #fbcfe8;">
-                    <span style="font-size:14px; font-weight:700; color:#be185d;">आजचे एकूण बिल: </span>
-                    <span id="otherFPreviewTotal" style="font-size:22px; font-weight:900; color:#db2777;">₹ 0</span>
-                </div>
-
-                <div class="table-container" style="max-height: 50vh; overflow-y: auto;">
-                    <table class="styled-table">
-                        <thead>
-                            <tr>
-                                <th>नाव</th>
-                                <th>प्रकार</th>
-                                <th style="text-align:right;">वजन x भाव</th>
-                                <th style="text-align:right;">देय (₹)</th>
-                                <th style="text-align:center;">⚙️</th>
-                            </tr>
-                        </thead>
-                        <tbody id="otherFPreviewBody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div id="otherFCommissionModal" class="modal no-print">
-            <div class="modal-content">
-                <div class="close-icon" onclick="closeModal('otherFCommissionModal')">✕</div>
-                <h3 style="color: #059669;">💰 कमिशन रिपोर्ट (इतर फुले)</h3>
-
-                <div style="display:flex; gap:10px; margin-bottom:15px;">
-                    <div
-                        style="flex:1; background:#f0fdf4; padding:15px; border-radius:12px; text-align:center; border:1px solid #bbf7d0;">
-                        <span
-                            style="font-size:12px; font-weight:700; color:#166534; display:block; margin-bottom:5px;">आजचे
-                            कमिशन</span>
-                        <span id="otherFCommToday" style="font-size:20px; font-weight:900; color:#15803d;">₹ 0</span>
-                    </div>
-                    <div
-                        style="flex:1; background:#ecfdf5; padding:15px; border-radius:12px; text-align:center; border:1px solid #a7f3d0;">
-                        <span
-                            style="font-size:12px; font-weight:700; color:#065f46; display:block; margin-bottom:5px;">एकूण
-                            कमिशन</span>
-                        <span id="otherFCommTotal" style="font-size:20px; font-weight:900; color:#047857;">₹ 0</span>
-                    </div>
-                </div>
-
-                <div class="table-container" style="max-height: 40vh; overflow-y: auto;">
-                    <table class="styled-table">
-                        <thead>
-                            <tr>
-                                <th style="text-align:left;">महिना</th>
-                                <th style="text-align:right;">कमिशन (₹)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="otherFCommMonthBody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+        <!-- Sibling modal placeholders for compatibility -->
+        <div id="otherFListModal" class="modal no-print" style="display:none;"></div>
+        <div id="otherFPreviewModal" class="modal no-print" style="display:none;"></div>
+        <div id="otherFCommissionModal" class="modal no-print" style="display:none;"></div>
 
         <div id="merchantHubModal" class="modal no-print">
             <div class="modal-content">
@@ -1724,6 +2134,7 @@
                 document.getElementById("mainAppTitle").innerText = "✨ Smart Billing Hub";
             }
             updateAlertBadge();
+            updateDashboard();
         }
         document.addEventListener("DOMContentLoaded", () => {
             if (sessionStorage.getItem("isLoggedIn") === "true") { currentUserRole = sessionStorage.getItem("userRole") || "staff"; unlockApp(); }
@@ -1848,6 +2259,46 @@
         // --- 🌟 END OFFLINE SYNC MANAGER 🌟 ---
 
 
+        function cleanFarmerName(str) {
+            if (!str) return "";
+            return String(str)
+                .split(' | ')[0]
+                .normalize('NFC')
+                .replace(/[\u200B-\u200D\uFEFF]/g, '')
+                .replace(/[\u00A0\s]+/g, ' ')
+                .replace(/\.\s*/g, '.')
+                .trim()
+                .toLowerCase();
+        }
+
+        function getFarmerBaseName(str) {
+            return cleanFarmerName(str).replace(/^\d+\./, '').trim();
+        }
+
+        function isFarmerHidden(name) {
+            if (!name) return false;
+            let cName = cleanFarmerName(name);
+            let baseName = getFarmerBaseName(name);
+            let numName = parseInt(cName) || null;
+
+            let hList = safeArray(hiddenFarmers);
+            for (let i = 0; i < hList.length; i++) {
+                let h = hList[i];
+                if (!h) continue;
+                let cH = cleanFarmerName(h);
+                if (cName === cH) return true;
+                
+                let baseH = getFarmerBaseName(h);
+                if (baseName && baseH && baseName === baseH) {
+                    let numH = parseInt(cH) || null;
+                    if (!numName || !numH || numName === numH) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         function getMergedFarmers(includeHidden = false) {
             let s = new Set();
             safeArray(farmers).forEach(x => { if (x && typeof x === 'string' && x.trim() !== '') s.add(x.trim()) });
@@ -1855,7 +2306,7 @@
             if (s.size === 0) defaultFarmersList.forEach(f => s.add(f));
             let list = Array.from(s).sort((a, b) => (parseInt(a) || 99999) - (parseInt(b) || 99999));
             if (includeHidden) return list;
-            return list.filter(f => !hiddenFarmers.includes(f));
+            return list.filter(f => !isFarmerHidden(f));
         }
 
         function getMergedMerchants() {
@@ -1874,13 +2325,13 @@
         }
 
         database.ref('farmers').on('value', s => { if (!s.exists()) { database.ref('farmers').set(defaultFarmersList); } else { farmers = safeArray(s.val()); localStorage.setItem('local_farmers', JSON.stringify(farmers)); } loadFarmerList(); if (document.getElementById("listModal").classList.contains("show")) generateFarmerStatus(); });
-        database.ref('hiddenFarmers').on('value', s => { hiddenFarmers = safeArray(s.val()); localStorage.setItem('local_hiddenFarmers', JSON.stringify(hiddenFarmers)); loadFarmerList(); if (document.getElementById("listModal").classList.contains("show")) generateFarmerStatus(); });
+        database.ref('hiddenFarmers').on('value', s => { hiddenFarmers = safeArray(s.val()); localStorage.setItem('local_hiddenFarmers', JSON.stringify(hiddenFarmers)); loadFarmerList(); if (document.getElementById("listModal").classList.contains("show")) generateFarmerStatus(); if (document.getElementById("hiddenFarmersModal").classList.contains("show")) renderHiddenFarmers(); if (document.getElementById("bulkEntryModal") && document.getElementById("bulkEntryModal").classList.contains("show")) renderBulkEntryList(); });
         database.ref('merchants').on('value', s => { if (!s.exists()) { database.ref('merchants').set(["Traders A"]); } else { merchants = safeArray(s.val()); localStorage.setItem('local_merchants', JSON.stringify(merchants)); } loadMerchantList(); if (document.getElementById("merchantListModal").classList.contains("show")) renderMerList(); });
         database.ref('bagPersons').on('value', s => { if (!s.exists()) { database.ref('bagPersons').set([]); } else { bagPersons = safeArray(s.val()); localStorage.setItem('local_bagPersons', JSON.stringify(bagPersons)); } loadBagPersonList(); if (document.getElementById("bagPersonListModal").classList.contains("show")) renderBagPersonList(); });
         database.ref('cropData').on('value', s => { cropDataDB = sanitizeData(s.val()); localStorage.setItem('local_cropData', JSON.stringify(cropDataDB)); updateDashboard(); syncRates(); loadFarmerList(); if (document.getElementById("listModal").classList.contains("show")) generateFarmerStatus(); });
         database.ref('merchantData').on('value', s => { merchantDB = sanitizeData(s.val()); localStorage.setItem('local_merchantData', JSON.stringify(merchantDB)); updateDashboard(); syncRates(); loadMerchantList(); if (document.getElementById("merchantListModal").classList.contains("show")) renderMerList(); });
         database.ref('bagData').on('value', s => { bagDB = sanitizeData(s.val()); localStorage.setItem('local_bagData', JSON.stringify(bagDB)); loadBagPersonList(); if (document.getElementById("bagPersonListModal").classList.contains("show")) renderBagPersonList(); });
-        database.ref('otherFarmersData').on('value', s => { otherFarmersDB = sanitizeData(s.val()); localStorage.setItem('local_otherFarmersData', JSON.stringify(otherFarmersDB)); if (typeof renderOtherFList === 'function' && document.getElementById("otherFModal") && document.getElementById("otherFModal").classList.contains("show")) renderOtherFList(); });
+        database.ref('otherFarmersData').on('value', s => { otherFarmersDB = sanitizeData(s.val()); localStorage.setItem('local_otherFarmersData', JSON.stringify(otherFarmersDB)); if (typeof updateOtherFBadge === 'function') updateOtherFBadge(); if (typeof refreshOtherFCurrentView === 'function' && document.getElementById("otherFModal") && document.getElementById("otherFModal").classList.contains("show")) refreshOtherFCurrentView(); });
 
         function getData() { return cropDataDB || []; } function saveData(d) { cropDataDB = sanitizeData(d); database.ref('cropData').set(cropDataDB); updateDashboard(); }
         function getMerchantDB() { return merchantDB || []; } function saveMerchantDB(d) { merchantDB = sanitizeData(d); database.ref('merchantData').set(merchantDB); updateDashboard(); }
@@ -1909,23 +2360,23 @@
         function renderBulkEntryList() {
             let d = val("bulkDate");
             let data = getData();
-            let farmers = getMergedFarmers();
+            let farmers = getMergedFarmers(false);
             let tbody = document.getElementById("bulkEntryBody");
             let html = "";
             farmers.forEach((f, index) => {
-                if (!f) return;
+                if (!f || isFarmerHidden(f)) return;
 
                 let existing = data.find(e => e && e.date === d && e.name === f && e.type === 'crop');
                 let inputHtml = "";
                 if (existing) {
                     inputHtml = `<div style="background:#dcfce7; color:#166534; padding:6px 10px; border-radius:6px; font-weight:700; font-size:13px; display:inline-block;">✅ ${existing.weight} kg</div>`;
                 } else {
-                    inputHtml = `<input type="number" class="bulk-weight-input" data-name="${f}" placeholder="0" style="width:100%; max-width:80px; padding:8px; border:2px solid #cbd5e1; border-radius:6px; text-align:right; font-weight:800; font-size:15px; color:#ea580c; outline:none; transition:border-color 0.2s;" onfocus="this.select(); this.style.borderColor='#0ea5e9';" onblur="this.style.borderColor='#cbd5e1';">`;
+                    inputHtml = `<input type="number" class="bulk-weight-input" data-name="${f}" placeholder="0" style="width:100%; max-width:85px; padding:8px 10px; border:2px solid #cbd5e1; border-radius:8px; text-align:right; font-weight:800; font-size:16px; color:#ea580c; outline:none; transition:border-color 0.2s;" onfocus="this.select(); this.style.borderColor='#0ea5e9';" onblur="this.style.borderColor='#cbd5e1';">`;
                 }
 
                 html += `<tr class="bulk-row">
                     <td style="font-weight:700; font-size:14px; color:#1e293b; padding:10px 12px;" class="bulk-name">${f}</td>
-                    <td style="text-align:right; padding:5px 12px;">
+                    <td style="text-align:right; padding:6px 12px;">
                         ${inputHtml}
                     </td>
                 </tr>`;
@@ -1997,6 +2448,7 @@
                     if (data.some(e => e && e.date === date && e.name === n && e.type === 'crop')) {
                         skipped.push(n);
                     } else {
+                        data = data.filter(e => !(e && e.date === date && cleanFarmerName(e.name) === cleanFarmerName(n) && e.type === 'no_crop'));
                         data.push({
                             id: Date.now() + count,
                             date: date,
@@ -2108,6 +2560,658 @@
                 document.getElementById("sumMerchantWt").innerText = `${tMw} Kg`;
             }
             updateAlertBadge();
+            updateWeightReminder();
+            if (typeof updateOtherFBadge === 'function') updateOtherFBadge();
+            if (document.getElementById("cropPredictionModal") && document.getElementById("cropPredictionModal").classList.contains("show")) renderCropPredictionModal();
+        }
+
+        // 🌟 WEIGHT PENDING REMINDER LOGIC 🌟
+        function getPendingFarmersForDate(dateStr) {
+            if (!dateStr) return { pending: [], completed: [], noCrop: [], total: 0 };
+            let allFarmers = getMergedFarmers(false);
+            let data = getData().filter(e => e && e.date === dateStr);
+            
+            let pending = [];
+            let completed = [];
+            let noCrop = [];
+            
+            allFarmers.forEach(f => {
+                let matchCrop = data.find(e => e.type === 'crop' && (cleanFarmerName(e.name) === cleanFarmerName(f) || (getFarmerBaseName(e.name) === getFarmerBaseName(f) && (parseInt(e.name) === parseInt(f) || !parseInt(e.name) || !parseInt(f)))));
+                if (matchCrop) {
+                    completed.push({ name: f, entry: matchCrop });
+                    return;
+                }
+                
+                let matchNoCrop = data.find(e => e.type === 'no_crop' && (cleanFarmerName(e.name) === cleanFarmerName(f) || (getFarmerBaseName(e.name) === getFarmerBaseName(f) && (parseInt(e.name) === parseInt(f) || !parseInt(e.name) || !parseInt(f)))));
+                if (matchNoCrop) {
+                    noCrop.push({ name: f, entry: matchNoCrop });
+                    return;
+                }
+                
+                pending.push(f);
+            });
+            
+            return {
+                pending: pending,
+                completed: completed,
+                noCrop: noCrop,
+                total: allFarmers.length
+            };
+        }
+
+        function markFarmerNoCrop(f) {
+            let remDate = document.getElementById("weightReminderDate") ? document.getElementById("weightReminderDate").value : "";
+            if (!remDate) remDate = document.getElementById("dateInput") ? document.getElementById("dateInput").value : "";
+            if (!remDate) remDate = new Date().toISOString().slice(0, 10);
+            
+            let data = getData();
+            data = data.filter(e => !(e && e.date === remDate && cleanFarmerName(e.name) === cleanFarmerName(f) && e.type === 'no_crop'));
+            data.push({
+                id: Date.now(),
+                date: remDate,
+                name: f,
+                type: 'no_crop'
+            });
+            saveData(data);
+        }
+
+        function unmarkFarmerNoCrop(f) {
+            let remDate = document.getElementById("weightReminderDate") ? document.getElementById("weightReminderDate").value : "";
+            if (!remDate) remDate = document.getElementById("dateInput") ? document.getElementById("dateInput").value : "";
+            if (!remDate) remDate = new Date().toISOString().slice(0, 10);
+            
+            let data = getData().filter(e => !(e && e.date === remDate && cleanFarmerName(e.name) === cleanFarmerName(f) && e.type === 'no_crop'));
+            saveData(data);
+        }
+
+        function updateWeightReminder() {
+            let selDate = document.getElementById("dateInput") ? document.getElementById("dateInput").value : "";
+            if (!selDate) selDate = new Date().toISOString().slice(0, 10);
+            
+            let info = getPendingFarmersForDate(selDate);
+            let banner = document.getElementById("weightReminderBanner");
+            let fastBadge = document.getElementById("fastEntryReminderBadge");
+            let actionBadge = document.getElementById("reminderActionBadge");
+            
+            if (info.pending.length > 0) {
+                if (banner) {
+                    banner.style.display = "block";
+                    let sub = document.getElementById("weightReminderSubtitle");
+                    if (sub) {
+                        let dDisplay = formatDate(selDate);
+                        sub.innerText = `${dDisplay} रोजी ${info.pending.length} शेतकऱ्यांची वजने भरणे बाकी आहेत.`;
+                    }
+                    let bBadge = document.getElementById("weightReminderBadge");
+                    if (bBadge) bBadge.innerText = `${info.pending.length} बाकी`;
+                }
+                if (fastBadge) {
+                    fastBadge.innerText = info.pending.length;
+                    fastBadge.style.display = "flex";
+                }
+                if (actionBadge) {
+                    actionBadge.innerText = info.pending.length;
+                    actionBadge.style.display = "flex";
+                }
+            } else {
+                if (banner) banner.style.display = "none";
+                if (fastBadge) fastBadge.style.display = "none";
+                if (actionBadge) actionBadge.style.display = "none";
+            }
+
+            if (document.getElementById("weightReminderModal") && document.getElementById("weightReminderModal").classList.contains("show")) {
+                renderWeightReminderModal();
+            }
+        }
+
+        function openWeightReminderModal() {
+            openModal('weightReminderModal');
+            let selDate = document.getElementById("dateInput") ? document.getElementById("dateInput").value : "";
+            if (!selDate) selDate = new Date().toISOString().slice(0, 10);
+            let dateInput = document.getElementById("weightReminderDate");
+            if (dateInput) dateInput.value = selDate;
+            renderWeightReminderModal();
+        }
+
+        function renderWeightReminderModal() {
+            let dateInput = document.getElementById("weightReminderDate");
+            let selDate = dateInput ? dateInput.value : "";
+            if (!selDate) selDate = new Date().toISOString().slice(0, 10);
+            
+            let info = getPendingFarmersForDate(selDate);
+            
+            if (document.getElementById("remTotalCount")) document.getElementById("remTotalCount").innerText = info.total;
+            if (document.getElementById("remCompletedCount")) document.getElementById("remCompletedCount").innerText = info.completed.length;
+            if (document.getElementById("remCompletedCount2")) document.getElementById("remCompletedCount2").innerText = info.completed.length;
+            if (document.getElementById("remNoCropCount")) document.getElementById("remNoCropCount").innerText = info.noCrop.length;
+            if (document.getElementById("remNoCropCount2")) document.getElementById("remNoCropCount2").innerText = info.noCrop.length;
+            if (document.getElementById("remPendingCount")) document.getElementById("remPendingCount").innerText = info.pending.length;
+            if (document.getElementById("pendingListBadge")) document.getElementById("pendingListBadge").innerText = `${info.pending.length} शिल्लक`;
+            
+            let pBody = document.getElementById("weightReminderPendingBody");
+            if (pBody) {
+                if (info.pending.length === 0) {
+                    pBody.innerHTML = `<tr><td colspan="2" style="text-align:center; padding:20px; color:#16a34a; font-weight:700;">🎉 या तारखेची सर्व शेतकऱ्यांची वजने भरून पूर्ण झाली आहेत!</td></tr>`;
+                } else {
+                    let pHtml = "";
+                    info.pending.forEach(f => {
+                        pHtml += `<tr class="bulk-row">
+                            <td style="font-weight:700; font-size:14px; color:#1e293b; padding:10px 8px;">${f}</td>
+                            <td style="text-align:right; padding:6px 8px; white-space:nowrap;">
+                                <button class="btn-action-small bg-gradient-orange" style="padding:6px 10px; font-size:12px; font-weight:700; border-radius:6px; margin-right:4px;" onclick="selectFarmerForEntry('${f}')">➕ वजन भरा</button>
+                                <button class="btn-action-small" style="background:#64748b; color:#fff; padding:6px 10px; font-size:12px; font-weight:700; border-radius:6px;" onclick="markFarmerNoCrop('${f}')">🚫 माल नाही</button>
+                            </td>
+                        </tr>`;
+                    });
+                    pBody.innerHTML = pHtml;
+                }
+            }
+            
+            let cBody = document.getElementById("weightReminderCompletedBody");
+            if (cBody) {
+                if (info.completed.length === 0) {
+                    cBody.innerHTML = `<tr><td colspan="2" style="text-align:center; padding:15px; color:#94a3b8; font-weight:600;">या तारखेला अद्याप कोणाचेही वजन भरलेले नाही.</td></tr>`;
+                } else {
+                    let cHtml = "";
+                    info.completed.forEach(item => {
+                        let e = item.entry || {};
+                        cHtml += `<tr>
+                            <td style="font-weight:600; font-size:13px; color:#334155; padding:8px 12px;">${item.name}</td>
+                            <td style="text-align:right; font-weight:700; font-size:13px; color:#059669; padding:8px 12px;">✅ ${e.weight || 0} kg <span style="font-size:11px; color:#64748b;">(@ ₹${e.rate || 0})</span></td>
+                        </tr>`;
+                    });
+                    cBody.innerHTML = cHtml;
+                }
+            }
+
+            let ncBody = document.getElementById("weightReminderNoCropBody");
+            if (ncBody) {
+                if (info.noCrop.length === 0) {
+                    ncBody.innerHTML = `<tr><td colspan="2" style="text-align:center; padding:15px; color:#94a3b8; font-weight:600;">कोणत्याही शेतकऱ्याला 'माल नाही' मार्क केलेले नाही.</td></tr>`;
+                } else {
+                    let ncHtml = "";
+                    info.noCrop.forEach(item => {
+                        ncHtml += `<tr>
+                            <td style="font-weight:600; font-size:13px; color:#64748b; padding:8px 12px;">${item.name} <span style="font-size:11px; color:#94a3b8;">(माल नाही)</span></td>
+                            <td style="text-align:right; padding:6px 12px; white-space:nowrap;">
+                                <button class="btn-action-small bg-gradient-blue" style="padding:4px 8px; font-size:11px; font-weight:700; border-radius:4px; margin-right:4px;" onclick="selectFarmerForEntry('${item.name}')">वजन भरा</button>
+                                <button class="small-btn" style="background:#e2e8f0; color:#475569; padding:4px 8px; font-size:11px; border-radius:4px;" onclick="unmarkFarmerNoCrop('${item.name}')">↩️ रद्द करा</button>
+                            </td>
+                        </tr>`;
+                    });
+                    ncBody.innerHTML = ncHtml;
+                }
+            }
+        }
+
+        function goToBulkEntryFromReminder() {
+            let remDate = document.getElementById("weightReminderDate").value;
+            closeModal('weightReminderModal');
+            openBulkEntryModal();
+            if (remDate) {
+                document.getElementById("bulkDate").value = remDate;
+                onBulkDateChange();
+            }
+        }
+
+        function selectFarmerForEntry(f) {
+            let remDate = document.getElementById("weightReminderDate").value;
+            closeModal('weightReminderModal');
+            if (remDate && document.getElementById("dateInput")) {
+                document.getElementById("dateInput").value = remDate;
+                onDateChange();
+            }
+            let input = document.getElementById("farmerName");
+            if (input) {
+                input.value = f;
+                autoSelectFarmerName();
+            }
+            let wtInput = document.getElementById("weight");
+            if (wtInput) {
+                setTimeout(() => wtInput.focus(), 200);
+            }
+        }
+
+        let showRemCompleted = false;
+        function toggleReminderCompletedList() {
+            showRemCompleted = !showRemCompleted;
+            let container = document.getElementById("remCompletedContainer");
+            let arrow = document.getElementById("remCompletedArrow");
+            if (container) container.style.display = showRemCompleted ? "block" : "none";
+            if (arrow) arrow.innerText = showRemCompleted ? "▲" : "▼";
+        }
+
+        let showRemNoCrop = false;
+        function toggleReminderNoCropList() {
+            showRemNoCrop = !showRemNoCrop;
+            let container = document.getElementById("remNoCropContainer");
+            let arrow = document.getElementById("remNoCropArrow");
+            if (container) container.style.display = showRemNoCrop ? "block" : "none";
+            if (arrow) arrow.innerText = showRemNoCrop ? "▲" : "▼";
+        }
+
+        // 🌟 SMART CROP PREDICTION LOGIC 🌟
+        function analyzeAndPredictCrop(targetDate) {
+            if (!targetDate) targetDate = new Date().toISOString().slice(0, 10);
+            
+            let allActiveFarmers = getMergedFarmers(false);
+            let allData = getData();
+            
+            // 1. Target Day Crop & No-Crop Data
+            let todayCrops = allData.filter(e => e && e.type === 'crop' && e.date === targetDate);
+            let todayNoCrops = allData.filter(e => e && e.type === 'no_crop' && e.date === targetDate);
+            let todayFarmerWt = {};
+            todayCrops.forEach(e => {
+                let nKey = cleanFarmerName(e.name);
+                todayFarmerWt[nKey] = (todayFarmerWt[nKey] || 0) + (Number(e.weight) || 0);
+            });
+            let todayNoCropSet = new Set(todayNoCrops.map(e => cleanFarmerName(e.name)));
+            
+            // 2. Find Most Recent Operating Dates before targetDate
+            let uniquePastDates = Array.from(new Set(
+                allData.filter(e => e && e.type === 'crop' && e.date && e.date < targetDate).map(e => e.date)
+            )).sort((a, b) => b.localeCompare(a));
+            
+            let prevDate = uniquePastDates[0] || "";
+            
+            // Previous Day Weights
+            let prevFarmerWt = {};
+            let prevDayTotal = 0;
+            if (prevDate) {
+                allData.filter(e => e && e.type === 'crop' && e.date === prevDate).forEach(e => {
+                    let nKey = cleanFarmerName(e.name);
+                    let w = Number(e.weight) || 0;
+                    prevFarmerWt[nKey] = (prevFarmerWt[nKey] || 0) + w;
+                    prevDayTotal += w;
+                });
+            }
+            
+            // Calculate how many active farmers have entered today
+            let countEntered = 0;
+            let grandActualToday = 0;
+            allActiveFarmers.forEach(f => {
+                let fKey = cleanFarmerName(f);
+                if (todayFarmerWt[fKey] !== undefined) {
+                    countEntered++;
+                    grandActualToday += todayFarmerWt[fKey];
+                }
+            });
+
+            // ⚠️ अट: फक्त १ शेतकऱ्यावर अंदाज ठरवू नका, ५-८ शेतकऱ्यांच्या वजनावर अंदाज ठरवा!
+            const MIN_SAMPLE = Math.min(5, allActiveFarmers.length);
+
+            if (countEntered < MIN_SAMPLE) {
+                let farmerBreakdown = [];
+                let countPending = 0;
+                let countNoCrop = 0;
+                
+                allActiveFarmers.forEach(f => {
+                    let fKey = cleanFarmerName(f);
+                    let yWt = prevFarmerWt[fKey] || 0;
+                    
+                    if (todayFarmerWt[fKey] !== undefined) {
+                        let actWt = todayFarmerWt[fKey];
+                        farmerBreakdown.push({
+                            name: f,
+                            prevWt: yWt,
+                            todayWt: actWt,
+                            predictedWt: actWt,
+                            hasEstimate: false,
+                            status: 'entered',
+                            diffPct: yWt > 0 ? Math.round(((actWt - yWt) / yWt) * 100) : 0
+                        });
+                    } else if (todayNoCropSet.has(fKey)) {
+                        countNoCrop++;
+                        farmerBreakdown.push({
+                            name: f,
+                            prevWt: yWt,
+                            todayWt: 0,
+                            predictedWt: 0,
+                            hasEstimate: false,
+                            status: 'no_crop',
+                            diffPct: 0
+                        });
+                    } else {
+                        countPending++;
+                        farmerBreakdown.push({
+                            name: f,
+                            prevWt: yWt,
+                            todayWt: null,
+                            predictedWt: 0,
+                            hasEstimate: false,
+                            status: 'pending',
+                            diffPct: 0
+                        });
+                    }
+                });
+                
+                farmerBreakdown.sort((a, b) => {
+                    let order = { 'pending': 1, 'entered': 2, 'no_crop': 3 };
+                    if (order[a.status] !== order[b.status]) return order[a.status] - order[b.status];
+                    return (parseInt(a.name) || 99999) - (parseInt(b.name) || 99999);
+                });
+                
+                return {
+                    targetDate: targetDate,
+                    prevDate: prevDate,
+                    prevDayTotal: Math.round(prevDayTotal * 10) / 10,
+                    todayActual: Math.round(grandActualToday * 10) / 10,
+                    predictedPending: 0,
+                    grandProjected: 0,
+                    rangeMin: 0,
+                    rangeMax: 0,
+                    trendRatio: 1.0,
+                    trendPct: 0,
+                    hasSampleTrend: false,
+                    sampleMatchedCount: 0,
+                    countEntered: countEntered,
+                    countPending: countPending,
+                    countPendingEstimated: 0,
+                    countPendingNoPrev: 0,
+                    countNoCrop: countNoCrop,
+                    minRequired: MIN_SAMPLE,
+                    isReady: false,
+                    totalFarmers: allActiveFarmers.length,
+                    farmerBreakdown: farmerBreakdown
+                };
+            }
+
+            // 3. Trend Calculation from Today's Sample (5-8+ शेतकरी) vs Yesterday
+            let sampleTodayTotal = 0;
+            let samplePrevTotal = 0;
+            let sampleMatchedCount = 0;
+            
+            allActiveFarmers.forEach(f => {
+                let fKey = cleanFarmerName(f);
+                if (todayFarmerWt[fKey] !== undefined) {
+                    let tWt = todayFarmerWt[fKey];
+                    let pWt = prevFarmerWt[fKey] || 0;
+                    if (pWt > 0 && tWt > 0) {
+                        sampleTodayTotal += tWt;
+                        samplePrevTotal += pWt;
+                        sampleMatchedCount++;
+                    }
+                }
+            });
+            
+            let trendRatio = 1.0;
+            let trendPct = 0;
+            let hasSampleTrend = false;
+            
+            if (sampleMatchedCount >= 1 && samplePrevTotal > 0) {
+                trendRatio = sampleTodayTotal / samplePrevTotal;
+                // Clamp between 0.6 and 1.8 for stability
+                trendRatio = Math.max(0.6, Math.min(1.8, trendRatio));
+                trendPct = Math.round((trendRatio - 1) * 100);
+                hasSampleTrend = true;
+            }
+            
+            // 4. Per-Farmer Prediction
+            // ⚠️ अट: ज्यांचा काल माल नव्हता त्यांचा आज अंदाज लावू नका
+            let farmerBreakdown = [];
+            let grandPredictedPending = 0;
+            let countPending = 0;
+            let countPendingEstimated = 0;
+            let countPendingNoPrev = 0;
+            let countNoCrop = 0;
+            
+            allActiveFarmers.forEach(f => {
+                let fKey = cleanFarmerName(f);
+                let yWt = prevFarmerWt[fKey] || 0;
+                
+                if (todayFarmerWt[fKey] !== undefined) {
+                    let actWt = todayFarmerWt[fKey];
+                    farmerBreakdown.push({
+                        name: f,
+                        prevWt: yWt,
+                        todayWt: actWt,
+                        predictedWt: actWt,
+                        hasEstimate: true,
+                        status: 'entered',
+                        diffPct: yWt > 0 ? Math.round(((actWt - yWt) / yWt) * 100) : 0
+                    });
+                } else if (todayNoCropSet.has(fKey)) {
+                    countNoCrop++;
+                    farmerBreakdown.push({
+                        name: f,
+                        prevWt: yWt,
+                        todayWt: 0,
+                        predictedWt: 0,
+                        hasEstimate: false,
+                        status: 'no_crop',
+                        diffPct: 0
+                    });
+                } else {
+                    countPending++;
+                    if (yWt > 0) {
+                        // काल माल होता -> आजचा ५-८ सॅम्पलवर आधारित अंदाज
+                        let pred = Math.round(yWt * trendRatio * 10) / 10;
+                        grandPredictedPending += pred;
+                        countPendingEstimated++;
+                        farmerBreakdown.push({
+                            name: f,
+                            prevWt: yWt,
+                            todayWt: null,
+                            predictedWt: pred,
+                            hasEstimate: true,
+                            status: 'pending',
+                            diffPct: Math.round(((pred - yWt) / yWt) * 100)
+                        });
+                    } else {
+                        // काल माल नव्हता -> अंदाज लावणार नाही!
+                        countPendingNoPrev++;
+                        farmerBreakdown.push({
+                            name: f,
+                            prevWt: 0,
+                            todayWt: null,
+                            predictedWt: 0,
+                            hasEstimate: false,
+                            status: 'pending',
+                            diffPct: 0
+                        });
+                    }
+                }
+            });
+            
+            farmerBreakdown.sort((a, b) => {
+                let order = { 'pending': 1, 'entered': 2, 'no_crop': 3 };
+                if (order[a.status] !== order[b.status]) return order[a.status] - order[b.status];
+                if (a.status === 'pending' && b.status === 'pending') {
+                    if (a.hasEstimate !== b.hasEstimate) return a.hasEstimate ? -1 : 1;
+                }
+                return (parseInt(a.name) || 99999) - (parseInt(b.name) || 99999);
+            });
+            
+            let grandTotalProjected = Math.round((grandActualToday + grandPredictedPending) * 10) / 10;
+            let rangeMin = Math.round(grandTotalProjected * 0.94);
+            let rangeMax = Math.round(grandTotalProjected * 1.06);
+            
+            return {
+                targetDate: targetDate,
+                prevDate: prevDate,
+                prevDayTotal: Math.round(prevDayTotal * 10) / 10,
+                todayActual: Math.round(grandActualToday * 10) / 10,
+                predictedPending: Math.round(grandPredictedPending * 10) / 10,
+                grandProjected: grandTotalProjected,
+                rangeMin: rangeMin,
+                rangeMax: rangeMax,
+                trendRatio: trendRatio,
+                trendPct: trendPct,
+                hasSampleTrend: hasSampleTrend,
+                sampleMatchedCount: sampleMatchedCount,
+                countEntered: countEntered,
+                countPending: countPending,
+                countPendingEstimated: countPendingEstimated,
+                countPendingNoPrev: countPendingNoPrev,
+                countNoCrop: countNoCrop,
+                minRequired: MIN_SAMPLE,
+                isReady: true,
+                totalFarmers: allActiveFarmers.length,
+                farmerBreakdown: farmerBreakdown
+            };
+        }
+
+        function openCropPredictionModal() {
+            openModal('cropPredictionModal');
+            let selDate = document.getElementById("dateInput") ? document.getElementById("dateInput").value : "";
+            if (!selDate) selDate = new Date().toISOString().slice(0, 10);
+            let dateInput = document.getElementById("predictDate");
+            if (dateInput) dateInput.value = selDate;
+            renderCropPredictionModal();
+        }
+
+        function renderCropPredictionModal() {
+            let dateInput = document.getElementById("predictDate");
+            let selDate = dateInput ? dateInput.value : "";
+            if (!selDate) selDate = new Date().toISOString().slice(0, 10);
+            
+            let info = analyzeAndPredictCrop(selDate);
+            
+            let grandEl = document.getElementById("predGrandTotal");
+            let rangeEl = document.getElementById("predRangeText");
+            let prevDateLabel = document.getElementById("predPrevDateLabel");
+            let prevTotalEl = document.getElementById("predPrevTotal");
+            let todayEnteredEl = document.getElementById("predTodayEntered");
+            let todayCountEl = document.getElementById("predTodayCount");
+            let trendEl = document.getElementById("predTrendPct");
+            let trendTxtEl = document.getElementById("predTrendText");
+            let insightEl = document.getElementById("predInsightBox");
+            let countBadgeEl = document.getElementById("predFarmerCountBadge");
+            let tbody = document.getElementById("cropPredictionBody");
+            
+            if (prevDateLabel) {
+                prevDateLabel.innerText = info.prevDate ? `कालचा माल (${formatDate(info.prevDate)})` : "कालचा माल";
+            }
+            if (prevTotalEl) prevTotalEl.innerText = `${info.prevDayTotal} Kg`;
+            if (todayEnteredEl) todayEnteredEl.innerText = `${info.todayActual} Kg`;
+            if (todayCountEl) todayCountEl.innerText = `(${info.countEntered} शेतकरी भरले)`;
+            
+            if (info.countEntered === 0) {
+                // ⚠️ आज एकही नोंद नाही - अंदाज दाखवू नका!
+                if (grandEl) grandEl.innerText = "—";
+                if (rangeEl) rangeEl.innerText = "(किमान ५-८ शेतकऱ्यांची वजने भरल्यावर अंदाज दिसेल)";
+                
+                if (trendEl && trendTxtEl) {
+                    trendEl.innerText = "—";
+                    trendEl.style.color = "#94a3b8";
+                    trendTxtEl.innerText = "नोंद नाही";
+                    trendTxtEl.style.color = "#94a3b8";
+                }
+                
+                if (insightEl) {
+                    insightEl.style.background = "#f8fafc";
+                    insightEl.style.borderColor = "#e2e8f0";
+                    insightEl.style.color = "#475569";
+                    insightEl.innerHTML = `⚠️ <b>नोंद आवश्यक:</b> आज अद्याप एकाही शेतकऱ्याची वजन नोंद झालेली नाही.<br><span style="font-size:12px; color:#64748b;">अचूक ट्रेंड आणि एकूण माल अंदाज पाहण्यासाठी किमान <b>५ ते ८ शेतकऱ्यांची</b> वजने भरणे आवश्यक आहे.</span>`;
+                }
+            } else if (!info.isReady) {
+                // ⚠️ १ ते ४ शेतकरी भरले आहेत - फक्त १-२ शेतकऱ्यांवर अंदाज ठरवू नका!
+                if (grandEl) grandEl.innerText = "—";
+                let remainingNeeded = info.minRequired - info.countEntered;
+                if (rangeEl) rangeEl.innerText = `(अचूक अंदाजासाठी किमान ५ शेतकरी आवश्यक • सध्या ${info.countEntered}/${info.minRequired} भरले)`;
+                
+                if (trendEl && trendTxtEl) {
+                    trendEl.innerText = `${info.countEntered}/${info.minRequired}`;
+                    trendEl.style.color = "#f97316";
+                    trendTxtEl.innerText = `आणखी ${remainingNeeded} आवश्यक`;
+                    trendTxtEl.style.color = "#ea580c";
+                }
+                
+                if (insightEl) {
+                    insightEl.style.background = "#fffbeb";
+                    insightEl.style.borderColor = "#fef3c7";
+                    insightEl.style.color = "#92400e";
+                    insightEl.innerHTML = `💡 <b>माहिती अपुरी (${info.countEntered}/${info.minRequired}):</b> फक्त १-२ शेतकऱ्यांवरून संपूर्ण बाजाराचा अंदाज ठरवणे अचूक नसते. योग्य कल (Trend) आणि माल अंदाज मोजण्यासाठी किमान <b>५ ते ८ शेतकऱ्यांची</b> वजने आवश्यक आहेत.<br><span style="font-size:11.5px; color:#b45309;">अंदाज सक्रिय करण्यासाठी आणखी <b>${remainingNeeded}</b> शेतकऱ्यांचे वजन भरा.</span>`;
+                }
+            } else {
+                // आज ५ किंवा अधिक शेतकरी भरले आहेत - अचूक अंदाज दाखवा!
+                if (grandEl) grandEl.innerText = `~${info.grandProjected} Kg`;
+                if (rangeEl) rangeEl.innerText = `(अंदाजे Range: ${info.rangeMin} - ${info.rangeMax} Kg)`;
+                
+                if (trendEl && trendTxtEl) {
+                    if (info.sampleMatchedCount >= 1) {
+                        if (info.trendPct > 0) {
+                            trendEl.innerText = `+${info.trendPct}%`;
+                            trendEl.style.color = "#10b981";
+                            trendTxtEl.innerText = "📈 वाढ";
+                            trendTxtEl.style.color = "#059669";
+                        } else if (info.trendPct < 0) {
+                            trendEl.innerText = `${info.trendPct}%`;
+                            trendEl.style.color = "#f97316";
+                            trendTxtEl.innerText = "📉 घट";
+                            trendTxtEl.style.color = "#ea580c";
+                        } else {
+                            trendEl.innerText = "0%";
+                            trendEl.style.color = "#7c3aed";
+                            trendTxtEl.innerText = "स्थिर";
+                            trendTxtEl.style.color = "#8b5cf6";
+                        }
+                    } else {
+                        trendEl.innerText = "—";
+                        trendEl.style.color = "#7c3aed";
+                        trendTxtEl.innerText = "स्थिर";
+                        trendTxtEl.style.color = "#8b5cf6";
+                    }
+                }
+                
+                if (insightEl) {
+                    insightEl.style.background = "#f5f3ff";
+                    insightEl.style.borderColor = "#ddd6fe";
+                    insightEl.style.color = "#5b21b6";
+                    
+                    let noPrevNote = info.countPendingNoPrev > 0 ? `<br><span style="font-size:11px; color:#6d28d9;">*(ज्यांचा काल माल नव्हता अशा <b>${info.countPendingNoPrev}</b> शेतकऱ्यांचा आज अंदाज धरलेला नाही)*</span>` : "";
+                    
+                    if (info.sampleMatchedCount >= 1) {
+                        let trendDesc = info.trendPct > 0 ? `<b style="color:#059669;">+${info.trendPct}% वाढ</b>` : (info.trendPct < 0 ? `<b style="color:#ea580c;">${info.trendPct}% घट</b>` : "<b>स्थिर</b>");
+                        insightEl.innerHTML = `💡 <b>विश्लेषण:</b> आज भरलेल्या <b>${info.countEntered}</b> शेतकऱ्यांच्या वजनावरून (५-८ सॅम्पल ट्रेंड) कालच्या तुलनेत सरासरी ${trendDesc} दिसून येत आहे. काल माल दिलेल्या उर्वरित <b>${info.countPendingEstimated}</b> शेतकऱ्यांचा अपेक्षित माल <b>~${info.predictedPending} Kg</b> असून, आजचा एकूण अपेक्षित माल सुमारे <b style="color:#7c3aed; font-size:14px;">~${info.grandProjected} Kg</b> (${info.rangeMin} ते ${info.rangeMax} Kg) असू शकतो.${noPrevNote}`;
+                    } else {
+                        insightEl.innerHTML = `💡 <b>विश्लेषण:</b> आज <b>${info.countEntered}</b> शेतकऱ्यांची नोंद झाली आहे. काल माल दिलेल्या बाकीच्या <b>${info.countPendingEstimated}</b> शेतकऱ्यांच्या कालच्या वजनानुसार अंदाजे <b>~${info.predictedPending} Kg</b> माल अपेक्षित असून, एकूण सुमारे <b style="color:#7c3aed; font-size:14px;">~${info.grandProjected} Kg</b> माल जमा होऊ शकतो.${noPrevNote}`;
+                    }
+                }
+            }
+            
+            if (countBadgeEl) {
+                countBadgeEl.innerText = `${info.countPending} बाकी | ${info.countEntered} भरले`;
+            }
+            
+            if (tbody) {
+                let html = "";
+                info.farmerBreakdown.forEach(item => {
+                    let statusBadge = "";
+                    let actOrPredText = "";
+                    
+                    if (item.status === 'entered') {
+                        statusBadge = `<span style="background:#dcfce7; color:#15803d; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:800;">✅ आलेला</span>`;
+                        let diffText = item.diffPct !== 0 ? `<br><span style="font-size:10px; color:${item.diffPct > 0 ? '#16a34a' : '#ea580c'}; font-weight:700;">(${item.diffPct > 0 ? '+' : ''}${item.diffPct}%)</span>` : "";
+                        actOrPredText = `<b style="color:#059669; font-size:14px;">${item.todayWt} Kg</b>${diffText}`;
+                    } else if (item.status === 'no_crop') {
+                        statusBadge = `<span style="background:#f1f5f9; color:#64748b; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">🚫 माल नाही</span>`;
+                        actOrPredText = `<span style="color:#94a3b8; font-size:13px;">-</span>`;
+                    } else {
+                        statusBadge = `<button class="btn-action-small bg-gradient-orange" style="padding:4px 8px; font-size:11px; font-weight:700; border-radius:6px;" onclick="closeModal('cropPredictionModal'); selectFarmerForEntry('${item.name}')">➕ भरा</button>`;
+                        
+                        if (info.countEntered === 0) {
+                            actOrPredText = `<span style="color:#94a3b8; font-size:13px;">—</span>`;
+                        } else if (!info.isReady) {
+                            actOrPredText = `<span style="color:#94a3b8; font-size:11px; font-weight:600;">५ नोंदी आवश्यक</span>`;
+                        } else if (!item.hasEstimate) {
+                            actOrPredText = `<span style="color:#94a3b8; font-size:11.5px; font-weight:600;">काल माल नव्हता</span>`;
+                        } else {
+                            let diffText = item.diffPct !== 0 ? `<br><span style="font-size:10px; color:${item.diffPct > 0 ? '#16a34a' : '#ea580c'}; font-weight:700;">(${item.diffPct > 0 ? '+' : ''}${item.diffPct}%)</span>` : "";
+                            actOrPredText = `<b style="color:#7c3aed; font-size:14px;">~${item.predictedWt} Kg</b>${diffText}`;
+                        }
+                    }
+                    
+                    let prevText = item.prevWt > 0 ? `${item.prevWt} Kg` : `<span style="color:#cbd5e1;">-</span>`;
+                    
+                    html += `<tr>
+                        <td style="font-weight:700; font-size:13px; color:#1e293b; padding:8px 10px;">${item.name}</td>
+                        <td style="text-align:right; font-weight:600; font-size:13px; color:#64748b; padding:8px 10px;">${prevText}</td>
+                        <td style="text-align:right; padding:8px 10px;">${actOrPredText}</td>
+                        <td style="text-align:center; padding:8px 10px;">${statusBadge}</td>
+                    </tr>`;
+                });
+                tbody.innerHTML = html;
+            }
         }
 
         function checkRateDiscrepancies() {
@@ -2262,6 +3366,7 @@
             let mArr = safeArray(farmers); if (!mArr.includes(n)) { mArr.push(n); database.ref('farmers').set(mArr); }
             let data = getData();
             if (data.some(e => e && e.date === d && e.name === n && e.type === 'crop')) { alert(`⚠️ ${n} ची आजची (${formatDate(d)}) खरेदी आधीच भरलेली आहे!\nएकाच दिवशी डबल एंट्री करता येणार नाही.`); return; }
+            data = data.filter(e => !(e && e.date === d && cleanFarmerName(e.name) === cleanFarmerName(n) && e.type === 'no_crop'));
             data.push({ id: Date.now(), date: d, name: n, type: 'crop', weight: w, rate: r, total: Math.floor((w * r) / 5) * 5 }); saveData(data);
             document.getElementById("weight").value = ""; document.getElementById("farmerName").value = ""; let btn = document.getElementById("mainBtn"); btn.innerText = "✅ Saved!"; setTimeout(() => { btn.innerHTML = "✅ Save Entry"; document.getElementById("farmerName").focus(); }, 1000);
         }
@@ -2724,7 +3829,7 @@
                     if (selMonth && !hasDataForMonth && total === 0 && totalAdv === 0) return;
                     if (total > 0) allFarmersGrandTotal += total;
 
-                    if (safeArray(hiddenFarmers).includes(f)) return;
+                    if (isFarmerHidden(f)) return;
 
                     let btns = listMode ? `<div style='float:right'><button class='manage-btn' style='color:#f59e0b; margin-right:5px;' title='नाव लपवा' onclick="hideFarmerName('${f}')">🚫</button><button class='manage-btn' onclick="editFarmerName('${f}')">✎</button><button class='manage-btn' style='color:#ef4444;' onclick="delFarmerName('${f}')">🗑</button></div>` : "";
                     let badgeClass = "badge-green"; let styleStr = ""; let prefix = "₹ ";
@@ -2775,20 +3880,32 @@
 
         function hideFarmerName(n) {
             let arr = safeArray(hiddenFarmers);
-            if (!arr.includes(n)) {
-                arr.push(n);
+            let nTrim = n.trim();
+            if (!arr.some(h => cleanFarmerName(h) === cleanFarmerName(nTrim))) {
+                arr.push(nTrim);
                 hiddenFarmers = arr; // Update locally immediately
+                localStorage.setItem('local_hiddenFarmers', JSON.stringify(arr));
                 database.ref('hiddenFarmers').set(arr);
                 generateFarmerStatus(); // Update UI immediately
+                loadFarmerList();
+                if (document.getElementById("bulkEntryModal") && document.getElementById("bulkEntryModal").classList.contains("show")) {
+                    renderBulkEntryList();
+                }
             }
         }
 
         function unhideFarmerName(n) {
-            let arr = safeArray(hiddenFarmers).filter(f => f !== n);
+            let nTrim = n.trim();
+            let arr = safeArray(hiddenFarmers).filter(h => cleanFarmerName(h) !== cleanFarmerName(nTrim) && getFarmerBaseName(h) !== getFarmerBaseName(nTrim));
             hiddenFarmers = arr; // Update locally immediately
+            localStorage.setItem('local_hiddenFarmers', JSON.stringify(arr));
             database.ref('hiddenFarmers').set(arr);
             if (document.getElementById("hiddenFarmersModal").classList.contains("show")) renderHiddenFarmers();
             generateFarmerStatus(); // Update UI immediately
+            loadFarmerList();
+            if (document.getElementById("bulkEntryModal") && document.getElementById("bulkEntryModal").classList.contains("show")) {
+                renderBulkEntryList();
+            }
         }
 
         function renderHiddenFarmers() {
@@ -3327,11 +4444,209 @@
             window.open("https://wa.me/?text=" + encodeURIComponent(msg), '_blank');
         }
 
-        // 🌸 OTHER FARMERS LOGIC 🌸
+        // 🌸 PREMIUM OTHER FLOWERS (इतर फुले) HUB LOGIC 🌸
+        let currentOtherFTab = 'entry';
+        const OTHER_FLOWER_NAMES = {
+            'पि': 'पिवळा झेंडू',
+            'के': 'केशरी झेंडू',
+            'पा': 'पांढरा शेवंती',
+            'शे': 'शेवंती',
+            'ग': 'गुलाब',
+            'म': 'मोगरा',
+            'रु': 'रुई',
+            'अ': 'अष्टर',
+            'प': 'पारिजातक',
+            'बे': 'बेल / निशिगंध',
+            'का': 'कागडा',
+            'जा': 'जास्वंद'
+        };
+
+        function getFlowerFullName(code) {
+            return OTHER_FLOWER_NAMES[code] ? `${code} (${OTHER_FLOWER_NAMES[code]})` : code;
+        }
+
         function openOtherFModal() {
             openModal('otherFModal');
-            document.getElementById('otherFDate').value = new Date().toISOString().slice(0, 10);
-            renderOtherFList();
+            let dateInput = document.getElementById('otherFDate');
+            if (dateInput && !dateInput.value) {
+                dateInput.value = new Date().toISOString().slice(0, 10);
+            }
+            switchOtherFTab(currentOtherFTab || 'entry');
+            updateOtherFKpis();
+            populateOtherFDatalists();
+            updateOtherFLiveCalc();
+            updateOtherFBadge();
+        }
+
+        function onOtherFDateChange() {
+            updateOtherFKpis();
+            if (currentOtherFTab === 'entry') {
+                renderOtherFRecentEntries();
+            } else if (currentOtherFTab === 'today') {
+                renderOtherFTodayTable();
+            }
+        }
+
+        function setOtherFQuickDate(which) {
+            let d = new Date();
+            if (which === 'yesterday') {
+                d.setDate(d.getDate() - 1);
+            }
+            let dateInput = document.getElementById('otherFDate');
+            if (dateInput) {
+                dateInput.value = d.toISOString().slice(0, 10);
+                onOtherFDateChange();
+            }
+        }
+
+        function selectOtherFType(code, btnEl) {
+            let sel = document.getElementById('otherFType');
+            if (sel) sel.value = code;
+            let container = document.getElementById('otherFChipsContainer');
+            if (container) {
+                let chips = container.querySelectorAll('.otherf-chip');
+                chips.forEach(c => c.classList.remove('selected'));
+            }
+            if (btnEl) btnEl.classList.add('selected');
+        }
+
+        function syncOtherFTypeChip(code) {
+            let container = document.getElementById('otherFChipsContainer');
+            if (!container) return;
+            let chips = container.querySelectorAll('.otherf-chip');
+            chips.forEach(c => {
+                let text = c.innerText.trim();
+                if (text.includes(code)) c.classList.add('selected');
+                else c.classList.remove('selected');
+            });
+        }
+
+        function updateOtherFLiveCalc() {
+            let wt = parseFloat(document.getElementById('otherFWt').value) || 0;
+            let rate = parseFloat(document.getElementById('otherFRate').value) || 0;
+            let pctEl = document.getElementById('otherFCommPct');
+            let pct = pctEl ? (parseFloat(pctEl.value) || 0) : 10;
+
+            let total = Math.round(wt * rate);
+            let comm = Math.round(total * (pct / 100));
+            let net = total - comm;
+
+            let mathEl = document.getElementById('otherFLiveCalcMath');
+            let commEl = document.getElementById('otherFLiveCalcComm');
+            let netEl = document.getElementById('otherFLiveCalcNet');
+
+            if (mathEl) mathEl.innerText = `${wt} kg × ₹${rate} = ₹${total.toLocaleString('en-IN')}`;
+            if (commEl) commEl.innerText = `कमिशन (${pct}%): -₹${comm.toLocaleString('en-IN')}`;
+            if (netEl) netEl.innerText = `₹ ${net.toLocaleString('en-IN')}`;
+        }
+
+        function switchOtherFTab(tab) {
+            currentOtherFTab = tab;
+            const tabs = ['entry', 'today', 'farmers', 'comm'];
+            tabs.forEach(t => {
+                let btn = document.getElementById(`otherFTabBtn_${t}`);
+                let content = document.getElementById(`otherFTabContent_${t}`);
+                if (btn) {
+                    if (t === tab) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                }
+                if (content) {
+                    content.style.display = (t === tab) ? 'block' : 'none';
+                }
+            });
+
+            refreshOtherFCurrentView();
+        }
+
+        function refreshOtherFCurrentView() {
+            updateOtherFKpis();
+            updateOtherFBadge();
+            if (currentOtherFTab === 'entry') {
+                populateOtherFDatalists();
+                renderOtherFRecentEntries();
+            } else if (currentOtherFTab === 'today') {
+                renderOtherFTodayTable();
+            } else if (currentOtherFTab === 'farmers') {
+                renderOtherFFarmersList();
+            } else if (currentOtherFTab === 'comm') {
+                renderOtherFCommReport();
+            }
+        }
+
+        function updateOtherFKpis() {
+            let date = document.getElementById('otherFDate') ? document.getElementById('otherFDate').value : new Date().toISOString().slice(0, 10);
+            let data = getOtherFDB().filter(e => e.date === date);
+
+            let totalWt = 0;
+            let totalNet = 0;
+            let totalGross = 0;
+            let totalComm = 0;
+
+            data.forEach(e => {
+                totalWt += (e.wt || 0);
+                totalNet += (e.finalAmt || 0);
+                totalGross += (e.total || (e.wt * e.rate) || 0);
+                let comm = (e.total ? (e.total - e.finalAmt) : Math.round(e.wt * e.rate * 0.10));
+                totalComm += comm;
+            });
+
+            let avgRate = totalWt > 0 ? (totalGross / totalWt).toFixed(1) : 0;
+
+            let wtEl = document.getElementById('otherFKpiWt');
+            let netEl = document.getElementById('otherFKpiNet');
+            let rateEl = document.getElementById('otherFKpiAvgRate');
+            let commEl = document.getElementById('otherFKpiComm');
+            let countBadge = document.getElementById('otherFTodayCountBadge');
+
+            if (wtEl) wtEl.innerText = `${Math.round(totalWt * 100) / 100} Kg`;
+            if (netEl) netEl.innerText = `₹ ${totalNet.toLocaleString('en-IN')}`;
+            if (rateEl) rateEl.innerText = `₹ ${avgRate}`;
+            if (commEl) commEl.innerText = `₹ ${totalComm.toLocaleString('en-IN')}`;
+            if (countBadge) countBadge.innerText = data.length;
+        }
+
+        function populateOtherFDatalists() {
+            let allData = getOtherFDB();
+            let allNames = [...new Set(allData.map(e => (e.name || '').trim()).filter(Boolean))];
+
+            let dl = document.getElementById('otherFList');
+            if (dl) {
+                dl.innerHTML = "";
+                allNames.forEach(n => {
+                    let op = document.createElement("option");
+                    op.value = n;
+                    dl.appendChild(op);
+                });
+            }
+
+            // Quick Recent Farmer Chips (last 6 unique active names)
+            let chipContainer = document.getElementById('otherFRecentChipsContainer');
+            let chipList = document.getElementById('otherFRecentChipsList');
+            if (chipContainer && chipList) {
+                let recentFarmers = [];
+                for (let i = allData.length - 1; i >= 0 && recentFarmers.length < 6; i--) {
+                    let nm = (allData[i].name || '').trim();
+                    if (nm && !recentFarmers.includes(nm)) {
+                        recentFarmers.push(nm);
+                    }
+                }
+                if (recentFarmers.length > 0) {
+                    chipContainer.style.display = 'flex';
+                    chipList.innerHTML = recentFarmers.map(name => {
+                        return `<button type="button" class="btn-action-small" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; padding:2px 8px; font-size:11px; border-radius:12px; cursor:pointer;" onclick="selectOtherFRecentName('${name.replace(/'/g, "\\'")}')">${name}</button>`;
+                    }).join('');
+                } else {
+                    chipContainer.style.display = 'none';
+                }
+            }
+        }
+
+        function selectOtherFRecentName(name) {
+            let nameInput = document.getElementById('otherFName');
+            if (nameInput) {
+                nameInput.value = name;
+                document.getElementById('otherFWt').focus();
+            }
         }
 
         function saveOtherFEntry() {
@@ -3339,128 +4654,261 @@
             let name = document.getElementById("otherFName").value.trim();
             let wt = parseFloat(document.getElementById("otherFWt").value);
             let rate = parseFloat(document.getElementById("otherFRate").value);
-            let type = document.getElementById("otherFType").value;
+            let type = document.getElementById("otherFType").value || 'पि';
+            let pctEl = document.getElementById("otherFCommPct");
+            let commPct = pctEl ? (parseFloat(pctEl.value) || 0) : 10;
 
             if (!date || !name || isNaN(wt) || wt <= 0 || isNaN(rate) || rate <= 0) {
-                alert("कृपया सर्व माहिती अचूक भरा!");
+                alert("कृपया शेतकरी नाव, वजन आणि भाव अचूक भरा!");
                 return;
             }
 
             let data = getOtherFDB();
             let total = Math.round(wt * rate);
-            let commission = Math.round(total * 0.10);
-            let finalAmt = total - commission;
+            let comm = Math.round(total * (commPct / 100));
+            let finalAmt = total - comm;
 
-            data.push({
+            let newEntry = {
                 id: Date.now(),
                 date: date,
                 name: name,
                 wt: wt,
                 rate: rate,
                 type: type,
+                commPct: commPct,
                 total: total,
-                finalAmt: finalAmt
-            });
+                finalAmt: finalAmt,
+                isPaid: false
+            };
 
+            data.push(newEntry);
             saveOtherFDB(data);
 
+            // Reset inputs for next entry
             document.getElementById("otherFWt").value = "";
             document.getElementById("otherFRate").value = "";
-            document.getElementById("otherFName").focus();
+            updateOtherFLiveCalc();
 
-            renderOtherFList();
+            document.getElementById("otherFWt").focus();
+            refreshOtherFCurrentView();
         }
 
-        let expandedOtherFNames = new Set();
-        function toggleOtherFExpand(id, name) {
-            let el = document.getElementById(id);
-            if (el.style.display === "none") { el.style.display = "table-row"; expandedOtherFNames.add(name); }
-            else { el.style.display = "none"; expandedOtherFNames.delete(name); }
-        }
-
-        function renderOtherFList() {
-            let date = document.getElementById("otherFDate").value;
-            if (!date) return;
-
+        function renderOtherFRecentEntries() {
+            let date = document.getElementById("otherFDate") ? document.getElementById("otherFDate").value : new Date().toISOString().slice(0, 10);
             let data = getOtherFDB().filter(e => e.date === date).sort((a, b) => b.id - a.id);
-            let grandTotal = data.reduce((sum, e) => sum + e.finalAmt, 0);
 
-            if (document.getElementById("otherFTotalBill")) {
-                document.getElementById("otherFTotalBill").innerText = `₹ ${grandTotal.toLocaleString('en-IN')}`;
+            let countEl = document.getElementById("otherFRecentCountText");
+            if (countEl) countEl.innerText = data.length;
+
+            let container = document.getElementById("otherFRecentListBody");
+            if (!container) return;
+
+            if (data.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:18px; color:#94a3b8; font-size:12.5px; font-weight:600;">या तारखेला अद्याप कोणतीही नोंद झालेली नाही.</div>`;
+                return;
             }
 
-            let dl = document.getElementById("otherFList");
-            if (dl) {
-                dl.innerHTML = "";
-                let allData = getOtherFDB();
-                let allNames = [...new Set(allData.map(e => e.name))];
-                allNames.forEach(n => {
-                    let op = document.createElement("option");
-                    op.value = n;
-                    dl.appendChild(op);
-                });
-            }
-        }
+            let html = "";
+            data.slice(0, 8).forEach(e => {
+                let paidBadge = e.isPaid 
+                    ? `<span style="background:#dcfce7; color:#15803d; border:1px solid #86efac; border-radius:6px; padding:2px 6px; font-size:10.5px; font-weight:800; cursor:pointer;" onclick="toggleOtherFEntryPaid(${e.id})">✅ जमा</span>`
+                    : `<span style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; border-radius:6px; padding:2px 6px; font-size:10.5px; font-weight:800; cursor:pointer;" onclick="toggleOtherFEntryPaid(${e.id})">⏳ बाकी</span>`;
 
-        function openOtherFListModal() {
-            openModal('otherFListModal');
-            renderOtherFListModal();
-        }
-
-        function renderOtherFListModal() {
-            let data = getOtherFDB();
-            let grouped = {};
-            let grandTotalAll = 0;
-            data.forEach(e => {
-                if (!grouped[e.name]) grouped[e.name] = [];
-                grouped[e.name].push(e);
-                if (!e.isPaid) grandTotalAll += e.finalAmt;
+                html += `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 10px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="flex:1;">
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <span style="font-weight:800; color:#1e293b; font-size:13.5px;">${e.name}</span>
+                            <span style="background:#fce7f3; color:#be185d; border-radius:6px; padding:1px 6px; font-size:11px; font-weight:800;">${e.type}</span>
+                            ${paidBadge}
+                        </div>
+                        <div style="font-size:11.5px; color:#64748b; margin-top:2px;">
+                            ${e.wt} kg × ₹${e.rate} = <span style="text-decoration:line-through;">₹${e.total || (e.wt * e.rate)}</span> (${e.commPct !== undefined ? e.commPct : 10}% कमिशन)
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-weight:900; color:#166534; font-size:15px;">₹ ${e.finalAmt.toLocaleString('en-IN')}</span>
+                        <button class="btn-action-small" style="background:#25d366; color:#fff; padding:3px 6px; font-size:11px; border-radius:6px;" onclick="shareOtherFWhatsApp(${e.id})" title="WhatsApp Receipt">📲</button>
+                        <button class="btn-action-small" style="background:#3b82f6; color:#fff; padding:3px 6px; font-size:11px; border-radius:6px;" onclick="openOtherFEditModal(${e.id})" title="Edit">✏️</button>
+                        <button class="btn-action-small btn-del" style="padding:3px 6px; font-size:11px; border-radius:6px;" onclick="delOtherFEntry(${e.id})" title="Delete">🗑</button>
+                    </div>
+                </div>`;
             });
 
-            if (document.getElementById("otherFListGrandTotal")) {
-                document.getElementById("otherFListGrandTotal").innerText = `₹ ${grandTotalAll.toLocaleString('en-IN')}`;
-            }
+            container.innerHTML = html;
+        }
 
-            let tbody = document.getElementById("otherFListBody");
+        function renderOtherFTodayTable() {
+            let date = document.getElementById("otherFDate") ? document.getElementById("otherFDate").value : new Date().toISOString().slice(0, 10);
+            let query = (document.getElementById("otherFTodaySearch") ? document.getElementById("otherFTodaySearch").value : "").trim().toLowerCase();
+
+            let data = getOtherFDB().filter(e => e.date === date);
+            if (query) {
+                data = data.filter(e => (e.name || '').toLowerCase().includes(query) || (e.type || '').toLowerCase().includes(query));
+            }
+            data.sort((a, b) => b.id - a.id);
+
+            let tbody = document.getElementById("otherFTodayTableBody");
             if (!tbody) return;
 
-            let html = "";
-            let sortedNames = Object.keys(grouped).sort((a, b) => a.localeCompare(b));
+            let totalWt = 0;
+            let totalNet = 0;
+            let totalComm = 0;
 
-            sortedNames.forEach(name => {
-                let errs = grouped[name];
-                let totalForName = errs.reduce((sum, val) => sum + (!val.isPaid ? val.finalAmt : 0), 0);
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px; color:#94a3b8; font-size:13px; font-weight:600;">कोणतीही नोंद सापडली नाही.</td></tr>`;
+            } else {
+                let html = "";
+                data.forEach(e => {
+                    totalWt += (e.wt || 0);
+                    totalNet += (e.finalAmt || 0);
+                    let comm = e.total ? (e.total - e.finalAmt) : Math.round(e.wt * e.rate * 0.10);
+                    totalComm += comm;
 
-                let isFullyPaid = totalForName === 0 && errs.length > 0;
-                let bgStyle = isFullyPaid ? "background:#f0fdf4;" : "";
+                    let statusBtn = e.isPaid 
+                        ? `<button class="btn-action-small" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; border-radius:6px; padding:3px 8px; font-size:11px; font-weight:800; cursor:pointer;" onclick="toggleOtherFEntryPaid(${e.id})">✅ जमा</button>`
+                        : `<button class="btn-action-small" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; border-radius:6px; padding:3px 8px; font-size:11px; font-weight:800; cursor:pointer;" onclick="toggleOtherFEntryPaid(${e.id})">⏳ बाकी</button>`;
 
-                html += `<tr class='premium-row' onclick="openOtherFDetailModal('${name}')" style="cursor:pointer; ${bgStyle}">
-                    <td style="font-weight:700; color:#1e293b; font-size:15px; padding:12px;">${name} ${isFullyPaid ? '✅' : ''}</td>
-                    <td style="text-align:right; font-weight:800; color:${isFullyPaid ? '#16a34a' : '#ec4899'}; padding:12px;">₹ ${totalForName.toLocaleString('en-IN')} <span style="font-size:12px; color:#8b5cf6;">➡️</span></td>
-                </tr>`;
-            });
-
-            if (sortedNames.length === 0) {
-                html = `<tr><td colspan="2" style="text-align:center; padding:20px; color:#8e8e93;">कोणतीही नोंद नाही.</td></tr>`;
+                    html += `<tr class="premium-row">
+                        <td style="padding:10px; font-weight:800; color:#1e293b; font-size:13.5px; cursor:pointer;" onclick="openOtherFDetailModal('${e.name.replace(/'/g, "\\'")}')">
+                            ${e.name} <span style="font-size:11px; color:#ec4899;">👁️</span>
+                        </td>
+                        <td style="padding:10px; text-align:center;">
+                            <span style="background:#fce7f3; color:#be185d; border-radius:6px; padding:2px 8px; font-size:11px; font-weight:800;">${e.type}</span>
+                        </td>
+                        <td style="padding:10px; text-align:right; font-size:12.5px; color:#475569;">
+                            ${e.wt} × ₹${e.rate}
+                        </td>
+                        <td style="padding:10px; text-align:right; font-weight:900; color:#166534; font-size:14px;">
+                            ₹ ${e.finalAmt.toLocaleString('en-IN')}
+                        </td>
+                        <td style="padding:10px; text-align:center;">
+                            ${statusBtn}
+                        </td>
+                        <td style="padding:10px; text-align:center;">
+                            <div style="display:flex; justify-content:center; gap:4px;">
+                                <button class="btn-action-small" style="background:#25d366; color:#fff; padding:3px 6px; font-size:11px; border-radius:6px;" onclick="shareOtherFWhatsApp(${e.id})" title="WhatsApp Receipt">📲</button>
+                                <button class="btn-action-small" style="background:#3b82f6; color:#fff; padding:3px 6px; font-size:11px; border-radius:6px;" onclick="openOtherFEditModal(${e.id})" title="Edit">✏️</button>
+                                <button class="btn-action-small btn-del" style="padding:3px 6px; font-size:11px; border-radius:6px;" onclick="delOtherFEntry(${e.id})" title="Delete">🗑</button>
+                            </div>
+                        </td>
+                    </tr>`;
+                });
+                tbody.innerHTML = html;
             }
 
-            tbody.innerHTML = html;
+            let footer = document.getElementById("otherFTodayFooterSummary");
+            if (footer) {
+                footer.innerHTML = `
+                    <span>⚖️ आवक: <b>${Math.round(totalWt * 100) / 100} Kg</b></span>
+                    <span>💰 एकूण निव्वळ: <b>₹ ${totalNet.toLocaleString('en-IN')}</b></span>
+                    <span>💵 कमिशन: <b>₹ ${totalComm.toLocaleString('en-IN')}</b></span>
+                `;
+            }
         }
 
+        function toggleOtherFEntryPaid(id) {
+            let data = getOtherFDB();
+            let item = data.find(e => e.id === id);
+            if (item) {
+                item.isPaid = !item.isPaid;
+                saveOtherFDB(data);
+                refreshOtherFCurrentView();
+            }
+        }
+
+        function renderOtherFFarmersList() {
+            let query = (document.getElementById("otherFFarmerSearch") ? document.getElementById("otherFFarmerSearch").value : "").trim().toLowerCase();
+            let allData = getOtherFDB();
+
+            let grouped = {};
+            let grandDueAll = 0;
+
+            allData.forEach(e => {
+                let n = (e.name || '').trim();
+                if (!n) return;
+                if (!grouped[n]) grouped[n] = { entries: [], totalNet: 0, totalDue: 0, lastDate: '' };
+                grouped[n].entries.push(e);
+                grouped[n].totalNet += (e.finalAmt || 0);
+                if (!e.isPaid) {
+                    grouped[n].totalDue += (e.finalAmt || 0);
+                    grandDueAll += (e.finalAmt || 0);
+                }
+                if (!grouped[n].lastDate || e.date > grouped[n].lastDate) {
+                    grouped[n].lastDate = e.date;
+                }
+            });
+
+            let grandDueEl = document.getElementById("otherFFarmersGrandDue");
+            if (grandDueEl) grandDueEl.innerText = `₹ ${grandDueAll.toLocaleString('en-IN')}`;
+
+            let container = document.getElementById("otherFFarmersListContainer");
+            if (!container) return;
+
+            let names = Object.keys(grouped);
+            if (query) {
+                names = names.filter(n => n.toLowerCase().includes(query));
+            }
+
+            names.sort((a, b) => {
+                if (grouped[b].totalDue !== grouped[a].totalDue) {
+                    return grouped[b].totalDue - grouped[a].totalDue;
+                }
+                return a.localeCompare(b);
+            });
+
+            if (names.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:24px; color:#94a3b8; font-size:13px; font-weight:600;">कोणताही शेतकरी सापडला नाही.</div>`;
+                return;
+            }
+
+            let html = "";
+            names.forEach(name => {
+                let info = grouped[name];
+                let isClear = info.totalDue === 0;
+                let bgStyle = isClear ? "background:#f0fdf4; border:1px solid #bbf7d0;" : "background:#fff; border:1px solid #fbcfe8;";
+                let dueBadge = isClear
+                    ? `<span style="background:#dcfce7; color:#15803d; font-size:11px; font-weight:800; padding:2px 8px; border-radius:12px; border:1px solid #86efac;">✅ सर्व जमा</span>`
+                    : `<span style="background:#fee2e2; color:#b91c1c; font-size:11px; font-weight:800; padding:2px 8px; border-radius:12px; border:1px solid #fca5a5;">⏳ बाकी: ₹ ${info.totalDue.toLocaleString('en-IN')}</span>`;
+
+                html += `<div style="${bgStyle} border-radius:12px; padding:10px 12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+                    <div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-weight:800; color:#1e293b; font-size:14.5px;">${name}</span>
+                            ${dueBadge}
+                        </div>
+                        <div style="font-size:11.5px; color:#64748b; margin-top:3px;">
+                            एकूण नोंदी: <b>${info.entries.length}</b> | शेवटची तारीख: <b>${formatDate(info.lastDate)}</b> | एकूण बिल: <b>₹ ${info.totalNet.toLocaleString('en-IN')}</b>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn-action-small" style="background:#25d366; color:#fff; padding:6px 10px; font-size:12px; border-radius:8px; font-weight:700;" onclick="shareOtherFFarmerStatementWhatsApp('${name.replace(/'/g, "\\'")}')" title="WhatsApp Statement">📲</button>
+                        <button class="btn-action-small bg-gradient-pink" style="padding:6px 12px; font-size:12px; border-radius:8px; font-weight:800;" onclick="openOtherFDetailModal('${name.replace(/'/g, "\\'")}')">खाते ➡️</button>
+                    </div>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        let currentDetailFarmerName = "";
         function openOtherFDetailModal(name) {
-            closeModal('otherFListModal');
+            currentDetailFarmerName = name;
             openModal('otherFDetailModal');
 
-            document.getElementById("otherFDetailName").innerText = name;
+            let nameEl = document.getElementById("otherFDetailName");
+            if (nameEl) nameEl.innerText = `👤 ${name}`;
 
             let data = getOtherFDB().filter(e => e.name === name).sort((a, b) => new Date(b.date) - new Date(a.date));
-            let total = data.reduce((sum, val) => sum + (!val.isPaid ? val.finalAmt : 0), 0);
+            let totalDue = data.reduce((sum, val) => sum + (!val.isPaid ? (val.finalAmt || 0) : 0), 0);
 
-            document.getElementById("otherFDetailTotal").innerText = `₹ ${total.toLocaleString('en-IN')}`;
-            document.getElementById("otherFDetailTotal").style.color = total === 0 ? "#16a34a" : "#db2777";
+            let dueEl = document.getElementById("otherFDetailTotal");
+            if (dueEl) {
+                dueEl.innerText = `₹ ${totalDue.toLocaleString('en-IN')}`;
+                dueEl.style.color = totalDue === 0 ? "#16a34a" : "#db2777";
+            }
 
             let container = document.getElementById("otherFDetailBody");
-            let html = "";
+            if (!container) return;
 
             let dateGrouped = {};
             data.forEach(e => {
@@ -3469,39 +4917,41 @@
             });
 
             let sortedDates = Object.keys(dateGrouped).sort((a, b) => new Date(b) - new Date(a));
+            let html = "";
 
             sortedDates.forEach(d => {
-                let isAllPaid = dateGrouped[d].length > 0 && dateGrouped[d].every(e => e.isPaid);
-                let dTotal = dateGrouped[d].reduce((sum, val) => sum + val.finalAmt, 0);
-
+                let items = dateGrouped[d];
+                let isAllPaid = items.length > 0 && items.every(e => e.isPaid);
+                let dTotal = items.reduce((sum, val) => sum + (val.finalAmt || 0), 0);
                 let bgCol = isAllPaid ? "#dcfce7" : "#faf5ff";
                 let borderCol = isAllPaid ? "#86efac" : "#e9d5ff";
                 let textCol = isAllPaid ? "#166534" : "#db2777";
 
                 let paidBtn = isAllPaid
-                    ? `<button class="small-btn" style="background:#16a34a; color:#fff; border:none; padding:3px 8px; border-radius:4px; font-size:12px; cursor:pointer;" onclick="markOtherFDatePaid('${name}', '${d}', false)">✅ Paid</button>`
-                    : `<button class="small-btn" style="background:#f59e0b; color:#fff; border:none; padding:3px 8px; border-radius:4px; font-size:12px; cursor:pointer;" onclick="markOtherFDatePaid('${name}', '${d}', true)">⏳ Paid करा</button>`;
+                    ? `<button class="btn-action-small" style="background:#16a34a; color:#fff; border:none; padding:3px 8px; border-radius:6px; font-size:11px; cursor:pointer;" onclick="markOtherFDatePaid('${name.replace(/'/g, "\\'")}', '${d}', false)">✅ जमा</button>`
+                    : `<button class="btn-action-small" style="background:#f59e0b; color:#fff; border:none; padding:3px 8px; border-radius:6px; font-size:11px; cursor:pointer;" onclick="markOtherFDatePaid('${name.replace(/'/g, "\\'")}', '${d}', true)">⏳ Paid करा</button>`;
 
-                html += `<div style="margin-bottom:10px; background:${bgCol}; border-radius:10px; padding:10px; border:1px solid ${borderCol};">
-                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #cbd5e1; padding-bottom:5px; margin-bottom:8px;">
-                        <span style="font-weight:800; color:#475569; font-size:14px;">📅 ${formatDate(d)}</span>
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <span style="font-weight:800; color:${textCol}; font-size:14px;">₹ ${dTotal.toLocaleString('en-IN')}</span>
+                html += `<div style="margin-bottom:10px; background:${bgCol}; border-radius:12px; padding:10px; border:1px solid ${borderCol};">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(0,0,0,0.06); padding-bottom:6px; margin-bottom:8px;">
+                        <span style="font-weight:800; color:#475569; font-size:13.5px;">📅 ${formatDate(d)}</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-weight:900; color:${textCol}; font-size:14px;">₹ ${dTotal.toLocaleString('en-IN')}</span>
                             ${paidBtn}
                         </div>
                     </div>`;
 
-                dateGrouped[d].forEach(e => {
-                    let eStyle = e.isPaid ? "text-decoration:line-through; opacity:0.6;" : "";
-                    html += `<div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:8px; margin-bottom:5px; display:flex; justify-content:space-between; align-items:center; ${eStyle}">
+                items.forEach(e => {
+                    let eStyle = e.isPaid ? "text-decoration:line-through; opacity:0.65;" : "";
+                    html += `<div style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:8px 10px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; ${eStyle}">
                         <div>
-                            <span style="font-weight:700; color:#1e293b; font-size:13px;">प्रकार: ${e.type}</span>
-                            <span style="color:#64748b; font-size:12px; margin-left:5px;">(${e.wt}kg x ₹${e.rate})</span>
+                            <span style="font-weight:800; color:#1e293b; font-size:13px;">प्रकार: ${e.type}</span>
+                            <span style="color:#64748b; font-size:11.5px; margin-left:6px;">(${e.wt} kg × ₹${e.rate} = ₹${e.total || (e.wt*e.rate)})</span>
                         </div>
-                        <div style="text-align:right;">
-                            <span style="font-weight:800; color:#059669; font-size:14px; margin-right:5px;">₹ ${e.finalAmt}</span>
-                            <button class="small-btn" style="background:#3b82f6; color:#fff; border:none; padding:2px 6px; border-radius:4px; font-size:12px; cursor:pointer;" onclick="editOtherFEntry(${e.id}, 'detail', '${name}')">✏️</button>
-                            <button class="small-btn btn-del" style="margin-left:5px; padding:2px 5px;" onclick="delOtherFEntry(${e.id}, '${name}')">🗑</button>
+                        <div style="text-align:right; display:flex; align-items:center; gap:6px;">
+                            <span style="font-weight:900; color:#059669; font-size:14px; margin-right:4px;">₹ ${e.finalAmt.toLocaleString('en-IN')}</span>
+                            <button class="btn-action-small" style="background:#25d366; color:#fff; padding:2px 6px; font-size:11px; border-radius:4px;" onclick="shareOtherFWhatsApp(${e.id})">📲</button>
+                            <button class="btn-action-small" style="background:#3b82f6; color:#fff; padding:2px 6px; font-size:11px; border-radius:4px;" onclick="openOtherFEditModal(${e.id})">✏️</button>
+                            <button class="btn-action-small btn-del" style="padding:2px 6px; font-size:11px; border-radius:4px;" onclick="delOtherFEntry(${e.id}, '${name.replace(/'/g, "\\'")}')">🗑</button>
                         </div>
                     </div>`;
                 });
@@ -3510,14 +4960,16 @@
             });
 
             if (data.length === 0) {
-                html = `<div style="text-align:center; padding:20px; color:#8e8e93;">कोणतीही नोंद नाही.</div>`;
+                html = `<div style="text-align:center; padding:24px; color:#94a3b8; font-weight:600;">कोणतीही नोंद नाही.</div>`;
             }
 
             container.innerHTML = html;
         }
 
         function markOtherFDatePaid(name, date, status) {
-            if (!confirm(status ? "या तारखेचे सर्व बिल Paid (जमा) करायचे आहे का?" : "Paid रद्द करायचे आहे का?")) return;
+            let msg = status ? `या तारखेच्या (${formatDate(date)}) सर्व नोंदी 'जमा' (Paid) करायच्या आहेत का?` : `या तारखेच्या नोंदी 'बाकी' करायच्या आहेत का?`;
+            if (!confirm(msg)) return;
+
             let data = getOtherFDB();
             data.forEach(e => {
                 if (e.name === name && e.date === date) {
@@ -3526,146 +4978,273 @@
             });
             saveOtherFDB(data);
 
-            if (document.getElementById("otherFListModal").classList.contains("show")) renderOtherFListModal();
-            if (document.getElementById("otherFDetailModal").classList.contains("show")) openOtherFDetailModal(name);
+            if (document.getElementById("otherFDetailModal").classList.contains("show")) {
+                openOtherFDetailModal(name);
+            }
+            refreshOtherFCurrentView();
         }
 
-        function delOtherFEntry(id, name, isPreview = false) {
-            if (confirm("ही नोंद खरोखर डिलीट करायची आहे का?")) {
-                let data = getOtherFDB().filter(e => e.id !== id);
-                saveOtherFDB(data);
-                renderOtherFList();
-                if (document.getElementById("otherFListModal").classList.contains("show")) {
-                    renderOtherFListModal();
-                }
-                if (name && document.getElementById("otherFDetailModal").classList.contains("show")) {
-                    openOtherFDetailModal(name);
-                }
-                if (isPreview && document.getElementById("otherFPreviewModal").classList.contains("show")) {
-                    renderOtherFPreview();
-                }
+        function shareOtherFCurrFarmerStatementWhatsApp() {
+            if (currentDetailFarmerName) {
+                shareOtherFFarmerStatementWhatsApp(currentDetailFarmerName);
             }
         }
 
-        function editOtherFEntry(id, modalContext, farmerName) {
+        function delOtherFEntry(id, farmerName, isPreview) {
+            if (!confirm("ही नोंद खरोखर डिलीट करायची आहे का?")) return;
+
+            let data = getOtherFDB().filter(e => e.id !== id);
+            saveOtherFDB(data);
+
+            if (farmerName && document.getElementById("otherFDetailModal").classList.contains("show")) {
+                openOtherFDetailModal(farmerName);
+            }
+            refreshOtherFCurrentView();
+        }
+
+        function openOtherFEditModal(id) {
+            let data = getOtherFDB();
+            let entry = data.find(e => e.id === id);
+            if (!entry) return;
+
+            document.getElementById("editOtherFId").value = entry.id;
+            document.getElementById("editOtherFDate").value = entry.date;
+            document.getElementById("editOtherFName").value = entry.name;
+            document.getElementById("editOtherFWt").value = entry.wt;
+            document.getElementById("editOtherFRate").value = entry.rate;
+            document.getElementById("editOtherFType").value = entry.type || 'पि';
+            document.getElementById("editOtherFCommPct").value = entry.commPct !== undefined ? entry.commPct : 10;
+            document.getElementById("editOtherFPaid").value = entry.isPaid ? "true" : "false";
+
+            updateOtherFEditLiveCalc();
+            openModal('otherFEditModal');
+        }
+
+        function updateOtherFEditLiveCalc() {
+            let wt = parseFloat(document.getElementById("editOtherFWt").value) || 0;
+            let rate = parseFloat(document.getElementById("editOtherFRate").value) || 0;
+            let pct = parseFloat(document.getElementById("editOtherFCommPct").value) || 0;
+
+            let total = Math.round(wt * rate);
+            let comm = Math.round(total * (pct / 100));
+            let net = total - comm;
+
+            let prev = document.getElementById("editOtherFLivePreview");
+            if (prev) {
+                prev.innerHTML = `गणना: ${wt} kg × ₹${rate} = ₹${total} | कमिशन (${pct}%): -₹${comm} | <b>निव्वळ देय: ₹${net}</b>`;
+            }
+        }
+
+        function saveOtherFEditedEntry() {
+            let id = parseInt(document.getElementById("editOtherFId").value);
+            let date = document.getElementById("editOtherFDate").value;
+            let name = document.getElementById("editOtherFName").value.trim();
+            let wt = parseFloat(document.getElementById("editOtherFWt").value);
+            let rate = parseFloat(document.getElementById("editOtherFRate").value);
+            let type = document.getElementById("editOtherFType").value;
+            let commPct = parseFloat(document.getElementById("editOtherFCommPct").value) || 0;
+            let isPaid = document.getElementById("editOtherFPaid").value === "true";
+
+            if (!date || !name || isNaN(wt) || wt <= 0 || isNaN(rate) || rate <= 0) {
+                alert("कृपया सर्व माहिती अचूक भरा!");
+                return;
+            }
+
             let data = getOtherFDB();
             let idx = data.findIndex(e => e.id === id);
             if (idx === -1) return;
-            let e = data[idx];
 
-            let w = prompt("नवीन वजन (Weight):", e.wt);
-            if (w === null) return;
-            let r = prompt("नवीन भाव (Rate):", e.rate);
-            if (r === null) return;
+            let total = Math.round(wt * rate);
+            let comm = Math.round(total * (commPct / 100));
+            let finalAmt = total - comm;
 
-            w = parseFloat(w);
-            r = parseFloat(r);
-            if (isNaN(w) || w <= 0 || isNaN(r) || r <= 0) {
-                alert("चुकीची माहिती!"); return;
-            }
-
-            e.wt = w;
-            e.rate = r;
-            e.total = Math.round(w * r);
-            let comm = Math.round(e.total * 0.10);
-            e.finalAmt = e.total - comm;
+            data[idx].date = date;
+            data[idx].name = name;
+            data[idx].wt = wt;
+            data[idx].rate = rate;
+            data[idx].type = type;
+            data[idx].commPct = commPct;
+            data[idx].total = total;
+            data[idx].finalAmt = finalAmt;
+            data[idx].isPaid = isPaid;
 
             saveOtherFDB(data);
-            renderOtherFList();
-            if (document.getElementById("otherFListModal").classList.contains("show")) {
-                renderOtherFListModal();
+            closeModal('otherFEditModal');
+
+            if (document.getElementById("otherFDetailModal").classList.contains("show")) {
+                openOtherFDetailModal(name);
             }
-            if (modalContext === 'detail' && farmerName && document.getElementById("otherFDetailModal").classList.contains("show")) {
-                openOtherFDetailModal(farmerName);
-            }
-            if (modalContext === 'preview' && document.getElementById("otherFPreviewModal").classList.contains("show")) {
-                renderOtherFPreview();
-            }
+            refreshOtherFCurrentView();
         }
 
-        function openOtherFPreviewModal() {
-            closeModal('otherFModal');
-            openModal('otherFPreviewModal');
-            document.getElementById('otherFPreviewDate').value = document.getElementById('otherFDate').value || new Date().toISOString().slice(0, 10);
-            renderOtherFPreview();
-        }
-
-        function renderOtherFPreview() {
-            let date = document.getElementById("otherFPreviewDate").value;
-            if (!date) return;
-
-            let data = getOtherFDB().filter(e => e.date === date).sort((a, b) => b.id - a.id);
-            let tbody = document.getElementById("otherFPreviewBody");
-            let html = "";
-            let grandTotal = 0;
-
-            data.forEach(e => {
-                grandTotal += e.finalAmt;
-                let btns = `<button class="small-btn" style="background:#3b82f6; color:#fff; border:none; padding:4px 6px; border-radius:4px; font-size:12px; cursor:pointer;" onclick="editOtherFEntry(${e.id}, 'preview')">✏️</button>
-                            <button class="small-btn btn-del" onclick="delOtherFEntry(${e.id}, null, true)">🗑</button>`;
-                html += `<tr>
-                    <td style="font-weight:700; color:#1e293b; font-size:14px;">${e.name}</td>
-                    <td style="font-weight:600; color:#ec4899; font-size:14px; text-align:center;">${e.type}</td>
-                    <td style="text-align:right; font-size:13px; color:#475569;">${e.wt} x ${e.rate} = <br><span style="text-decoration:line-through; font-size:11px;">₹${e.total}</span></td>
-                    <td style="text-align:right; font-weight:800; color:#059669; font-size:15px;">₹${e.finalAmt}</td>
-                    <td style="text-align:center;">${btns}</td>
-                </tr>`;
-            });
-
-            if (data.length === 0) {
-                html = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#8e8e93; font-weight:600;">कोणतीही नोंद नाही.</td></tr>`;
-            }
-
-            tbody.innerHTML = html;
-            document.getElementById("otherFPreviewTotal").innerText = `₹ ${grandTotal.toLocaleString('en-IN')}`;
-        }
-
-        function openOtherFCommissionModal() {
-            closeModal('otherFModal');
-            openModal('otherFCommissionModal');
-
+        function renderOtherFCommReport() {
             let data = getOtherFDB();
             let today = new Date().toISOString().slice(0, 10);
+            let currentMonth = today.substring(0, 7);
 
             let commToday = 0;
+            let commMonth = 0;
             let commTotal = 0;
+
             let monthGrouped = {};
 
             data.forEach(e => {
-                let comm = e.total - e.finalAmt;
-                if (comm > 0) {
-                    commTotal += comm;
-                    if (e.date === today) commToday += comm;
+                let gross = e.total || Math.round((e.wt || 0) * (e.rate || 0));
+                let comm = gross - (e.finalAmt || 0);
+                if (comm < 0) comm = 0;
 
-                    let m = e.date.substring(0, 7); // YYYY-MM
-                    if (!monthGrouped[m]) monthGrouped[m] = 0;
-                    monthGrouped[m] += comm;
+                commTotal += comm;
+                if (e.date === today) commToday += comm;
+                if (e.date && e.date.substring(0, 7) === currentMonth) commMonth += comm;
+
+                if (e.date) {
+                    let mKey = e.date.substring(0, 7);
+                    if (!monthGrouped[mKey]) monthGrouped[mKey] = { wt: 0, gross: 0, comm: 0 };
+                    monthGrouped[mKey].wt += (e.wt || 0);
+                    monthGrouped[mKey].gross += gross;
+                    monthGrouped[mKey].comm += comm;
                 }
             });
 
-            document.getElementById("otherFCommToday").innerText = `₹ ${commToday.toLocaleString('en-IN')}`;
-            document.getElementById("otherFCommTotal").innerText = `₹ ${commTotal.toLocaleString('en-IN')}`;
+            let kpiToday = document.getElementById("otherFCommKpiToday");
+            let kpiMonth = document.getElementById("otherFCommKpiMonth");
+            let kpiTotal = document.getElementById("otherFCommKpiTotal");
+
+            if (kpiToday) kpiToday.innerText = `₹ ${commToday.toLocaleString('en-IN')}`;
+            if (kpiMonth) kpiMonth.innerText = `₹ ${commMonth.toLocaleString('en-IN')}`;
+            if (kpiTotal) kpiTotal.innerText = `₹ ${commTotal.toLocaleString('en-IN')}`;
 
             let tbody = document.getElementById("otherFCommMonthBody");
-            let html = "";
-            let sortedMonths = Object.keys(monthGrouped).sort((a, b) => b.localeCompare(a));
+            if (!tbody) return;
 
+            let sortedMonths = Object.keys(monthGrouped).sort((a, b) => b.localeCompare(a));
+            if (sortedMonths.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:24px; color:#94a3b8; font-size:13px; font-weight:600;">कोणताही कमिशन डेटा उपलब्ध नाही.</td></tr>`;
+                return;
+            }
+
+            let html = "";
             sortedMonths.forEach(m => {
                 let parts = m.split('-');
                 let y = parts[0];
                 let mon = parseInt(parts[1]);
-                let mName = marathiMonths[mon - 1];
+                let mName = marathiMonths[mon - 1] || m;
+                let info = monthGrouped[m];
 
-                html += `<tr>
-                    <td style="font-weight:700; color:#1e293b; font-size:14px;">📅 ${mName} ${y}</td>
-                    <td style="text-align:right; font-weight:800; color:#059669; font-size:15px;">₹ ${monthGrouped[m].toLocaleString('en-IN')}</td>
+                html += `<tr class="premium-row">
+                    <td style="padding:10px; font-weight:800; color:#1e293b; font-size:13.5px;">📅 ${mName} ${y}</td>
+                    <td style="padding:10px; text-align:right; font-weight:700; color:#475569; font-size:13px;">${Math.round(info.wt * 100) / 100} Kg</td>
+                    <td style="padding:10px; text-align:right; font-weight:700; color:#0f172a; font-size:13px;">₹ ${info.gross.toLocaleString('en-IN')}</td>
+                    <td style="padding:10px; text-align:right; font-weight:900; color:#7e22ce; font-size:14px;">₹ ${info.comm.toLocaleString('en-IN')}</td>
                 </tr>`;
             });
 
-            if (sortedMonths.length === 0) {
-                html = `<tr><td colspan="2" style="text-align:center; padding:20px; color:#8e8e93;">कमिशन डेटा उपलब्ध नाही.</td></tr>`;
-            }
             tbody.innerHTML = html;
+        }
+
+        function shareOtherFWhatsApp(id) {
+            let data = getOtherFDB();
+            let e = data.find(item => item.id === id);
+            if (!e) return;
+
+            let flowerName = getFlowerFullName(e.type);
+            let commAmt = (e.total ? (e.total - e.finalAmt) : Math.round(e.wt * e.rate * 0.10));
+            let statusTxt = e.isPaid ? "✅ जमा (Paid)" : "⏳ बाकी (Unpaid)";
+
+            let msg = `🌸 *फुले आवक पावती* 🌸\n` +
+                      `━━━━━━━━━━━━━━━━\n` +
+                      `👤 शेतकरी: *${e.name}*\n` +
+                      `📅 तारीख: *${formatDate(e.date)}*\n` +
+                      `🌺 फूल प्रकार: *${flowerName}*\n` +
+                      `⚖️ वजन: *${e.wt} kg*\n` +
+                      `🏷️ भाव: *₹${e.rate} /kg*\n` +
+                      `━━━━━━━━━━━━━━━━\n` +
+                      `💰 एकूण रक्कम: ₹${e.total ? e.total.toLocaleString('en-IN') : (e.wt * e.rate).toLocaleString('en-IN')}\n` +
+                      `➖ कमिशन (${e.commPct !== undefined ? e.commPct : 10}%): -₹${commAmt.toLocaleString('en-IN')}\n` +
+                      `👉 *निव्वळ देय रक्कम: ₹${e.finalAmt.toLocaleString('en-IN')}*\n` +
+                      `━━━━━━━━━━━━━━━━\n` +
+                      `📌 स्थिती: *${statusTxt}*\n` +
+                      `🙏 धन्यवाद!`;
+
+            window.open("https://wa.me/?text=" + encodeURIComponent(msg), '_blank');
+        }
+
+        function shareOtherFFarmerStatementWhatsApp(name) {
+            let data = getOtherFDB().filter(e => e.name === name).sort((a, b) => new Date(a.date) - new Date(b.date));
+            if (data.length === 0) return;
+
+            let totalNet = 0;
+            let totalDue = 0;
+            let itemsTxt = "";
+
+            data.forEach(e => {
+                totalNet += (e.finalAmt || 0);
+                if (!e.isPaid) totalDue += (e.finalAmt || 0);
+                let st = e.isPaid ? "✅ जमा" : "⏳ बाकी";
+                itemsTxt += `📅 ${formatDate(e.date)} | ${e.type} | ${e.wt}kg @ ₹${e.rate} = *₹${e.finalAmt}* (${st})\n`;
+            });
+
+            let paidAmt = totalNet - totalDue;
+            let todayStr = formatDate(new Date().toISOString().slice(0, 10));
+
+            let msg = `🌸 *इतर फुले - शेतकरी खाते विवरण* 🌸\n` +
+                      `━━━━━━━━━━━━━━━━\n` +
+                      `👤 शेतकरी: *${name}*\n` +
+                      `📅 दिनांक: *${todayStr} पर्यंत*\n` +
+                      `━━━━━━━━━━━━━━━━\n` +
+                      `📋 *तपशील:*\n` +
+                      itemsTxt +
+                      `━━━━━━━━━━━━━━━━\n` +
+                      `💰 एकूण निव्वळ बिल: ₹${totalNet.toLocaleString('en-IN')}\n` +
+                      `✅ एकूण जमा: ₹${paidAmt.toLocaleString('en-IN')}\n` +
+                      `👉 *येणे बाकी (Due Balance): ₹${totalDue.toLocaleString('en-IN')}*\n` +
+                      `━━━━━━━━━━━━━━━━\n` +
+                      `🙏 धन्यवाद!`;
+
+            window.open("https://wa.me/?text=" + encodeURIComponent(msg), '_blank');
+        }
+
+        function updateOtherFBadge() {
+            let today = new Date().toISOString().slice(0, 10);
+            let count = getOtherFDB().filter(e => e.date === today).length;
+
+            let badge = document.getElementById("otherFTodayBadge");
+            if (badge) {
+                if (count > 0) {
+                    badge.innerText = count;
+                    badge.style.display = "flex";
+                } else {
+                    badge.style.display = "none";
+                }
+            }
+
+            let countInModal = document.getElementById("otherFTodayCountBadge");
+            if (countInModal) {
+                countInModal.innerText = count;
+            }
+        }
+
+        // Backward compatibility functions
+        function renderOtherFList() {
+            refreshOtherFCurrentView();
+        }
+        function openOtherFListModal() {
+            openOtherFModal();
+            switchOtherFTab('farmers');
+        }
+        function renderOtherFListModal() {
+            renderOtherFFarmersList();
+        }
+        function openOtherFPreviewModal() {
+            openOtherFModal();
+            switchOtherFTab('today');
+        }
+        function renderOtherFPreview() {
+            renderOtherFTodayTable();
+        }
+        function openOtherFCommissionModal() {
+            openOtherFModal();
+            switchOtherFTab('comm');
         }
     </script>
 </body>
