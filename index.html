@@ -3393,20 +3393,8 @@
             if (t === 'नि') {
                 rateInput.value = getRateForDate(d) || "";
             } else {
-                // 🧠 Smart auto-rate for specialized merchant types (का, बे, प, अ, ग, म, पि, के, शे, रु, पा):
-                // 1. Look for same date and same type in merchantDB
-                let todaySameType = getMerchantDB().find(e => e && e.date === d && e.merType === t && (!e.type || e.type === 'bill') && e.rate > 0);
-                if (todaySameType) {
-                    rateInput.value = todaySameType.rate;
-                } else {
-                    // 2. Look for most recent rate used for this type
-                    let recentSameType = [...getMerchantDB()].reverse().find(e => e && e.merType === t && (!e.type || e.type === 'bill') && e.rate > 0);
-                    if (recentSameType) {
-                        rateInput.value = recentSameType.rate;
-                    } else {
-                        rateInput.value = "";
-                    }
-                }
+                // 'नि' सोडून इतर कोणत्याही प्रकारासाठी दर आपोआप भरू नये (रिकामे ठेवावे)
+                rateInput.value = "";
             }
             if (typeof calcMerLiveTotal === 'function') calcMerLiveTotal();
         }
@@ -4817,6 +4805,11 @@
             // Clear inputs
             document.getElementById("merWeight").value = "";
             document.getElementById("merName").value = "";
+            if (tSel !== 'नि') {
+                document.getElementById("merRate").value = "";
+            } else {
+                document.getElementById("merRate").value = getRateForDate(d) || "";
+            }
             calcMerLiveTotal();
 
             // Refresh Hub states
