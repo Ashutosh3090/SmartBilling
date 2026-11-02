@@ -1243,7 +1243,7 @@
                 margin: 0 !important;
                 width: 100% !important;
                 max-width: 100% !important;
-                min-height: 260mm !important;
+                min-height: 235mm !important;
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: space-between !important;
@@ -1255,14 +1255,14 @@
             table {
                 max-width: 100% !important;
                 width: 100% !important;
-                font-size: 12pt !important;
-                line-height: 1.35 !important;
+                font-size: 11.8pt !important;
+                line-height: 1.3 !important;
             }
 
             th,
             td {
-                font-size: 12pt !important;
-                padding: 6px 5px !important;
+                font-size: 11.8pt !important;
+                padding: 5px 5px !important;
             }
 
             table tr {
@@ -2672,7 +2672,7 @@
         <div id="billModal" class="modal no-print">
             <div class="modal-content">
                 <div class="close-icon" onclick="closeModal('billModal')">✕</div>
-                <h3 id="billTitle">Generate Bill</h3><input type="hidden" id="billType">
+                <h3 id="billTitle">📜 Farmer Bill</h3><input type="hidden" id="billType" value="FARMER">
                 <div class="section-box">
                     <div class="segmented-control"><input type="radio" id="modeMonth" name="billDateMode" value="month"
                             checked onchange="toggleBillDateMode()"><label for="modeMonth">📅 Monthly</label><input
@@ -2703,13 +2703,13 @@
                         class="small-btn" style="background:var(--secondary);" onclick="closeModal('finalBillModal')">✕
                         Close</button></div>
                 <div id="mainBillPrintableArea" class="bill-area-printable"
-                    style="min-height:820px; width:100%; display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box;">
-                    <div style="text-align: center; margin-bottom: 8px;">
-                        <div id="billHeaderName" style="font-size: 22px; font-weight: 800; color: #0f172a;">---</div>
+                    style="min-height:730px; width:100%; display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box;">
+                    <div style="text-align: center; margin-bottom: 6px;">
+                        <div id="billHeaderName" style="font-size: 21px; font-weight: 800; color: #0f172a;">---</div>
                         <div id="billMonthDisplay"
-                            style="color: #4338ca; background: #e0e7ff; display: inline-block; padding: 3px 12px; border-radius: 6px; font-weight: 700; font-size:13px; margin-top: 3px;">
+                            style="color: #4338ca; background: #e0e7ff; display: inline-block; padding: 2px 10px; border-radius: 6px; font-weight: 700; font-size:12px; margin-top: 2px;">
                             ---</div>
-                        <hr style="margin-top: 8px; margin-bottom: 8px; border: 0; border-top: 2px dashed #cbd5e1;">
+                        <hr style="margin-top: 6px; margin-bottom: 6px; border: 0; border-top: 2px dashed #cbd5e1;">
                     </div>
                     <div id="billTableWrapper"
                         style="overflow:visible; width:100%; flex:1; display:flex; flex-direction:column; justify-content:space-between;">
@@ -3200,6 +3200,7 @@
             let today = new Date().toISOString().slice(0, 10); document.getElementById("dateInput").value = today; document.getElementById("reportMonthPicker").value = new Date().toISOString().slice(0, 7);
             let savedKey = localStorage.getItem("geminiApiKey"); if (savedKey) document.getElementById("geminiApiKey").value = savedKey;
             if (document.getElementById("farmerListMonth")) document.getElementById("farmerListMonth").value = "";
+            if (typeof refreshBillSuggestions === 'function') refreshBillSuggestions();
         });
 
         firebase.database().ref(".info/connected").on("value", (s) => {
@@ -4672,11 +4673,65 @@
 
         // 🌟 IPHONE & ALL DEVICE SMART SEARCH FIX 🌟
 
-        function loadFarmerList() { let dl = document.getElementById("farmerList"); if (!dl) return; dl.innerHTML = ""; let h = ""; getMergedFarmers().forEach(f => { h += `<option value="${f} | ${marathiToEnglish(f)}"></option>`; }); dl.innerHTML = h; }
+        function refreshBillSuggestions() {
+            let dl = document.getElementById("billNameSuggestions");
+            if (!dl) return;
+            let type = document.getElementById("billType") ? document.getElementById("billType").value : 'FARMER';
+            let h = "";
+            if (type === 'MERCHANT') {
+                getMergedMerchants().forEach(m => {
+                    h += `<option value="${m} | ${marathiToEnglish(m)}"></option>`;
+                });
+            } else if (type === 'OTHER_FARMER') {
+                let allNames = [...new Set(getOtherFDB().map(e => e.name))];
+                allNames.forEach(n => {
+                    h += `<option value="${n} | ${marathiToEnglish(n)}"></option>`;
+                });
+            } else {
+                getMergedFarmers(true).forEach(f => {
+                    h += `<option value="${f} | ${marathiToEnglish(f)}"></option>`;
+                });
+            }
+            dl.innerHTML = h;
+        }
 
-        function loadMerchantList() { let dl = document.getElementById("merchantList"); let dl2 = document.getElementById("billNameSuggestions"); if (!dl) return; let h = ""; getMergedMerchants().forEach(m => { h += `<option value="${m} | ${marathiToEnglish(m)}"></option>`; }); dl.innerHTML = h; if (dl2) dl2.innerHTML = h; }
+        function loadFarmerList() {
+            let dl = document.getElementById("farmerList");
+            if (dl) {
+                let h = "";
+                getMergedFarmers().forEach(f => { h += `<option value="${f} | ${marathiToEnglish(f)}"></option>`; });
+                dl.innerHTML = h;
+            }
+            let bType = document.getElementById("billType") ? document.getElementById("billType").value : 'FARMER';
+            if (bType === 'FARMER' || !bType) {
+                refreshBillSuggestions();
+            }
+        }
 
-        function loadBagPersonList() { let dl1 = document.getElementById("bagPersonList"); let dl2 = document.getElementById("bagBillPersonList"); if (!dl1) return; let h = ""; safeArray(bagPersons).sort((a, b) => (parseInt(a) || 99999) - (parseInt(b) || 99999)).forEach(p => { h += `<option value="${p} | ${marathiToEnglish(p)}"></option>`; }); dl1.innerHTML = h; if (dl2) dl2.innerHTML = h; }
+        function loadMerchantList() {
+            let dl = document.getElementById("merchantList");
+            if (dl) {
+                let h = "";
+                getMergedMerchants().forEach(m => { h += `<option value="${m} | ${marathiToEnglish(m)}"></option>`; });
+                dl.innerHTML = h;
+            }
+            let bType = document.getElementById("billType") ? document.getElementById("billType").value : '';
+            if (bType === 'MERCHANT') {
+                refreshBillSuggestions();
+            }
+        }
+
+        function loadBagPersonList() {
+            let dl1 = document.getElementById("bagPersonList");
+            let dl2 = document.getElementById("bagBillPersonList");
+            if (!dl1) return;
+            let h = "";
+            safeArray(bagPersons).sort((a, b) => (parseInt(a) || 99999) - (parseInt(b) || 99999)).forEach(p => {
+                h += `<option value="${p} | ${marathiToEnglish(p)}"></option>`;
+            });
+            dl1.innerHTML = h;
+            if (dl2) dl2.innerHTML = h;
+        }
 
         function autoSelectFarmerName() {
             let inputEl = document.getElementById("farmerName");
@@ -5201,14 +5256,51 @@
 
         function toggleBillDateMode() { let mode = document.querySelector('input[name="billDateMode"]:checked').value; if (mode === 'month') { document.getElementById("monthlyBillDiv").style.display = 'block'; document.getElementById("customBillDiv").style.display = 'none'; } else { document.getElementById("monthlyBillDiv").style.display = 'none'; document.getElementById("customBillDiv").style.display = 'flex'; } }
 
-        function initFarmerBill() { document.getElementById("searchName").value = ""; document.getElementById("billType").value = 'FARMER'; document.getElementById("billTitle").innerText = "📜 Farmer Bill"; let dl = document.getElementById("billNameSuggestions"); dl.innerHTML = ""; getMergedFarmers(true).forEach(f => { let op = document.createElement("option"); op.value = f; dl.appendChild(op); }); }
-        function initMerBill() { document.getElementById("searchName").value = ""; document.getElementById("billType").value = 'MERCHANT'; document.getElementById("billTitle").innerText = "📜 Merchant Bill"; let dl = document.getElementById("billNameSuggestions"); dl.innerHTML = ""; getMergedMerchants().forEach(m => { let op = document.createElement("option"); op.value = m; dl.appendChild(op); }); }
-        function initOtherFBill() { document.getElementById("searchName").value = ""; document.getElementById("billType").value = 'OTHER_FARMER'; document.getElementById("billTitle").innerText = "📜 शेतकरी बिल (इतर फुले)"; let dl = document.getElementById("billNameSuggestions"); dl.innerHTML = ""; let allNames = [...new Set(getOtherFDB().map(e => e.name))]; allNames.forEach(n => { let op = document.createElement("option"); op.value = n; dl.appendChild(op); }); }
+        function initFarmerBill() {
+            document.getElementById("searchName").value = "";
+            document.getElementById("billType").value = 'FARMER';
+            document.getElementById("billTitle").innerText = "📜 Farmer Bill";
+            refreshBillSuggestions();
+        }
+        function initMerBill() {
+            document.getElementById("searchName").value = "";
+            document.getElementById("billType").value = 'MERCHANT';
+            document.getElementById("billTitle").innerText = "📜 Merchant Bill";
+            refreshBillSuggestions();
+        }
+        function initOtherFBill() {
+            document.getElementById("searchName").value = "";
+            document.getElementById("billType").value = 'OTHER_FARMER';
+            document.getElementById("billTitle").innerText = "📜 शेतकरी बिल (इतर फुले)";
+            refreshBillSuggestions();
+        }
 
         // 🌟 Merchant Bill TOP Previous Balance & Flow Fix 🌟
         // 🌟 Farmer Bill Month-to-Month (No Opening Balance) & Merchant Bill 🌟
         function generateFinalBill() {
-            let type = val("billType"); let n = val("searchName"); if (!n) return;
+            let type = val("billType");
+            let n = val("searchName");
+            if (!n) return;
+            if (n.includes(' | ')) n = n.split(' | ')[0].trim();
+            if (type === 'FARMER') {
+                let fList = getMergedFarmers(true);
+                if (!fList.includes(n)) {
+                    let matched = fList.find(f => f.startsWith(n + ".") || f.startsWith(n + " ") || marathiToEnglish(f).toLowerCase().includes(n.toLowerCase()));
+                    if (matched) {
+                        n = matched;
+                        document.getElementById("searchName").value = n;
+                    }
+                }
+            } else if (type === 'MERCHANT') {
+                let mList = getMergedMerchants();
+                if (!mList.includes(n)) {
+                    let matched = mList.find(m => marathiToEnglish(m).toLowerCase().includes(n.toLowerCase()));
+                    if (matched) {
+                        n = matched;
+                        document.getElementById("searchName").value = n;
+                    }
+                }
+            }
             let mode = document.querySelector('input[name="billDateMode"]:checked').value; let startFilter = "", endFilter = "", displayDate = "", openingBalDateFilter = "";
 
             if (mode === 'month') { let m = val("reportMonth"); startFilter = m + "-01"; let year = parseInt(m.split('-')[0]); let month = parseInt(m.split('-')[1]); endFilter = m + "-" + String(new Date(year, month, 0).getDate()).padStart(2, '0'); displayDate = `📅 ${marathiMonths[month - 1]} ${year}`; openingBalDateFilter = startFilter; }
@@ -5222,7 +5314,7 @@
                 d.forEach(e => { if (e && e.name === n) { if (e.type === 'advance') allTimeAdv += (Number(e.amount) || 0); if (e.date >= startFilter && e.date <= endFilter) { filteredData.push(e); } } });
 
                 let tStyle = `width:100%; max-width:100%; border-collapse:collapse; font-family:sans-serif; color:#000;`;
-                let tHead = `<table style="${tStyle}"><thead><tr><th style="padding:7px 6px; border-bottom:2px solid #000; text-align:left; width:28%; font-size:14px; color:#000;">तारीख</th><th style="padding:7px 6px; border-bottom:2px solid #000; text-align:center; width:44%; font-size:14px; color:#000;">तपशील</th><th style="padding:7px 6px; border-bottom:2px solid #000; text-align:right; width:28%; font-size:14px; color:#000;">रक्कम (₹)</th></tr></thead><tbody style="font-size:14px;">`;
+                let tHead = `<table style="${tStyle}"><thead><tr><th style="padding:6.5px 6px; border-bottom:2px solid #000; text-align:left; width:28%; font-size:14px; color:#000;">तारीख</th><th style="padding:6.5px 6px; border-bottom:2px solid #000; text-align:center; width:44%; font-size:14px; color:#000;">तपशील</th><th style="padding:6.5px 6px; border-bottom:2px solid #000; text-align:right; width:28%; font-size:14px; color:#000;">रक्कम (₹)</th></tr></thead><tbody style="font-size:14px;">`;
                 let runningBal = 0; let totalCropAmount = 0; let totalBhade = 0; let totalAdv = 0; let totalPay = 0;
                 let allRows = [];
 
@@ -5236,7 +5328,7 @@
                         // 🌟 फक्त शेतकरी बिलासाठी: ज्या दिवशी माल नाही, तिथे 'माल नाही' दाखवा 🌟
                         let hasCrop = dailyEntries.some(e => e.type === 'crop');
                         if (!hasCrop) {
-                            allRows.push(`<tr><td style="padding:5px 4px; border-bottom:1px solid #e2e8f0; font-weight:800; color:#64748b;">${fDate}</td><td style="padding:5px 4px; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700; color:#94a3b8;">माल नाही</td><td style="padding:5px 4px; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800; color:#94a3b8;">-</td></tr>`);
+                            allRows.push(`<tr><td style="padding:4.5px 4px; border-bottom:1px solid #e2e8f0; font-weight:800; color:#64748b;">${fDate}</td><td style="padding:4.5px 4px; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700; color:#94a3b8;">माल नाही</td><td style="padding:4.5px 4px; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800; color:#94a3b8;">-</td></tr>`);
                         }
 
                         dailyEntries.forEach(e => {
@@ -5244,16 +5336,16 @@
                                 let entryTotal = Math.round((Number(e.total) || 0) / 5) * 5;
                                 totalCropAmount += entryTotal;
                                 let cR = getCommonRateForDate(dStr); let rateDisplay = (e.rate !== cR && cR > 0) ? `<span style="color:#ef4444; font-weight:900;">${e.rate}⚠️</span>` : e.rate;
-                                allRows.push(`<tr><td style="padding:5px 4px; border-bottom:1px solid #e2e8f0; font-weight:800;">${fDate}</td><td style="padding:5px 4px; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700;">नि ${e.weight}x${rateDisplay}</td><td style="padding:5px 4px; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800;">${entryTotal}</td></tr>`);
+                                allRows.push(`<tr><td style="padding:4.5px 4px; border-bottom:1px solid #e2e8f0; font-weight:800;">${fDate}</td><td style="padding:4.5px 4px; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700;">नि ${e.weight}x${rateDisplay}</td><td style="padding:4.5px 4px; border-bottom:1px solid #e2e8f0; text-align:right; font-weight:800;">${entryTotal}</td></tr>`);
                             } else if (e.type === 'payment') {
                                 totalPay += (Number(e.amount) || 0);
-                                allRows.push(`<tr style="background:#ecfdf5;"><td style="padding:5px 4px; font-weight:800;">${fDate}</td><td style="padding:5px 4px; text-align:center; font-weight:600; color:#059669;">पैसे जमा</td><td style="padding:5px 4px; text-align:right; font-weight:800; color:#059669;">- ${e.amount}</td></tr>`);
+                                allRows.push(`<tr style="background:#ecfdf5;"><td style="padding:4.5px 4px; font-weight:800;">${fDate}</td><td style="padding:4.5px 4px; text-align:center; font-weight:600; color:#059669;">पैसे जमा</td><td style="padding:4.5px 4px; text-align:right; font-weight:800; color:#059669;">- ${e.amount}</td></tr>`);
                             } else if (e.type === 'bhade') {
                                 totalBhade += (Number(e.amount) || 0);
                             }
                         });
 
-                        allRows.push(`<tr><td colspan="3" style="height:5px; padding:0; border:none;"></td></tr>`);
+                        allRows.push(`<tr><td colspan="3" style="height:3.5px; padding:0; border:none;"></td></tr>`);
                         currD.setDate(currD.getDate() + 1);
                     }
 
@@ -5261,8 +5353,8 @@
                     let leftRows = allRows.slice(0, mid);
                     let rightRows = allRows.slice(mid);
 
-                    let html = `<div style="display:flex; flex-direction:column; justify-content:space-between; flex:1; width:100%; min-height:760px; box-sizing:border-box;">`;
-                    html += `<div style="display:flex; justify-content:space-between; gap:28px; width:100%; margin-bottom:10px;">`;
+                    let html = `<div style="display:flex; flex-direction:column; justify-content:space-between; flex:1; width:100%; min-height:640px; box-sizing:border-box;">`;
+                    html += `<div style="display:flex; justify-content:space-between; gap:28px; width:100%; margin-bottom:8px;">`;
                     html += `<div style="flex:1; border-right:1px dashed #cbd5e1; padding-right:20px;">${tHead}${leftRows.join('')}</tbody></table></div>`;
                     html += `<div style="flex:1; padding-left:20px;">${tHead}${rightRows.join('')}</tbody></table></div>`;
                     html += `</div>`;
@@ -5276,24 +5368,24 @@
                     let tenPercentDeduction = Math.round((totalCropAmount * 0.10) / 5) * 5;
                     if (tenPercentDeduction > 0) {
                         runningBal -= tenPercentDeduction;
-                        let uchalHtml = allTimeAdv > 0 ? `<div style="text-align:left; font-weight:800; font-size:14px; color:#000;">उचल : <span style="font-size:15px;">${allTimeAdv.toLocaleString('en-IN')}</span></div>` : "<div></div>";
-                        html += `<tr><td colspan="2" style="padding:4px 4px; font-weight:700; color:#d97706;"><div style="display:flex; justify-content:space-between; align-items:center;">${uchalHtml}</div></td><td style="padding:4px 0; text-align:right; font-weight:800; color:#d97706; border-bottom:1px solid #000;">- ${tenPercentDeduction.toLocaleString('en-IN')}</td></tr>`;
+                        let uchalHtml = allTimeAdv > 0 ? `<div style="text-align:left; font-weight:800; font-size:13.5px; color:#000;">उचल : <span style="font-size:14.5px;">${allTimeAdv.toLocaleString('en-IN')}</span></div>` : "<div></div>";
+                        html += `<tr><td colspan="2" style="padding:3.5px 4px; font-weight:700; color:#d97706;"><div style="display:flex; justify-content:space-between; align-items:center;">${uchalHtml}</div></td><td style="padding:3.5px 0; text-align:right; font-weight:800; color:#d97706; border-bottom:1px solid #000;">- ${tenPercentDeduction.toLocaleString('en-IN')}</td></tr>`;
                         if (totalBhade > 0 || totalPay > 0) {
-                            html += `<tr><td colspan="2" style="padding:4px 4px; text-align:right; font-weight:800; font-size:14px; color:#1e293b;">एकूण :</td><td style="padding:4px 0; text-align:right; font-weight:800; font-size:15px; color:#1e293b;">${(Math.round(runningBal / 5) * 5).toLocaleString('en-IN')}</td></tr>`;
+                            html += `<tr><td colspan="2" style="padding:3.5px 4px; text-align:right; font-weight:800; font-size:14px; color:#1e293b;">एकूण :</td><td style="padding:3.5px 0; text-align:right; font-weight:800; font-size:15px; color:#1e293b;">${(Math.round(runningBal / 5) * 5).toLocaleString('en-IN')}</td></tr>`;
                         }
                     }
 
                     if (totalBhade > 0) {
                         runningBal -= totalBhade;
-                        html += `<tr><td colspan="2" style="padding:4px 4px; text-align:right; font-weight:700; color:#dc2626;">गाडी भाडे :</td><td style="padding:4px 0; text-align:right; font-weight:800; color:#dc2626;">- ${totalBhade.toLocaleString('en-IN')}</td></tr>`;
+                        html += `<tr><td colspan="2" style="padding:3.5px 4px; text-align:right; font-weight:700; color:#dc2626;">गाडी भाडे :</td><td style="padding:3.5px 0; text-align:right; font-weight:800; color:#dc2626;">- ${totalBhade.toLocaleString('en-IN')}</td></tr>`;
                     }
                     if (totalPay > 0) {
                         runningBal -= totalPay;
-                        html += `<tr><td colspan="2" style="padding:4px 4px; text-align:right; font-weight:700; color:#059669;">पैसे जमा :</td><td style="padding:4px 0; text-align:right; font-weight:800; color:#059669;">- ${totalPay.toLocaleString('en-IN')}</td></tr>`;
+                        html += `<tr><td colspan="2" style="padding:3.5px 4px; text-align:right; font-weight:700; color:#059669;">पैसे जमा :</td><td style="padding:3.5px 0; text-align:right; font-weight:800; color:#059669;">- ${totalPay.toLocaleString('en-IN')}</td></tr>`;
                     }
 
                     runningBal = Math.round(runningBal / 5) * 5;
-                    html += `<tr><td colspan="2" style="padding:7px 4px; text-align:right; font-weight:800; font-size:15px; color:#1e293b; border-top:2px solid #000;">देय रक्कम :</td><td style="padding:7px 0; text-align:right; font-weight:900; font-size:18px; color:#1e293b; border-top:2px solid #000;">${runningBal.toLocaleString('en-IN')}</td></tr>`;
+                    html += `<tr><td colspan="2" style="padding:6px 4px; text-align:right; font-weight:800; font-size:15px; color:#1e293b; border-top:2px solid #000;">देय रक्कम :</td><td style="padding:6px 0; text-align:right; font-weight:900; font-size:17.5px; color:#1e293b; border-top:2px solid #000;">${runningBal.toLocaleString('en-IN')}</td></tr>`;
 
                     html += `</tbody></table></div></div>`;
                     list.innerHTML = html;
